@@ -104,11 +104,11 @@ RUN version=0.5.18 \
   && go version -m /usr/local/bin/litestream | grep -q 'golang.org/x/net\s*v0.62.0' \
   && rm -rf /root/go /root/.cache /src
 FROM node:26-trixie-slim AS runtime
-LABEL org.opencontainers.image.title="Flowplan" \
-  org.opencontainers.image.description="Documents, databases, whiteboards and a daily journal for teams – self-hosted." \
-  org.opencontainers.image.source="https://github.com/yannicschuller/flowplan" \
-  org.opencontainers.image.url="https://flowplan.org" \
-  org.opencontainers.image.documentation="https://docs.flowplan.org/installation" \
+LABEL org.opencontainers.image.title="Daybar" \
+  org.opencontainers.image.description="A self-hosted day planner – tasks, events, habits and notes – built on flowplan." \
+  org.opencontainers.image.source="https://github.com/nayefdw/daybar" \
+  org.opencontainers.image.url="https://github.com/nayefdw/daybar" \
+  org.opencontainers.image.documentation="https://github.com/nayefdw/daybar#readme" \
   org.opencontainers.image.licenses="AGPL-3.0-only"
 WORKDIR /app
 # Certificates for HTTPS to the S3 endpoint (Litestream is a static binary).
@@ -147,6 +147,11 @@ COPY --chmod=755 docker/healthcheck-curl.mjs /usr/local/bin/curl
 COPY --chmod=644 docker/litestream.yml /etc/litestream.yml
 COPY --chmod=755 docker/entrypoint.sh /app/entrypoint.sh
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000 FLOWPLAN_DATA_DIR=/app/data
+# Daybar runs on small servers (1 GB of memory plus swap): one worker thread
+# for exports and imports, and a JavaScript heap that stops growing at
+# 640 MB, inside the memory, instead of sizing itself on the host. Both are
+# defaults; the container's environment overrides them.
+ENV FLOWPLAN_WORKERS=1 NODE_OPTIONS=--max-old-space-size=640
 RUN mkdir /app/data && chown node:node /app/data
 COPY --from=standalone --chown=node:node /out ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static

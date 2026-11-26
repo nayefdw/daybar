@@ -1,137 +1,37 @@
-# Builds the Docker image and publishes it to the GitHub Container Registry:
-#   ghcr.io/yannicschuller/flowplan:latest         the latest release
-#   ghcr.io/yannicschuller/flowplan:1.2.3, :1.2, :1  a release (tag v1.2.3)
-#   ghcr.io/yannicschuller/flowplan:beta           the latest manual build, or a
-#                                                  release newer than it
-#   ghcr.io/yannicschuller/flowplan:sha-abc1234    every build
-# For linux/amd64 and linux/arm64, each built natively on GitHub's runners
-# (ubuntu-latest and ubuntu-24.04-arm, free for public repositories) in
-# parallel, then joined into one multi-platform image. Images are only built for a release
-# (release.yml calls this workflow with the version; the tag it pushes
-# starts no second build – both used to race for the release's archives)
-# or by hand: Actions → Docker image → Run workflow builds :beta from the
-# chosen branch, or rebuilds a release when a version is given. Pushes and
-# pull requests build no image; CI (ci.yml) tests them. Two Coolify
-# resources follow the images (see README): every beta build rolls out the
-# beta instance (COOLIFY_BETA_WEBHOOK), every release the production
-# instance on :latest (COOLIFY_WEBHOOK). Both use COOLIFY_TOKEN.
+# Builds Daybar's Docker image and publishes it to the GitHub Container
+# Registry on every push to main (and by hand: Actions → Docker image →
+# Run workflow):
+#   ghcr.io/nayefdw/daybar:latest        the newest main
+#   ghcr.io/nayefdw/daybar:sha-abc1234   every build
+# For linux/amd64 only: the production server is an x86_64 VM. Adapted from
+# flowplan's image workflow, without its releases, archives, arm64 build and
+# Coolify roll-outs; the server pulls :latest itself.
 name: Docker image
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      version:
-        description: Rebuild this release (e.g. 1.2.3); empty builds :beta
-        type: string
-        required: false
-  workflow_call:
-    inputs:
-      version:
-        description: Release version without "v" (e.g. 1.2.3)
-        type: string
-        required: true
 
 permissions:
   contents: read
   packages: write
 
+# A newer push replaces a build still running.
 concurrency:
-  group: docker-${{ inputs.version || github.ref }}
-  cancel-in-progress: ${{ !inputs.version && github.ref_type != 'tag' }}
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # One native build per platform on GitHub's runners – no QEMU emulation,
-  # and no waiting for a busy machine.
-  # Each pushes its image by digest only; "image" below tags them together.
-  build:
-    # Only the repository owner builds and publishes images (also via a
-    # pushed tag): collaborators and Dependabot can't, and CI tests their work.
-    if: github.actor == github.repository_owner && github.triggering_actor == github.repository_owner
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - platform: linux/amd64
-            runner: ubuntu-latest
-          - platform: linux/arm64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner }}
+  image:
+    # Only this repository publishes (a fork's run would push elsewhere).
+    if: github.repository == 'nayefdw/daybar'
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - id: platform
-        run: |
-          platform="${{ matrix.platform }}"
-          echo "pair=${platform//\//-}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.version && format('v{0}', inputs.version) || '' }}
           persist-credentials: false
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - id: build
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          context: .
-          platforms: ${{ matrix.platform }}
-          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
-          build-args: |
-            FLOWPLAN_SKIP_TYPECHECK=1
-            GIT_COMMIT=${{ github.sha }}
-            FLOWPLAN_CHANNEL=${{ (inputs.version || github.ref_type == 'tag') && 'release' || 'beta' }}
-          # GitHub's Actions cache, one scope per platform, kept between runs.
-          # BuildKit takes a layer from it only for the same instruction on
-          # the same inputs (base image digest, files, build arguments – the
-          # build stage differs between beta and release by FLOWPLAN_CHANNEL
-          # alone). One layer would go stale that way: the runtime stage's
-          # `apt-get upgrade`, whose input never changes while the base image
-          # stays. A release builds that stage afresh, with the security
-          # updates of the day; betas reuse it (faster, rebuilt with every
-          # new base image or Dockerfile change).
-          cache-from: type=gha,scope=image-${{ steps.platform.outputs.pair }}
-          cache-to: type=gha,scope=image-${{ steps.platform.outputs.pair }},mode=max
-          no-cache-filters: ${{ (inputs.version || github.ref_type == 'tag') && 'runtime' || '' }}
-      - name: Remember the digest
-        run: |
-          mkdir -p "$RUNNER_TEMP/digests"
-          digest="${{ steps.build.outputs.digest }}"
-          touch "$RUNNER_TEMP/digests/${digest#sha256:}"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: digests-${{ steps.platform.outputs.pair }}
-          path: ${{ runner.temp }}/digests/*
-          if-no-files-found: error
-          retention-days: 1
-
-  # Joins both platform images under the tags.
-  image:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    outputs:
-      release: ${{ steps.release.outputs.version }}
-      deploy: ${{ steps.newest.outputs.deploy }}
-    steps:
-      # A release: the version from release.yml or from a pushed tag v1.2.3.
-      - id: release
-        run: |
-          version="${{ inputs.version }}"
-          if [ -z "$version" ] && [ "${{ github.ref_type }}" = "tag" ]; then version="${GITHUB_REF_NAME#v}"; fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-      # The whole history: a release compares its commit with the :beta one.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ steps.release.outputs.version && format('v{0}', steps.release.outputs.version) || '' }}
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
-          merge-multiple: true
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
@@ -144,184 +44,27 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           flavor: latest=false
           tags: |
-            type=semver,pattern={{version}},value=${{ steps.release.outputs.version }},enable=${{ steps.release.outputs.version != '' }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ steps.release.outputs.version }},enable=${{ steps.release.outputs.version != '' }}
-            type=semver,pattern={{major}},value=${{ steps.release.outputs.version }},enable=${{ steps.release.outputs.version != '' }}
-            type=raw,value=latest,enable=${{ steps.release.outputs.version != '' }}
-            type=raw,value=beta,enable=${{ steps.release.outputs.version == '' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             type=sha
-      # Coolify runs :beta. A beta build always moves it; a release moves it
-      # too when it is newer than the current :beta – its commit not already
-      # contained in the beta's (every image notes its commit as the
-      # annotation org.opencontainers.image.revision). So a release built
-      # after the last beta is rolled out as well, an older one is not.
-      - id: newest
-        env:
-          VERSION: ${{ steps.release.outputs.version }}
-        run: |
-          image="ghcr.io/${{ github.repository }}"
-          release=$(git rev-parse HEAD)
-          echo "commit=$release" >> "$GITHUB_OUTPUT"
-          if [ -z "$VERSION" ]; then echo "deploy=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          beta=$(docker buildx imagetools inspect --raw "$image:beta" 2>/dev/null | jq -r '.annotations["org.opencontainers.image.revision"] // empty' || true)
-          newer=true
-          if [ -z "$beta" ]; then
-            echo ":beta has no commit noted – the release replaces it."
-          elif ! git cat-file -e "$beta^{commit}" 2>/dev/null && ! git fetch -q origin "$beta" 2>/dev/null; then
-            echo ":beta is from $beta, which is no longer in the repository – the release replaces it."
-          elif git merge-base --is-ancestor "$release" "$beta"; then
-            newer=false; echo ":beta ($beta) already contains release $VERSION ($release) – :beta stays."
-          elif git merge-base --is-ancestor "$beta" "$release"; then
-            echo "Release $VERSION ($release) is newer than :beta ($beta)."
-          elif [ "$(git show -s --format=%ct "$release")" -le "$(git show -s --format=%ct "$beta")" ]; then
-            newer=false; echo ":beta ($beta, another branch) is more recent than release $VERSION – :beta stays."
-          else
-            echo "Release $VERSION ($release) is more recent than :beta ($beta, another branch)."
-          fi
-          echo "deploy=$newer" >> "$GITHUB_OUTPUT"
-          if [ "$newer" = true ]; then
-            echo "beta=-t $image:beta" >> "$GITHUB_OUTPUT"
-            echo "Release $VERSION is also tagged :beta and rolled out on Coolify." >> "$GITHUB_STEP_SUMMARY"
-          fi
-      - name: Tag the multi-platform image
-        working-directory: ${{ runner.temp }}/digests
-        run: |
-          docker buildx imagetools create \
-            --annotation "index:org.opencontainers.image.revision=${{ steps.newest.outputs.commit }}" \
-            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") ${{ steps.newest.outputs.beta }} \
-            $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
-          docker buildx imagetools inspect "ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.version }}"
-
-  # A release also gets the app as plain archives, one per platform:
-  # flowplan-<version>-linux-<amd64|arm64>.tar.gz with a .sha256 next to it,
-  # attached to the GitHub release. They hold the image's /app (the Next.js
-  # standalone build, static files, scripts) and run with `node server.js`
-  # (several processes: `FLOWPLAN_PROCESSES=… node processes.mjs`) on
-  # Node.js 26 – for installs without Docker such as the YunoHost package
-  # (yannicschuller/flowplan_ynh). Taken from the published image, so the
-  # archive is exactly what the image runs; a rebuild (version given)
-  # replaces them.
-  archives:
-    needs: image
-    if: needs.image.outputs.release != ''
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - arch: amd64
-            runner: ubuntu-latest
-          - arch: arm64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 15
-    permissions:
-      contents: write
-      packages: read
-    steps:
-      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pack and attach the archive
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.image.outputs.release }}
-          ARCH: ${{ matrix.arch }}
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            FLOWPLAN_SKIP_TYPECHECK=1
+            GIT_COMMIT=${{ github.sha }}
+            FLOWPLAN_CHANNEL=release
+          # GitHub's Actions cache, kept between runs: a push that changes
+          # only the app rebuilds the app, not the base layers.
+          cache-from: type=gha,scope=image-linux-amd64
+          cache-to: type=gha,scope=image-linux-amd64,mode=max
+      - name: Summary
         run: |
-          image="ghcr.io/${GITHUB_REPOSITORY,,}:$VERSION"
-          name="flowplan-$VERSION-linux-$ARCH"
-          cd "$RUNNER_TEMP"
-          docker pull --platform "linux/$ARCH" "$image"
-          id=$(docker create --platform "linux/$ARCH" "$image")
-          docker cp "$id:/app" "$name"
-          docker rm "$id" > /dev/null
-          # The container's empty data folder and build cache stay out.
-          rm -rf "$name/data" "$name/.next/cache"
-          printf '%s\n' "$VERSION" > "$name/VERSION"
-          tar --owner=0 --group=0 --numeric-owner -czf "$name.tar.gz" "$name"
-          sha256sum "$name.tar.gz" > "$name.tar.gz.sha256"
-          ls -l "$name.tar.gz"
-          gh release upload "v$VERSION" "$name.tar.gz" "$name.tar.gz.sha256" --clobber --repo "$GITHUB_REPOSITORY"
-
-  # Rolls out every new :beta image on Coolify: every manual build without
-  # a version, and a release newer than the last beta. Coolify's API must
-  # accept GitHub's runners (Settings → Advanced → API access: allowed IPs);
-  # the token still guards it.
-  # Rolls out on Coolify: every beta build the beta instance (:beta), every
-  # release the production instance (:latest) – and only that one. Without a
-  # resource's webhook the step says so and does nothing.
-  deploy:
-    needs: image
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # The Coolify secrets live in the environment "production", which only
-    # main and tags v* may use (Settings → Environments): a workflow changed
-    # on another branch cannot read them.
-    environment: production
-    steps:
-      - name: Deploy on Coolify
-        env:
-          BETA_WEBHOOK: ${{ secrets.COOLIFY_BETA_WEBHOOK }}
-          LATEST_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
-          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-          RELEASE: ${{ needs.image.outputs.release }}
-        run: |
-          deploy() {
-            name="$1" webhook="$2"
-            if [ -z "$webhook" ] || [ -z "$COOLIFY_TOKEN" ]; then echo "No Coolify webhook or token for the $name instance: nothing to deploy."; return 0; fi
-            # Coolify's answer explains a refusal (e.g. a missing permission).
-            status=$(curl -sS --retry 3 --max-time 60 -o "$RUNNER_TEMP/coolify.json" -w '%{http_code}' -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" "$webhook")
-            echo "Coolify ($name) answered $status: $(head -c 500 "$RUNNER_TEMP/coolify.json")"
-            if [ "$status" -ge 300 ]; then
-              echo "::error::Coolify did not deploy the $name instance ($status). 401/403: the API token needs the “deploy” permission and the team of the resource; check Settings → Advanced → API access and its allowed IPs."
-              return 1
-            fi
-            echo "Rolled out the $name instance on Coolify." >> "$GITHUB_STEP_SUMMARY"
-          }
-          failed=0
-          if [ -n "$RELEASE" ]; then deploy production "$LATEST_WEBHOOK" || failed=1
-          else deploy beta "$BETA_WEBHOOK" || failed=1; fi
-          exit $failed
-
-  # Known vulnerabilities in the published image (operating system packages
-  # and npm dependencies), with Trivy. Reports only – a finding never blocks
-  # a release or the beta; it shows in the run's summary. Runs on GitHub's
-  # runners.
-  scan:
-    needs: image
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - name: Scan the image with Trivy
-        env:
-          TRIVY_USERNAME: ${{ github.actor }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          image="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${GITHUB_SHA::7}"
-          echo "Scanning $image"
-          docker run --rm -e TRIVY_USERNAME -e TRIVY_PASSWORD aquasec/trivy:0.76.2 image \
-            --severity HIGH,CRITICAL --ignore-unfixed --scanners vuln --exit-code 0 --format table \
-            --timeout 15m "$image" | tee "$RUNNER_TEMP/trivy.txt"
-          # What scanners without --ignore-unfixed show (users run those):
-          # findings the distribution has no fix for yet, as a count per
-          # package – for information, never a failure.
-          docker run --rm -e TRIVY_USERNAME -e TRIVY_PASSWORD aquasec/trivy:0.76.2 image \
-            --severity CRITICAL --scanners vuln --exit-code 0 --format json \
-            --timeout 15m "$image" > "$RUNNER_TEMP/trivy-all.json" || true
           {
-            echo "## Trivy: HIGH and CRITICAL with a fix available"
+            echo "Published for linux/amd64:"
             echo
-            echo '```'
-            tail -c 60000 "$RUNNER_TEMP/trivy.txt"
-            echo '```'
-            echo
-            echo "## Trivy: CRITICAL without a fix yet (for information)"
-            echo
-            jq -r '[.Results[]?.Vulnerabilities[]? | select((.FixedVersion // "") == "") | "\(.PkgName) \(.InstalledVersion): \(.VulnerabilityID)"] | if length == 0 then "none" else .[] end' "$RUNNER_TEMP/trivy-all.json" 2>/dev/null | sort -u | head -200 || echo "(no report)"
+            echo '${{ steps.meta.outputs.tags }}' | sed 's/^/- `/; s/$/`/'
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "Critical findings without a fix:"
-          jq -r '[.Results[]?.Vulnerabilities[]? | select((.FixedVersion // "") == "")] | length' "$RUNNER_TEMP/trivy-all.json" 2>/dev/null || true
