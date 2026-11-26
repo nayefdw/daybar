@@ -66,7 +66,7 @@ const forget = (page: Page) => page.evaluate(() => ((window as unknown as { __vt
 const pageTitle = (page: Page) => page.locator(".split-primary textarea.page-title");
 
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: /Willkommen bei Flowplan/ });
+  const welcome = page.getByRole("dialog", { name: /Willkommen bei Daybar/ });
   if (await welcome.isVisible().catch(() => false)) await page.keyboard.press("Escape");
 }
 // The entry of a page in the tree (on phones in the navigation drawer).

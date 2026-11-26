@@ -3,8 +3,8 @@
 <h1>
   <a href="https://flowplan.org">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-dark.svg">
-      <img src=".github/assets/logo-light.svg" alt="Flowplan" width="300">
+      <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/logo-dark.svg">
+      <img src="../../.github/assets/logo-light.svg" alt="Flowplan" width="300">
     </picture>
   </a>
 </h1>
@@ -19,7 +19,7 @@
 [![Docker-Image](https://github.com/yannicschuller/flowplan/actions/workflows/docker.yml/badge.svg)](https://github.com/yannicschuller/flowplan/pkgs/container/flowplan)
 [![Release](https://img.shields.io/github/v/release/yannicschuller/flowplan?color=3b3fd8)](https://github.com/yannicschuller/flowplan/releases)
 [![Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyannicschuller%2Fflowplan-status%2Fstatus-data%2Fbadge.json&cacheSeconds=300)](https://status.flowplan.org)
-[![Lizenz: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-3b3fd8.svg)](LICENSE)
+[![Lizenz: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-3b3fd8.svg)](../../LICENSE)
 <br>
 [![Sterne](https://img.shields.io/github/stars/yannicschuller/flowplan?color=3b3fd8)](https://github.com/yannicschuller/flowplan/stargazers)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/bCEdB6MPrR)
@@ -27,7 +27,7 @@
 
 <br>
 
-<img src=".github/assets/readme/hero.gif" alt="Schreiben in einer Seite mit dem Slash-Menü – eine Überschrift und eine Checkliste –, während ein Kollege mitschreibt; eine Datenbank wechselt von Tabelle zu Board zu Kalender; ein Whiteboard mit Haftnotizen und Verbindern" width="100%">
+<img src="../../.github/assets/readme/hero.gif" alt="Schreiben in einer Seite mit dem Slash-Menü – eine Überschrift und eine Checkliste –, während ein Kollege mitschreibt; eine Datenbank wechselt von Tabelle zu Board zu Kalender; ein Whiteboard mit Haftnotizen und Verbindern" width="100%">
 
 [Website](https://flowplan.org) · [Gehostete Version](https://app.flowplan.org) · [Discord](https://discord.gg/bCEdB6MPrR) · [Änderungen](CHANGELOG.md)
 
@@ -187,14 +187,14 @@ Schritt für Schritt: [Mit einem Klick bereitstellen](https://docs.flowplan.org/
   <tr>
     <td width="50%">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/screenshot-document-dark.png">
-        <img src=".github/assets/readme/screenshot-document-light.png" alt="Eine Seite zum Projekt-Kickoff mit Hinweisbox, Erwähnungen der vier Teilnehmenden und Überschriften, links der Seitenbaum">
+        <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/screenshot-document-dark.png">
+        <img src="../../.github/assets/readme/screenshot-document-light.png" alt="Eine Seite zum Projekt-Kickoff mit Hinweisbox, Erwähnungen der vier Teilnehmenden und Überschriften, links der Seitenbaum">
       </picture>
     </td>
     <td width="50%">
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/screenshot-database-dark.png">
-        <img src=".github/assets/readme/screenshot-database-light.png" alt="Eine Roadmap-Datenbank als Board mit den Spalten Backlog, Planned, In progress und Done">
+        <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/screenshot-database-dark.png">
+        <img src="../../.github/assets/readme/screenshot-database-light.png" alt="Eine Roadmap-Datenbank als Board mit den Spalten Backlog, Planned, In progress und Done">
       </picture>
     </td>
   </tr>
@@ -205,14 +205,14 @@ Schritt für Schritt: [Mit einem Klick bereitstellen](https://docs.flowplan.org/
   <tr>
     <td>
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/screenshot-whiteboard-dark.png">
-        <img src=".github/assets/readme/screenshot-whiteboard-light.png" alt="Ein Whiteboard zum Brainstorming: zwei Rahmen mit Haftnotizen und Formen, verbunden durch Verbinder">
+        <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/screenshot-whiteboard-dark.png">
+        <img src="../../.github/assets/readme/screenshot-whiteboard-light.png" alt="Ein Whiteboard zum Brainstorming: zwei Rahmen mit Haftnotizen und Formen, verbunden durch Verbinder">
       </picture>
     </td>
     <td>
       <picture>
-        <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/screenshot-phone-dark.png">
-        <img src=".github/assets/readme/screenshot-phone-light.png" alt="Flowplan auf zwei Telefonen: das Roadmap-Board und das Team-Wiki">
+        <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/screenshot-phone-dark.png">
+        <img src="../../.github/assets/readme/screenshot-phone-light.png" alt="Flowplan auf zwei Telefonen: das Roadmap-Board und das Team-Wiki">
       </picture>
     </td>
   </tr>
@@ -256,7 +256,7 @@ Ein fairer Vergleich ist schwer – jedes dieser Werkzeuge kann etwas gut. Das h
 
 Ein Block-Editor, der nicht im Weg steht. `/` öffnet das Blockmenü, Markdown-Kürzel funktionieren auch; lange Seiten behalten ihr Inhaltsverzeichnis neben dem Text.
 
-<p align="center"><img src=".github/assets/readme/calculate.webp" alt="Eine Rechnung tippen, das Ergebnis mit Tab übernehmen, einen Term faktorisieren und zwei Vektoren mit ihrer Summe in einem 3D-Graphen zeichnen, der mit der Maus gedreht wird" width="100%"></p>
+<p align="center"><img src="../../.github/assets/readme/calculate.webp" alt="Eine Rechnung tippen, das Ergebnis mit Tab übernehmen, einen Term faktorisieren und zwei Vektoren mit ihrer Summe in einem 3D-Graphen zeichnen, der mit der Maus gedreht wird" width="100%"></p>
 
 **Rechnen direkt in den Notizen** – Rechnung und `=` tippen, mit <kbd>Tab</kbd> übernehmen; Terme ausmultiplizieren, faktorisieren oder lösen, Funktionsgraphen und Vektoren in 2D und 3D zeichnen.
 
@@ -279,12 +279,12 @@ Ein Block-Editor, der nicht im Weg steht. `/` öffnet das Blockmenü, Markdown-K
 
 Tabelle, Board, Kalender, Timeline, Galerie, Liste, Feed, Diagramm, Formular und Sprints auf dieselben Einträge – mit Relationen, Rollups und Formeln.
 
-<p align="center"><img src=".github/assets/readme/board-drag.webp" alt="Eine Karte im Board von Idee nach In Arbeit ziehen; die anderen Karten gleiten an ihren Platz" width="100%"></p>
+<p align="center"><img src="../../.github/assets/readme/board-drag.webp" alt="Eine Karte im Board von Idee nach In Arbeit ziehen; die anderen Karten gleiten an ihren Platz" width="100%"></p>
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/assets/readme/timeline.webp" alt="Timeline mit Abhängigkeitspfeilen: ein Balken wird verschoben, die wartenden Einträge rücken mit"></td>
-    <td width="50%"><img src=".github/assets/readme/calendar.webp" alt="Kalenderansicht der Projekte-Datenbank"></td>
+    <td width="50%"><img src="../../.github/assets/readme/timeline.webp" alt="Timeline mit Abhängigkeitspfeilen: ein Balken wird verschoben, die wartenden Einträge rücken mit"></td>
+    <td width="50%"><img src="../../.github/assets/readme/calendar.webp" alt="Kalenderansicht der Projekte-Datenbank"></td>
   </tr>
   <tr>
     <td><b>Timeline</b> – Gantt mit Abhängigkeiten, kritischem Pfad und Nachfolgern, die mitrücken.</td>
@@ -308,12 +308,12 @@ Tabelle, Board, Kalender, Timeline, Galerie, Liste, Feed, Diagramm, Formular und
 
 KI ist in Flowplan **aus, bis ein Admin sie einschaltet** – und dann nur für die Funktionen und Personen, die er wählt. Sie läuft **komplett lokal mit Ollama**, sodass kein Text den Server verlässt, oder mit einem Schlüssel für OpenAI, Anthropic, Gemini oder jeden OpenAI-kompatiblen Dienst. Admins können stattdessen auch jede Person ihren eigenen Schlüssel mitbringen lassen.
 
-<p align="center"><img src=".github/assets/readme/ai-write.webp" alt="Einen Absatz markieren und im KI-Menü Kürzen wählen; die Antwort entsteht in einer Vorschau und ersetzt den Text, kurz hervorgehoben" width="100%"></p>
+<p align="center"><img src="../../.github/assets/readme/ai-write.webp" alt="Einen Absatz markieren und im KI-Menü Kürzen wählen; die Antwort entsteht in einer Vorschau und ersetzt den Text, kurz hervorgehoben" width="100%"></p>
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/assets/readme/ai-ask.webp" alt="KI fragen: eine Frage zum Arbeitsbereich mit nummerierten Quellenverweisen beantwortet"></td>
-    <td width="50%"><img src=".github/assets/readme/ai-settings.webp" alt="Einstellungen → Instanz → KI: Anbieter Ollama, wer KI nutzen darf, und ein Schalter pro Funktion"></td>
+    <td width="50%"><img src="../../.github/assets/readme/ai-ask.webp" alt="KI fragen: eine Frage zum Arbeitsbereich mit nummerierten Quellenverweisen beantwortet"></td>
+    <td width="50%"><img src="../../.github/assets/readme/ai-settings.webp" alt="Einstellungen → Instanz → KI: Anbieter Ollama, wer KI nutzen darf, und ein Schalter pro Funktion"></td>
   </tr>
   <tr>
     <td><b>Fragen an den Arbeitsbereich</b> – Antworten mit Links zu ihren Quellen, nie mehr, als du lesen darfst.</td>
@@ -334,8 +334,8 @@ Mehr unter [KI in der Dokumentation](https://docs.flowplan.org/de/ai).
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/assets/readme/whiteboard.webp" alt="Ein Whiteboard mit Notizzetteln, einem Ablaufdiagramm, einer Mindmap und einer verknüpften Projektkarte"></td>
-    <td width="50%"><img src=".github/assets/readme/journal.webp" alt="Das Journal mit dem heutigen Eintrag, einer Schreibserie, Erinnerungen und Stimmungsstatistik"></td>
+    <td width="50%"><img src="../../.github/assets/readme/whiteboard.webp" alt="Ein Whiteboard mit Notizzetteln, einem Ablaufdiagramm, einer Mindmap und einer verknüpften Projektkarte"></td>
+    <td width="50%"><img src="../../.github/assets/readme/journal.webp" alt="Das Journal mit dem heutigen Eintrag, einer Schreibserie, Erinnerungen und Stimmungsstatistik"></td>
   </tr>
   <tr>
     <td><b>Whiteboards</b> – Notizzettel, Formen, Verbinder, Rahmen, Mindmaps, Abstimmungen, Timer, Präsentationsmodus, Import aus Excalidraw und draw.io.</td>
@@ -347,19 +347,19 @@ Mehr unter [KI in der Dokumentation](https://docs.flowplan.org/de/ai).
 
 Schreiben mit dem Apple Pencil, einem anderen Tablet-Stift, der Maus oder dem Finger – in Notizbüchern, auf PDFs und mitten im Dokument.
 
-<p align="center"><img src=".github/assets/readme/notebook.webp" alt="Vorlesungsnotizen mit dem Stift auf liniertem Papier: ein Titel in Blau, zwei Sätze, eine Formel, um die ein Rechteck gezogen wird, das zur sauberen Form einrastet, eine rote Notiz mit Pfeil und ein markiertes Wort" width="100%"></p>
+<p align="center"><img src="../../.github/assets/readme/notebook.webp" alt="Vorlesungsnotizen mit dem Stift auf liniertem Papier: ein Titel in Blau, zwei Sätze, eine Formel, um die ein Rechteck gezogen wird, das zur sauberen Form einrastet, eine rote Notiz mit Pfeil und ein markiertes Wort" width="100%"></p>
 
 **Notizbücher** sind eine eigene Seitenart: Blätter mit leerem, liniertem, kariertem, gepunktetem, Cornell- oder Notenpapier, A4 oder Letter, hell oder dunkel, mit Vorschauen zum Springen und Umsortieren. Ein PDF öffnet sich als Notizbuch zum Beschreiben Seite für Seite, und jedes Notizbuch lässt sich als PDF exportieren – die Handschrift als Vektoren.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/notebook-ipad-dark.webp">
-  <img src=".github/assets/readme/notebook-ipad-light.webp" alt="Ein Notizbuch in iPad-Größe: links die Seitenübersicht mit zwei Blättern, daneben ein liniertes Blatt mit handschriftlichen Notizen, einer Formel, Markierungen und einer Skizze der Kräfte an einer schiefen Ebene" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/notebook-ipad-dark.webp">
+  <img src="../../.github/assets/readme/notebook-ipad-light.webp" alt="Ein Notizbuch in iPad-Größe: links die Seitenübersicht mit zwei Blättern, daneben ein liniertes Blatt mit handschriftlichen Notizen, einer Formel, Markierungen und einer Skizze der Kräfte an einer schiefen Ebene" width="100%">
 </picture>
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/assets/readme/pdf-annotate.webp" alt="Ein Fachartikel im PDF-Viewer mit markierten Sätzen, einer eingekreisten Zahl in einer Tabelle und handschriftlichen Notizen in Blau"></td>
-    <td width="50%"><img src=".github/assets/readme/draw-block.webp" alt="Ein Zeichenblock auf kariertem Papier in einem Dokument: drei skizzierte App-Bildschirme mit Pfeilen dazwischen und einer roten Notiz"></td>
+    <td width="50%"><img src="../../.github/assets/readme/pdf-annotate.webp" alt="Ein Fachartikel im PDF-Viewer mit markierten Sätzen, einer eingekreisten Zahl in einer Tabelle und handschriftlichen Notizen in Blau"></td>
+    <td width="50%"><img src="../../.github/assets/readme/draw-block.webp" alt="Ein Zeichenblock auf kariertem Papier in einem Dokument: drei skizzierte App-Bildschirme mit Pfeilen dazwischen und einer roten Notiz"></td>
   </tr>
   <tr>
     <td><b>Auf PDFs schreiben</b> – Textmarker und Stift direkt im Viewer; jedes Speichern ist eine Version, und das PDF lässt sich mit den Anmerkungen herunterladen.</td>
@@ -376,7 +376,7 @@ Mehr unter [Notizbücher und Handschrift](https://docs.flowplan.org/de/notebooks
 
 ## Eine Startseite nach deinem Geschmack
 
-<p align="center"><img src=".github/assets/readme/home-customize.webp" alt="Die Startseite anpassen: Für den Kopfbereich wird ein Waldverlauf gewählt, der Notizzettel vor die Aufgaben gezogen und die Termine auf volle Breite gestellt" width="100%"></p>
+<p align="center"><img src="../../.github/assets/readme/home-customize.webp" alt="Die Startseite anpassen: Für den Kopfbereich wird ein Waldverlauf gewählt, der Notizzettel vor die Aufgaben gezogen und die Termine auf volle Breite gestellt" width="100%"></p>
 
 Stell die Startseite aus 20 Widgets zusammen – Aufgaben zum Abhaken, Termine, Journal heute, Fokus-Timer, Gewohnheiten, Zähler, Notizzettel, eine Datenbankansicht, Links und mehr. Ziehen, Größe ändern und einstellen, pro Arbeitsbereich; dazu ein Kopfbereich mit Farbe, Verlauf oder Cover, ein Emoji, Abstände und ein Hintergrund. Eigentümer legen den Standard für ihre Mitglieder fest. Mehr unter [Startseite anpassen](https://docs.flowplan.org/de/first-steps#startseite-anpassen).
 
@@ -385,9 +385,9 @@ Stell die Startseite aus 20 Widgets zusammen – Aufgaben zum Abhaken, Termine, 
 Gleichzeitig bearbeiten mit Live-Cursorn (Yjs/CRDT), Kommentare und Textkommentare, Erwähnungen, Reaktionen, Änderungsvorschläge, ein Posteingang, E-Mail-Zusammenfassungen und Web-Push. Teile eine Seite mit einer einzelnen Person, mit Gästen über Links (auf Wunsch mit **Passwort und Ablaufdatum**), veröffentliche sie im Web oder mach ein Formular daraus. Flowplan lässt sich als App installieren und funktioniert offline; Desktop-Apps für macOS, Windows und Linux gibt es unter [flowplan.org/download](https://flowplan.org/download) – mit Schnell erfassen aus jeder App (Kürzel wie `morgen 15 Uhr #kunde @anna !hoch`, Links, Dateien, Bildschirmausschnitte und Sprachnotizen, Warteschlange ohne Verbindung; [Doku](https://docs.flowplan.org/de/desktop-capture)). Für **iPhone und iPad gibt es die App im [App Store](https://apps.apple.com/app/id6825801344)**, für **Android eine App zum [Herunterladen](https://flowplan.org/download/android.apk)** ohne Play Store (sie aktualisiert sich selbst) – mit Widgets, Knöpfen an Benachrichtigungen, Siri und Kurzbefehlen, Teilen aus anderen Apps, dem Apple Pencil und Fenstern auf dem iPad ([Apps](https://docs.flowplan.org/de/mobile-apps)). Ihre Benachrichtigungen laufen über das quelloffene [Flowplan-Push-Relay](https://github.com/yannicschuller/flowplan-push), Ende-zu-Ende-verschlüsselt: Sie zeigen ihren Text, während Relay, Apple und Google nur Chiffretext sehen.
 
 <p align="center">
-  <img src=".github/assets/readme/mobile-board.webp" alt="Das Board auf dem Handy" width="32%">
+  <img src="../../.github/assets/readme/mobile-board.webp" alt="Das Board auf dem Handy" width="32%">
   &nbsp;
-  <img src=".github/assets/readme/mobile-journal.webp" alt="Das Journal auf dem Handy" width="32%">
+  <img src="../../.github/assets/readme/mobile-journal.webp" alt="Das Journal auf dem Handy" width="32%">
 </p>
 
 ## Für Admins und Integrationen
@@ -395,8 +395,8 @@ Gleichzeitig bearbeiten mit Live-Cursorn (Yjs/CRDT), Kommentare und Textkommenta
 ### Architektur
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme/architecture-de-dark.png">
-  <img src=".github/assets/readme/architecture-de-light.png" alt="Architektur: Clients erreichen den Flowplan-Container über einen Reverse Proxy; SQLite und Uploads, optional nach S3 gesichert; optional OIDC/LDAP, SMTP, KI-Anbieter und Push-Relay" width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="../../.github/assets/readme/architecture-de-dark.png">
+  <img src="../../.github/assets/readme/architecture-de-light.png" alt="Architektur: Clients erreichen den Flowplan-Container über einen Reverse Proxy; SQLite und Uploads, optional nach S3 gesichert; optional OIDC/LDAP, SMTP, KI-Anbieter und Push-Relay" width="100%">
 </picture>
 
 Gestrichelte Linien sind optional. Alles, was Flowplan speichert, liegt in einem Datenverzeichnis (`/app/data`): die SQLite-Datenbank, Uploads und Schlüssel. Mit [PostgreSQL](https://docs.flowplan.org/de/postgresql) wandert die Datenbank dorthin; im [Cluster-Modus](https://docs.flowplan.org/de/cluster) teilen sich mehrere Instanzen PostgreSQL, Redis und S3. Das [Push-Relay](https://github.com/yannicschuller/flowplan-push) trägt nur Benachrichtigungen an die mobilen Apps aus und sieht dabei nur Chiffretext.
@@ -599,7 +599,7 @@ Flowplan entsteht in der Freizeit. Wenn es dir hilft, unterstützt [Sponsoring a
 
 Beiträge sind willkommen – siehe [CONTRIBUTING.md](CONTRIBUTING.md). Sicherheitslücken bitte vertraulich melden, wie in [SECURITY.md](SECURITY.md) beschrieben.
 
-Flowplan ist freie Software unter der [GNU Affero General Public License v3.0](LICENSE). Wer eine veränderte Fassung als Netzdienst betreibt, muss den Quellcode den Nutzenden zugänglich machen. Der n8n-Knoten in `integrations/n8n` steht unter der MIT-Lizenz, wie n8n es für Community-Knoten verlangt.
+Flowplan ist freie Software unter der [GNU Affero General Public License v3.0](../../LICENSE). Wer eine veränderte Fassung als Netzdienst betreibt, muss den Quellcode den Nutzenden zugänglich machen. Der n8n-Knoten in `integrations/n8n` steht unter der MIT-Lizenz, wie n8n es für Community-Knoten verlangt.
 
 ---
 

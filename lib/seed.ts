@@ -72,15 +72,15 @@ export async function createPage(
   if (kind === "workflow") await createWorkflowRecord(pid, workspace, user);
   return pid;
 }
-// The built-in first page of a personal workspace ("Willkommen bei Flowplan").
+// The built-in first page of a personal workspace ("Willkommen bei Daybar").
 export async function seedWelcome(wid: string, sid: string, user: string) {
-  const home = await createPage(wid, sid, user, ct("Willkommen bei Flowplan", "Welcome to Flowplan"));
+  const home = await createPage(wid, sid, user, ct("Willkommen bei Daybar", "Welcome to Daybar"));
   await run("UPDATE pages SET icon=? WHERE id=?", "hand", home);
   await run(
     "UPDATE documents SET html=? WHERE page_id=?",
     ct(
-      '<h2>Ein guter Ort für große Ideen.</h2><p>Hier kommen Wissen, Projekte und Menschen zusammen. Halte Gedanken fest, plane die nächsten Schritte und bringe gemeinsam mit deinem Team Dinge voran.</p><blockquote><p>Dein Arbeitsbereich. So flexibel wie deine Ideen.</p></blockquote><h2>Mach es zu deinem Flowplan</h2><ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Eine erste Seite schreiben</p></div></li><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Ein Projekt mit deinem Team planen</p></div></li></ul><h2>Alles an seinem Platz</h2><p>Nutze Seiten für Notizen und Dokumente. Datenbanken lassen sich als Tabelle, Board, Kalender, Galerie, Liste oder Timeline anzeigen.</p>',
-      '<h2>A good place for big ideas.</h2><p>Knowledge, projects and people come together here. Capture thoughts, plan the next steps and move things forward with your team.</p><blockquote><p>Your workspace. As flexible as your ideas.</p></blockquote><h2>Make it your Flowplan</h2><ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Write a first page</p></div></li><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Plan a project with your team</p></div></li></ul><h2>Everything in its place</h2><p>Use pages for notes and documents. Databases can be shown as a table, board, calendar, gallery, list or timeline.</p>',
+      '<h2>Dein Tag, auf einen Blick.</h2><p>Daybar hält Aufgaben, Termine, Gewohnheiten und Notizen an einem Ort. Fang bei <strong>Heute</strong> an: Tippe in „Suchen oder erstellen …“ (⌘K) oder drücke ⌘N – aus einem Satz wird eine Aufgabe, ein Termin, eine Notiz oder eine Gewohnheit.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Eine Aufgabe für morgen anlegen: „Anna anrufen morgen 10:00“</p></div></li><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Eine Gewohnheit planen: „Spazieren jeden Tag“</p></div></li></ul><h2>Seiten gibt es auch</h2><p>Dokumente, Datenbanken und Whiteboards stehen unter dem Planer in der Seitenleiste.</p>',
+      '<h2>Your day, at a glance.</h2><p>Daybar keeps tasks, events, habits and notes in one place. Start on <strong>Today</strong>: type into “Search, or create anything…” (⌘K) or press ⌘N, and one sentence becomes a task, an event, a note or a habit.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Add a task for tomorrow: “Call Anna tomorrow 10:00”</p></div></li><li data-type="taskItem" data-checked="false"><label><input type="checkbox"></label><div><p>Plan a habit: “Walk every day”</p></div></li></ul><h2>Pages, too</h2><p>Documents, databases and whiteboards sit below the planner in the sidebar.</p>',
     ),
     home,
   );

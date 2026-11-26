@@ -64,8 +64,8 @@ export function StarterContent() {
         field="starterKeepWelcome"
         label={t("Eingebaute Willkommensseite behalten", "Keep the built-in welcome page")}
         description={t(
-          "An: „Willkommen bei Flowplan“ steht vor den Seiten des Bereichs. Aus: nur die Seiten des Bereichs. Die eingebauten Beispiele (Roadmap, Handbuch) ersetzt der Bereich immer.",
-          "On: “Welcome to Flowplan” comes before the space’s pages. Off: only the space’s pages. The built-in examples (roadmap, handbook) are always replaced by the space.",
+          "An: „Willkommen bei Daybar“ steht vor den Seiten des Bereichs. Aus: nur die Seiten des Bereichs. Die eingebauten Beispiele (Roadmap, Handbuch) ersetzt der Bereich immer.",
+          "On: “Welcome to Daybar” comes before the space’s pages. Off: only the space’s pages. The built-in examples (roadmap, handbook) are always replaced by the space.",
         )}
         disabled={!data.settings.starterSpace}
       />

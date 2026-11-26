@@ -40,7 +40,7 @@ test("hiding the sponsor link keeps licence and source", () => {
 });
 
 test("the source link: the official repository unless FLOWPLAN_SOURCE_URL names another", () => {
-  assert.equal(sourceUrl({}), "https://github.com/yannicschuller/flowplan");
+  assert.equal(sourceUrl({}), "https://github.com/nayefdw/daybar");
   assert.equal(aboutInfo(BROWSER, {}).customSource, false);
   const custom = aboutInfo(BROWSER, { FLOWPLAN_SOURCE_URL: " https://git.example.org/team/flowplan-fork/ " });
   assert.equal(custom.sourceUrl, "https://git.example.org/team/flowplan-fork");
@@ -61,7 +61,7 @@ test("the release channel of the image", () => {
   assert.equal(aboutInfo(BROWSER, { FLOWPLAN_CHANNEL: "beta" }).channel, "beta");
 });
 
-test("settings search finds Über Flowplan", () => {
+test("settings search finds Über Daybar", () => {
   const about = findSection("settings", "about");
   assert.ok(about, "settings/about exists");
   assert.equal(about.group, "help");

@@ -134,7 +134,7 @@ test("iOS keyboard: the / menu lies in the visible area at the caret and scrolls
   await page.goto(`/#page=${created.id}`);
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await page.waitForTimeout(300);
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
@@ -195,7 +195,7 @@ test("toolbar \"+\": the block menu with its search field scrolls by touch while
   await page.goto(`/#page=${created.id}`);
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await page.waitForTimeout(300);
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");

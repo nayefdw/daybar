@@ -24,7 +24,7 @@ async function setup(page: Page, title: string) {
 }
 // The welcome of a new account, if it shows.
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
 }
 

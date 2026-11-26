@@ -54,7 +54,7 @@ test("CSV of the current view has its columns and readable names, and imports ba
   await command({ action: "row.create", pageId: db, cells: { title: "B. Beispiel", note: "vertraulich" } });
 
   await page.goto(`/#page=${db}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
   await expect(page.getByText("A. Muster").first()).toBeVisible();
   await page.getByRole("button", { name: "Exportieren", exact: true }).click();

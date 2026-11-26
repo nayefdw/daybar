@@ -11,7 +11,7 @@ const localDay = () => {
 };
 async function open(page: Page, id: string) {
   await page.goto(`/#page=${id}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
 }
 

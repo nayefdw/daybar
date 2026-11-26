@@ -17813,7 +17813,8 @@ pre,
 .brand-mark .brand-mark-to {
   stop-color: var(--logo-to, #6a3fe0);
 }
-.brand-mark path.brand-mark-ink {
+.brand-mark path.brand-mark-ink,
+.brand-mark .brand-mark-fill {
   fill: var(--logo-ink, #fff);
 }
 .brand-mark g.brand-mark-ink {

@@ -58,7 +58,7 @@ test("moving from Notion: guide, import, terms, starters, sample space and the c
     }
   }
   await page.goto("/");
-  const dialog = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const dialog = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await expect(dialog.getByRole("heading", { name: "Hallo Nora!" })).toBeVisible({ timeout: 30_000 });
   await expect(dialog.getByRole("heading", { name: "Hallo Nora!" })).toBeFocused();
   await dialog.getByRole("button", { name: "Weiter", exact: true }).click();

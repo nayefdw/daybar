@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { cookies, headers } from "next/headers";
 import { LOCALE_COOKIE, pickLocale, translate } from "@/lib/i18n";
 import { ensureCatalog } from "@/lib/i18n-catalogs-server";
+import { BRAND } from "@/lib/brand";
 
 // The web app manifest in the reader's language: name, description and the
 // shortcuts of the installed app (long press on its icon).
@@ -11,9 +12,9 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const t = translate(locale);
   const icon = [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }];
   return {
-    name: "Flowplan",
-    short_name: "Flowplan",
-    description: t("Dein Arbeitsbereich für Notizen und Projekte", "Your workspace for notes and projects"),
+    name: BRAND,
+    short_name: BRAND,
+    description: t("Dein Tagesplaner für Aufgaben, Termine, Gewohnheiten und Notizen", "Your day planner for tasks, events, habits and notes"),
     start_url: "/",
     display: "standalone",
     background_color: "#fcfbf8",
@@ -25,8 +26,9 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     id: "/",
     scope: "/",
     shortcuts: [
-      { name: t("Erfassen", "Capture"), short_name: t("Erfassen", "Capture"), description: t("Ein Eintrag in deiner Datenbank zum Erfassen", "A record in your capture database"), url: "/#capture", icons: icon },
-      { name: t("Neue Seite", "New page"), short_name: t("Neue Seite", "New page"), url: "/#new", icons: icon },
+      { name: t("Heute", "Today"), short_name: t("Heute", "Today"), url: "/#plan/today", icons: icon },
+      { name: t("Schnell hinzufügen", "Quick add"), short_name: t("Hinzufügen", "Add"), description: t("Eine Aufgabe, einen Termin, eine Notiz oder eine Gewohnheit in einem Satz", "A task, event, note or habit in one sentence"), url: "/#plan/add", icons: icon },
+      { name: t("Kalender", "Calendar"), short_name: t("Kalender", "Calendar"), url: "/#plan/calendar", icons: icon },
       { name: t("Suchen", "Search"), short_name: t("Suchen", "Search"), url: "/#search", icons: icon },
     ],
     share_target: {

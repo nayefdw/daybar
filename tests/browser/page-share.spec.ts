@@ -43,5 +43,5 @@ test("a page is shared with an existing account without the whole workspace", as
   expect(titles.every((t) => t.startsWith("Steuer "))).toBe(true);
   await guest.goto(`/#page=${created.id}`);
   await expect(guest.locator("main")).toContainText(title);
-  await expect(guest.locator(".sidebar")).not.toContainText("Welcome to Flowplan");
+  await expect(guest.locator(".sidebar")).not.toContainText("Welcome to Daybar");
 });

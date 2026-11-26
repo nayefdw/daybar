@@ -406,7 +406,7 @@ export default function Login({
     ? [t("Aus einer Sicherung", "Restore from"), t("wiederherstellen.", "a backup.")]
     : mode === "register"
       ? firstAccount
-        ? [t("Willkommen bei", "Welcome to"), t("deinem Flowplan.", "your Flowplan.")]
+        ? [t("Willkommen bei", "Welcome to"), t("deinem Daybar.", "your Daybar.")]
         : [t("Konto", "Create your"), t("erstellen.", "account.")]
       : mode === "confirm" || mode === "totp"
         ? [t("Fast", "Almost"), t("geschafft.", "there.")]

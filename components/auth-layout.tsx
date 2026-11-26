@@ -1,7 +1,7 @@
 "use client";
 // The frame of the pages before signing in (sign-in, registration, password
 // reset, second factor, linking an account): on wide screens split in two –
-// on the left a panel in Flowplan's colours with the logo and one line, on
+// on the left a panel in Daybar's colours with the logo and one line, on
 // the right the page's own column. Phones and narrow windows show only the
 // column (app/globals.css, "Sign-in: split layout").
 import type { ReactNode } from "react";
@@ -27,13 +27,13 @@ export function AuthLayout({
       <div className="auth-panel">
         <div className="auth-panel-brand">
           <BrandMark size={34} />
-          flowplan
+          daybar
           {instanceName && <span className="auth-panel-instance"> · {instanceName}</span>}
         </div>
         <p className="auth-panel-line">
-          {t("Raum für deine", "Room for your")}
+          {t("Dein Tag,", "Your day,")}
           <br />
-          {t("nächste große Idee.", "next big idea.")}
+          {t("auf einen Blick.", "at a glance.")}
         </p>
       </div>
       <div className="auth-side">{children}</div>

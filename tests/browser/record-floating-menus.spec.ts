@@ -45,7 +45,7 @@ test("menus and outline stay at the text in a scrolled record", async ({ page },
     await page.goto("about:blank");
     await page.goto(`/#page=${db.id}&row=${row.id}`);
     // A new account's welcome tour.
-    const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+    const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
     if (await welcome.isVisible()) {
       await page.keyboard.press("Escape");
       await expect(welcome).toBeHidden();

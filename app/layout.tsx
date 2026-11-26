@@ -42,6 +42,7 @@ import "./inbox.css";
 import { requestLocale } from "@/lib/i18n-server";
 import { localeTag, translate } from "@/lib/i18n";
 import { siteUrl } from "@/lib/seo";
+import { BRAND } from "@/lib/brand";
 import { LocaleProvider } from "@/components/i18n";
 import { catalogScript } from "@/lib/i18n-catalogs-server";
 import { PdfViewerHost } from "@/components/pdf-viewer";
@@ -61,26 +62,26 @@ import { BUILD_META, selfHealScript } from "@/lib/stale-copy";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await requestLocale();
   const say = translate(locale);
-  const title = say("Flowplan — Dein Raum für Ideen", "Flowplan — Room for your ideas");
-  const description = say("Flowplan: Dokumente, Datenbanken, Whiteboards und Journal in einem Arbeitsbereich. Open Source, ohne Tracking.", "Flowplan: documents, databases, whiteboards and a journal in one workspace. Open source, without tracking.");
+  const title = say("Daybar — Dein Tag im Blick", "Daybar — Your day at a glance");
+  const description = say("Daybar: Aufgaben, Termine, Gewohnheiten und Notizen in einem Tagesplaner. Selbst gehostet, Open Source, ohne Tracking.", "Daybar: tasks, events, habits and notes in one day planner. Self-hosted, open source, without tracking.");
   return {
   metadataBase: new URL(siteUrl()),
   title,
   description,
-  applicationName: "Flowplan",
+  applicationName: BRAND,
   // Workspaces are private; the public pages switch indexing on.
   robots: { index: false, follow: false },
   openGraph: {
     type: "website",
-    siteName: "Flowplan",
+    siteName: BRAND,
     title,
     description,
     locale: localeTag(locale).replace("-", "_"),
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Flowplan" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: BRAND }],
   },
   twitter: { card: "summary_large_image", title, description, images: ["/opengraph-image"] },
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "Flowplan", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: BRAND, statusBarStyle: "default" },
   other: { "apple-mobile-web-app-capable": "yes" },
   icons: {
     icon: [

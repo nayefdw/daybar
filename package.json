@@ -1,16 +1,16 @@
 {
-  "name": "flowplan",
+  "name": "daybar",
   "version": "0.12.0",
   "private": true,
-  "description": "Documents, databases, whiteboards and a daily journal for teams – self-hosted.",
+  "description": "A self-hosted day planner – tasks, events, habits and notes – built on flowplan.",
   "license": "AGPL-3.0-only",
-  "homepage": "https://flowplan.org",
+  "homepage": "https://github.com/nayefdw/daybar",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yannicschuller/flowplan.git"
+    "url": "https://github.com/nayefdw/daybar.git"
   },
   "bugs": {
-    "url": "https://github.com/yannicschuller/flowplan/issues"
+    "url": "https://github.com/nayefdw/daybar/issues"
   },
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1",

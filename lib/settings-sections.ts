@@ -590,7 +590,7 @@ export const SETTINGS_SECTIONS: SectionMeta[] = [
     level: "beginner",
     group: "help",
     icon: "Info",
-    title: { de: "Über Flowplan", en: "About Flowplan" },
+    title: { de: "Über Daybar", en: "About Daybar" },
     description: { de: "Version, Lizenz und Quellcode, Links zu Hilfe und Community.", en: "Version, licence and source code, links to help and community." },
     keywords: {
       de: "über info version build commit beta release lizenz agpl quellcode source github website dokumentation hilfe discord community fehler melden bug unterstützen sponsor spenden",

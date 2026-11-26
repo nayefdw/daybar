@@ -23,10 +23,10 @@ const titles = async (uid: string) =>
 test("the first workspace follows the reader's language", async () => {
   const de = await user("Jana");
   await ensureWorkspace(de);
-  assert.ok((await titles(de)).includes("Willkommen bei Flowplan"));
+  assert.ok((await titles(de)).includes("Willkommen bei Daybar"));
   const en = await user("Jane");
   await withContentLocale("en", async () => await ensureWorkspace(en));
-  assert.deepEqual(await titles(en), ["Meeting notes", "Product roadmap", "Team handbook", "Welcome to Flowplan"]);
+  assert.deepEqual(await titles(en), ["Meeting notes", "Product roadmap", "Team handbook", "Welcome to Daybar"]);
   const fields = JSON.parse(
     (await one<{ fields: string }>(
       "SELECT d.fields FROM databases d JOIN pages p ON p.id=d.page_id JOIN members m ON m.workspace_id=p.workspace_id WHERE m.user_id=?",

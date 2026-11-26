@@ -77,7 +77,7 @@ const titles = async (workspace: string) => (await pagesOf(workspace)).map((p) =
 test("without a chosen space new accounts get the built-in pages", async () => {
   const fresh = await user("Fresh");
   await ensureWorkspace(fresh.id);
-  assert.deepEqual(await titles(await personal(fresh.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Flowplan"]);
+  assert.deepEqual(await titles(await personal(fresh.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Daybar"]);
 });
 
 test("only readable, unencrypted spaces can be chosen, and the chooser is the saving admin", async () => {
@@ -112,8 +112,8 @@ test("a new account gets a copy of the space: nested pages, databases, files –
   const ws = await personal(newcomer.id);
   const pages = await pagesOf(ws);
   // Welcome page first, then the space's pages; no built-in examples.
-  assert.equal(pages.filter((p) => !p.parent_id)[0].title, "Willkommen bei Flowplan");
-  assert.deepEqual(pages.map((p) => p.title).sort(), ["Day one", "First week", "Ideas", "Onboarding tasks", "Start here", "Willkommen bei Flowplan"]);
+  assert.equal(pages.filter((p) => !p.parent_id)[0].title, "Willkommen bei Daybar");
+  assert.deepEqual(pages.map((p) => p.title).sort(), ["Day one", "First week", "Ideas", "Onboarding tasks", "Start here", "Willkommen bei Daybar"]);
   assert.ok(pages.every((p) => p.created_by === newcomer.id));
   const byTitle = (t: string) => pages.find((p) => p.title === t)!;
   // Nesting.
@@ -180,7 +180,7 @@ test("a gone space or a failing copy falls back to the built-in pages", async ()
     await run("INSERT INTO pages(id,workspace_id,space_id,parent_id,title,kind,created_by,position,icon) VALUES(?,?,?,?,?,?,?,?,?)", broken, wid, onboarding.id, null, "Broken", "database", admin.id, 99, "file");
     const failing = await user("Failing");
     await ensureWorkspace(failing.id);
-    assert.deepEqual(await titles(await personal(failing.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Flowplan"]);
+    assert.deepEqual(await titles(await personal(failing.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Daybar"]);
     assert.ok(errors.some((e) => e.includes("Starter content")));
     // Nothing of the failed copy is left.
     assert.equal((await all("SELECT 1 FROM pages WHERE workspace_id=? AND title='Start here'", await personal(failing.id))).length, 0);
@@ -190,7 +190,7 @@ test("a gone space or a failing copy falls back to the built-in pages", async ()
     assert.equal((await starterSpaceStatus())?.problem, "space gone");
     const late = await user("Late");
     await ensureWorkspace(late.id);
-    assert.deepEqual(await titles(await personal(late.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Flowplan"]);
+    assert.deepEqual(await titles(await personal(late.id)), ["Meeting-Notizen", "Produkt-Roadmap", "Team-Handbuch", "Willkommen bei Daybar"]);
     assert.ok(errors.filter((e) => e.includes("space gone")).length >= 1);
   } finally {
     console.error = original;
@@ -202,7 +202,7 @@ test("demo accounts keep their own examples", async () => {
   // lib/demo.ts builds its workspace with createWorkspace, not ensureWorkspace.
   const demo = await user("Demo");
   const ws = await createWorkspace(demo.id, "Demo");
-  assert.deepEqual(await titles(ws), ["Willkommen bei Flowplan"]);
+  assert.deepEqual(await titles(ws), ["Willkommen bei Daybar"]);
 });
 
 test("choosing none goes back to the built-in pages", async () => {

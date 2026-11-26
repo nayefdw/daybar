@@ -1,6 +1,8 @@
 // The running build: version, commit and build time (set in next.config.ts
 // when building). A commit given at runtime (Coolify sets SOURCE_COMMIT) wins
 // when the build did not know it.
+import { BRAND_REPOSITORY } from "./brand";
+
 export type BuildInfo = { version: string; commit: string; builtAt: string; node: string; repository: string };
 
 export function buildInfo(): BuildInfo {
@@ -10,7 +12,7 @@ export function buildInfo(): BuildInfo {
     commit: /^[0-9a-f]{7,40}$/i.test(commit) ? commit.toLowerCase() : "",
     builtAt: process.env.FLOWPLAN_BUILT_AT || "",
     node: process.version,
-    repository: "https://github.com/yannicschuller/flowplan",
+    repository: BRAND_REPOSITORY,
   };
 }
 

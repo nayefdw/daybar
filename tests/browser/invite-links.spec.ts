@@ -65,7 +65,7 @@ test("an invite link lets a new person sign up and join until it is revoked", as
     await n.page.getByLabel("E-Mail-Adresse").fill(email);
     await n.page.locator("input[name=password]").fill("ein-langes-passwort");
     await n.page.getByRole("button", { name: "Konto erstellen" }).click();
-    const intro = n.page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+    const intro = n.page.getByRole("dialog", { name: "Willkommen bei Daybar" });
     await expect(intro.or(n.page.locator(".workspace-switch").first())).toBeVisible({ timeout: 90_000 });
     if (await intro.isVisible()) await intro.getByRole("button", { name: "Überspringen" }).click();
     const joined = await (await n.page.request.get("/api/bootstrap")).json();

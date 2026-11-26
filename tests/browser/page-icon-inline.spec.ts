@@ -22,7 +22,7 @@ async function pageWith(page: Page, place: "above" | "inline", patch: Record<str
   expect(updated.ok(), await updated.text()).toBe(true);
   await page.goto(`/#page=${pageId}`);
   await expect(page.getByLabel("Dokumentinhalt", { exact: true })).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();

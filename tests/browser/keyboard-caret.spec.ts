@@ -71,7 +71,7 @@ async function openNewPage(page: Page, title = `Neu ${Date.now()}`) {
   await page.goto(`/#page=${pageId}`);
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await page.waitForTimeout(300);
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");

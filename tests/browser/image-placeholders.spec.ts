@@ -46,7 +46,7 @@ async function holdImage(page: Page, url: string) {
 }
 
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: /Willkommen bei Flowplan/ });
+  const welcome = page.getByRole("dialog", { name: /Willkommen bei Daybar/ });
   if (await welcome.isVisible().catch(() => false)) await page.keyboard.press("Escape");
 }
 

@@ -4370,7 +4370,7 @@ export default function WorkspaceApp({
     { label: t("Papierkorb", "Trash"), keywords: t("trash gelöscht wiederherstellen", "trash gelöscht wiederherstellen papierkorb deleted restore"), icon: Trash, run: () => go("trash") },
     { label: t("Einstellungen", "Settings"), keywords: t("settings konto mitglieder profil sprache", "settings konto mitglieder preferences account members profile language"), icon: GearSix, run: () => go("settings") },
     { label: t("Tastenkürzel", "Keyboard shortcuts"), keywords: t("shortcuts tasten hilfe tastatur", "shortcuts tasten hilfe keyboard keys help hotkeys"), icon: Keyboard, run: () => setShortcuts(true) },
-    { label: t("Über Flowplan", "About Flowplan"), keywords: t("über info version lizenz quellcode hilfe", "über info about version licence license source code help"), icon: InfoIcon, run: () => void (toPlace("settings/about") || (location.hash = "settings/about")) },
+    { label: t("Über Daybar", "About Daybar"), keywords: t("über info version lizenz quellcode hilfe", "über info about version licence license source code help"), icon: InfoIcon, run: () => void (toPlace("settings/about") || (location.hash = "settings/about")) },
     { label: t("Was ist neu", "What’s new"), keywords: t("neu neuigkeiten update version änderungen changelog versionshinweise", "neu neuigkeiten new news update version changes changelog release notes"), icon: Gift, run: openWhatsNew },
     // The instance's part of the settings (#532; formerly "Administration").
     ...(boot.user.isAdmin
@@ -4616,7 +4616,7 @@ export default function WorkspaceApp({
   const legal = boot.instance?.legal;
   const accountItems: SidebarAccountItem[] = [
     { id: "theme", label: dark ? t("Helles Design", "Light theme") : t("Dunkles Design", "Dark theme"), icon: dark ? Sun : Moon, keepOpen: true, onSelect: toggleTheme },
-    { id: "about", label: t("Über Flowplan", "About Flowplan"), icon: InfoIcon, href: "#settings/about" },
+    { id: "about", label: t("Über Daybar", "About Daybar"), icon: InfoIcon, href: "#settings/about" },
     { id: "whats-new", label: t("Was ist neu", "What’s new"), icon: Gift, onSelect: openWhatsNew },
     ...(legal?.imprint ? [{ id: "imprint", label: t("Impressum", "Legal notice"), icon: Scales, href: legal.imprint, external: true }] : []),
     ...(legal?.privacy ? [{ id: "privacy", label: t("Datenschutz", "Privacy"), icon: ShieldCheck, href: legal.privacy, external: true }] : []),
@@ -4716,7 +4716,7 @@ export default function WorkspaceApp({
             }}
           >
             <BrandMark size={28} />
-            <span>flowplan</span>
+            <span>daybar</span>
             {boot.instance?.name && (
               <small className="instance-name">{boot.instance.name}</small>
             )}

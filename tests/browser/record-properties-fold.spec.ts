@@ -9,7 +9,7 @@ const origin = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 const shots = process.env.RECORD_FOLD_SHOTS;
 
 async function setup(page: Page) {
-  await page.addLocatorHandler(page.getByRole("dialog", { name: "Willkommen bei Flowplan" }), (intro) =>
+  await page.addLocatorHandler(page.getByRole("dialog", { name: "Willkommen bei Daybar" }), (intro) =>
     intro.getByRole("button", { name: "Überspringen" }).click(),
   );
   // The hint that Flowplan is also an app (components/app-promo.tsx) has
@@ -109,7 +109,7 @@ test.describe("on an iPhone", () => {
     // the phone's choice.
     const desktop = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: "de-DE", storageState: await page.context().storageState() });
     const large = await desktop.newPage();
-    await large.addLocatorHandler(large.getByRole("dialog", { name: "Willkommen bei Flowplan" }), (intro) =>
+    await large.addLocatorHandler(large.getByRole("dialog", { name: "Willkommen bei Daybar" }), (intro) =>
       intro.getByRole("button", { name: "Überspringen" }).click(),
     );
     await large.goto(`/#page=${db}&row=${second}`);

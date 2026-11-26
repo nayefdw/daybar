@@ -22,7 +22,7 @@ const register = async (page: Page, email: string) => {
   await page.locator("input[name=password]").fill("ein-langes-passwort");
   await page.getByRole("button", { name: "Konto erstellen" }).click();
   await expect(page.getByLabel("Dokumentinhalt", { exact: true }).or(page.locator(".sidebar"))).toBeVisible({ timeout: 20_000 });
-  const intro = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const intro = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await intro.getByRole("button", { name: "Überspringen" }).click();
   await expect(intro).toBeHidden();
 };

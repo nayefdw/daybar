@@ -42,7 +42,7 @@ async function setup(page: Page) {
     else document.addEventListener("DOMContentLoaded", hide);
   });
   await page.goto(`/#page=${host.id}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor.getByText("Ende")).toBeVisible({ timeout: 30_000 });

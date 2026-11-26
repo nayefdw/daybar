@@ -216,10 +216,11 @@ export function logoColors(accent: string): LogoColors {
 // public/icon.svg byte for byte (tests/workspace-theme.test.ts), and
 // components/brand-mark.tsx draws the same shapes.
 export function logoSvg({ from, to, ink }: LogoColors = DEFAULT_LOGO) {
+  // Daybar's mark (components/brand-mark.tsx): a sun over the bar of a day.
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs>` +
-    `<rect width="32" height="32" rx="9" fill="url(#g)"/><path d="M16 6.8 25.2 11.4 16 16 6.8 11.4Z" fill="${ink}"/>` +
-    `<g fill="none" stroke="${ink}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 16 16 20.6 25.2 16" opacity=".72"/><path d="M6.8 20.6 16 25.2 25.2 20.6" opacity=".42"/></g></svg>`
+    `<rect width="32" height="32" rx="9" fill="url(#g)"/><g fill="${ink}"><path d="M10.2 14.6a5.8 5.8 0 0 1 11.6 0Z"/><rect x="6.6" y="16.6" width="18.8" height="3" rx="1.5"/>` +
+    `<rect x="6.6" y="21.2" width="11.2" height="2.6" rx="1.3" opacity=".5"/></g></svg>`
   );
 }
 // The browser tab's icon for a look with an accent (null: Flowplan's own,

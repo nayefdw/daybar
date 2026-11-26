@@ -68,10 +68,10 @@ async function sendWelcome(user: Pick<User, "id" | "name" | "email">, inviter: s
   const url = linkOf(await issue(user.id, "welcome"));
   await queueLinkMail({
     to: user.email,
-    subject: t("Dein Flowplan-Konto wurde angelegt", "Your Flowplan account was created"),
-    title: t("Willkommen bei Flowplan", "Welcome to Flowplan"),
+    subject: t("Dein Daybar-Konto wurde angelegt", "Your Daybar account was created"),
+    title: t("Willkommen bei Daybar", "Welcome to Daybar"),
     lines: [
-      t(`Hallo ${user.name}, ${inviter} hat dir ein Konto bei Flowplan angelegt.`, `Hello ${user.name}, ${inviter} created a Flowplan account for you.`),
+      t(`Hallo ${user.name}, ${inviter} hat dir ein Konto bei Daybar angelegt.`, `Hello ${user.name}, ${inviter} created a Daybar account for you.`),
       t(
         `Mit diesem Link legst du dein Passwort fest und meldest dich an. Er gilt ${WELCOME_DAYS} Tage und nur einmal.`,
         `This link lets you set your password and sign in. It is valid for ${WELCOME_DAYS} days and only once.`,

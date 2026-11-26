@@ -37,7 +37,7 @@ async function stubPrint(page: Page) {
 }
 const printed = (page: Page) => page.evaluate(() => (window as unknown as { __printed: number }).__printed);
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();

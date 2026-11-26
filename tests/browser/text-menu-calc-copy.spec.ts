@@ -19,7 +19,7 @@ test("a calculation's result is copied with the button at the end of its row; th
   await page.goto(`/#page=${(await created.json()).id}`);
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();

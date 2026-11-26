@@ -266,7 +266,7 @@ test("ZIP round trip preserves nested content, binary files, relations, template
   const target = (await one<Page>(
     "SELECT * FROM pages WHERE workspace_id=? AND title=?",
     destination,
-    "Willkommen bei Flowplan",
+    "Willkommen bei Daybar",
   ))!;
   await assert.rejects(
     async () =>

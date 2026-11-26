@@ -11,10 +11,13 @@
 //   window.FlowplanApp as well (hideSponsorInPage). Browsers and the desktop
 //   app show it.
 import { buildInfo } from "./build-info";
+import { BRAND_REPOSITORY } from "./brand";
 
 // No server-only imports: the settings page and the sign-in page use the
 // addresses below as well.
-export const GITHUB_URL = "https://github.com/yannicschuller/flowplan";
+// The source of what runs (AGPL-3.0 §13): Daybar's repository. flowplan,
+// which Daybar is built on, is credited next to it (UPSTREAM_REPOSITORY).
+export const GITHUB_URL = BRAND_REPOSITORY;
 
 export const LICENSE_URL = "https://www.gnu.org/licenses/agpl-3.0.html";
 export const SPONSOR_URL = "https://github.com/sponsors/yannicschuller";

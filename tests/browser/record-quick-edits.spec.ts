@@ -12,7 +12,7 @@ const origin = process.env.TEST_BASE_URL || "http://127.0.0.1:3000";
 
 async function setup(page: Page, name: string) {
   // The introduction of a first account closes when it shows.
-  await page.addLocatorHandler(page.getByRole("dialog", { name: "Willkommen bei Flowplan" }), (intro) =>
+  await page.addLocatorHandler(page.getByRole("dialog", { name: "Willkommen bei Daybar" }), (intro) =>
     intro.getByRole("button", { name: "Überspringen" }).click(),
   );
   // The app's 10-second reload runs when the test says so.

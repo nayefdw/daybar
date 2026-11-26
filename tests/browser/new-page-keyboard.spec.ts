@@ -60,7 +60,7 @@ async function openDialog(page: Page) {
   await page.goto(`/#page=${(await created.json()).id}`);
   // The editor loads its code on demand (slow after a load on the dev server).
   await expect(page.getByLabel("Dokumentinhalt", { exact: true })).toBeVisible({ timeout: 30_000 });
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await page.waitForTimeout(300);
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");

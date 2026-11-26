@@ -23,7 +23,7 @@ async function openRecord(page: Page, html: string) {
   const db = await command({ action: "page.create", workspaceId: boot.workspace.id, spaceId: boot.spaces[0].id, title: `Einträge ${Date.now()}`, kind: "database" });
   const row = await command({ action: "row.create", pageId: db.id, cells: { title: "Kundengespräch" } });
   await page.goto(`/#page=${db.id}&row=${row.id}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
   const dialog = page.locator(".modal.record-dialog");
   const editor = dialog.locator(".ProseMirror");

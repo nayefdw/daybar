@@ -15,7 +15,7 @@ test("a bullet list with a sub-list below a task stays stacked (#233)", async ({
     })
   ).json();
   await page.goto(`/#page=${id}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await editor.click();

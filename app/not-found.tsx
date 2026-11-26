@@ -8,7 +8,7 @@ import { HistoryBackLink } from "@/components/history-back-link";
 // published page that is no longer public.
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: (await serverT())("Seite nicht gefunden · Flowplan", "Page not found · Flowplan"),
+    title: (await serverT())("Seite nicht gefunden · Daybar", "Page not found · Daybar"),
     robots: { index: false, follow: false },
   };
 }

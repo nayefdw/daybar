@@ -70,7 +70,7 @@ async function setup(page: Page) {
   return { command, newPage };
 }
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: /Willkommen bei Flowplan/ });
+  const welcome = page.getByRole("dialog", { name: /Willkommen bei Daybar/ });
   if (await welcome.isVisible().catch(() => false)) await page.keyboard.press("Escape");
 }
 async function openWithText(page: Page, id: string) {

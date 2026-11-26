@@ -22,7 +22,7 @@ async function setup(page: Page, title: string) {
 }
 async function open(page: Page, id: string) {
   await page.goto(`/#page=${id}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
 }
 const overviewHtml = async (page: Page, id: string) => (await (await page.request.get(`/api/pages/${id}`)).json()).html as string;

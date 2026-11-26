@@ -22,7 +22,7 @@ async function openPage(page: Page, patch: Record<string, unknown> = {}) {
   }
   await page.goto(`/#page=${pageId}`);
   await expect(page.getByLabel("Dokumentinhalt", { exact: true })).toBeVisible();
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();

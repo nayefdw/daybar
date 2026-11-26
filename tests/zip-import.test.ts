@@ -204,7 +204,7 @@ test("Flowplan's own Markdown export comes back with its tree, titles and databa
       spaceId,
     );
     return list
-      .filter((p) => p.title !== "Willkommen bei Flowplan")
+      .filter((p) => p.title !== "Willkommen bei Daybar")
       .map((p) => `${p.kind}:${p.title} <- ${list.find((x) => x.id === p.parent_id)?.title ?? "-"}`)
       .sort();
   };

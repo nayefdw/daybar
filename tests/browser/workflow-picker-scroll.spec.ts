@@ -39,7 +39,7 @@ test("a placeholder picked with the mouse while scroll methods return a Promise"
   const workflow = (await command({ action: "page.create", ...where, title: "Platzhalter 182", kind: "workflow" })).id as string;
   await page.goto(`/#page=${workflow}`);
   expect(await page.evaluate(() => (document.body.scrollIntoView({ block: "nearest" }) as unknown) instanceof Promise)).toBe(true);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
 
   await page.getByRole("button", { name: "Leer beginnen" }).click();

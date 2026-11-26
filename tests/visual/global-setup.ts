@@ -25,7 +25,7 @@ export default async function globalSetup() {
 // start page's "Zuletzt bearbeitet" came in a different order from run to
 // run. The pages get fixed edit times just before FIXED_TIME instead (all
 // "gerade eben"), newest first in this order.
-const EDIT_ORDER = ["Projektbriefing", "Projekte", "Willkommen bei Flowplan", "Team-Handbuch"];
+const EDIT_ORDER = ["Projektbriefing", "Projekte", "Willkommen bei Daybar", "Team-Handbuch"];
 function fixEditTimes(dataDir: string) {
   const db = new DatabaseSync(join(dataDir, "flowplan.sqlite"));
   try {

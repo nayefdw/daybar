@@ -20,7 +20,7 @@ async function documentWithText(page: Page, textMenu: "always" | "computer" | "n
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
   // A new account's welcome tour.
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();

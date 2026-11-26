@@ -16,7 +16,7 @@ async function openNewPage(page: Page) {
   const editor = page.getByLabel("Dokumentinhalt", { exact: true });
   await expect(editor).toBeVisible();
   // A new account's welcome tour.
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");
     await expect(welcome).toBeHidden();
@@ -192,7 +192,7 @@ async function command(page: Page, data: Record<string, unknown>) {
   return response.json();
 }
 async function dismissWelcome(page: Page) {
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await page.waitForTimeout(300);
   if (await welcome.isVisible()) {
     await page.keyboard.press("Escape");

@@ -25,7 +25,7 @@ export default function GlobalError({ error, retry, reset }: { error: unknown; r
   return (
     <html lang={browserLocale()}>
       <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "Canvas", color: "CanvasText", colorScheme: "light dark" }}>
-        <title>Flowplan</title>
+        <title>Daybar</title>
         <main role="alert" style={{ maxWidth: 420, margin: "18vh auto 0", padding: "0 20px", textAlign: "center", lineHeight: 1.5 }}>
           <h1 style={{ fontSize: 20, fontWeight: 600 }}>
             {offline

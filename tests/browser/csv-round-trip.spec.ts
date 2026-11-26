@@ -36,7 +36,7 @@ test("CSV export and import round-trip formula-like text and tags with commas", 
   for (const cells of values) await command({ action: "row.create", pageId: database, cells });
 
   await page.goto(`/#page=${database}`);
-  const welcome = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const welcome = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await welcome.waitFor({ timeout: 3000 }).then(() => page.keyboard.press("Escape"), () => {});
   await expect(page.getByText("+1 805 555 0100").first()).toBeVisible();
   await page.getByRole("button", { name: "Exportieren", exact: true }).click();

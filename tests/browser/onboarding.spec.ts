@@ -14,7 +14,7 @@ test("the introduction walks through settings, starter pages and the tour", asyn
   await page.request.post("/api/command", { headers: { origin }, data: { action: "profile.onboarded" } });
   await page.goto("/#settings/appearance");
   await page.getByRole("button", { name: "Einführung starten" }).click();
-  const dialog = page.getByRole("dialog", { name: "Willkommen bei Flowplan" });
+  const dialog = page.getByRole("dialog", { name: "Willkommen bei Daybar" });
   await expect(dialog.getByRole("heading", { name: /^Hallo / })).toBeVisible();
   await dialog.getByRole("radiogroup", { name: "Erscheinungsbild" }).getByText("Dunkel").click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

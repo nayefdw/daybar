@@ -314,7 +314,7 @@ export function Onboarding({
       open
       wide
       className="onboarding"
-      title={t("Willkommen bei Flowplan", "Welcome to Flowplan")}
+      title={t("Willkommen bei Daybar", "Welcome to Daybar")}
       onClose={() => !importing && void finish()}
       onOpenAutoFocus={(e) => {
         e.preventDefault();
@@ -335,8 +335,8 @@ export function Onboarding({
             <h2 id="onboarding-welcome" tabIndex={-1} ref={heading}>{t(`Hallo ${boot.user.name.split(" ")[0]}!`, `Hello ${boot.user.name.split(" ")[0]}!`)}</h2>
             <p>
               {t(
-                "Flowplan ist dein Ort für Dokumente, Datenbanken, Whiteboards und ein Journal – in einem Seitenbaum, gemeinsam und live. In zwei Minuten richten wir das Wichtigste ein; alles lässt sich später in den Einstellungen ändern.",
-                "Flowplan is your place for documents, databases, whiteboards and a journal – in one page tree, together and live. Let's set up the essentials in two minutes; everything can be changed later in the settings.",
+                "Daybar ist dein Tagesplaner für Aufgaben, Termine, Gewohnheiten und Notizen – mit Dokumenten, Datenbanken, Whiteboards und einem Journal darunter. In zwei Minuten richten wir das Wichtigste ein; alles lässt sich später in den Einstellungen ändern.",
+                "Daybar is your day planner for tasks, events, habits and notes – with documents, databases, whiteboards and a journal underneath. Let's set up the essentials in two minutes; everything can be changed later in the settings.",
               )}
             </p>
             <div className="onboarding-fields">
@@ -441,7 +441,7 @@ export function Onboarding({
             )}
             {space && canCreate && (
               <>
-                <span className="onboarding-label" id="onboarding-goal-label">{t("Wofür nutzt du Flowplan vor allem?", "What do you mainly use Flowplan for?")}</span>
+                <span className="onboarding-label" id="onboarding-goal-label">{t("Wofür nutzt du Daybar vor allem?", "What do you mainly use Daybar for?")}</span>
                 <div className="segmented onboarding-goals" role="radiogroup" aria-labelledby="onboarding-goal-label">
                   {ONBOARDING_GOALS.map((g) => {
                     const Glyph = goals[g].icon;
@@ -520,7 +520,7 @@ export function Onboarding({
         )}
         {current === "tour" && (
           <section aria-labelledby="onboarding-tour" className="onboarding-tour">
-            <h2 id="onboarding-tour" tabIndex={-1} ref={heading}>{t("Das kann Flowplan", "What Flowplan does")}</h2>
+            <h2 id="onboarding-tour" tabIndex={-1} ref={heading}>{t("Das kann Daybar", "What Daybar does")}</h2>
             <div className="onboarding-tour-grid">
               <div role="tablist" aria-label={t("Funktionen", "Features")} aria-orientation="vertical" ref={featureTabs}>
                 {features.map((f, index) => (
