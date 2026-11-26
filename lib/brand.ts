@@ -10,6 +10,3 @@ export const BRAND_REPOSITORY = "https://github.com/nayefdw/daybar";
 export const UPSTREAM_NAME = "flowplan";
 export const UPSTREAM_AUTHOR = "Yannic Schuller";
 export const UPSTREAM_REPOSITORY = "https://github.com/yannicschuller/flowplan";
-// The tile of the mark (light and dark share it) and the page colours of
-// the installed app.
-export const BRAND_TILE = { from: "#4146e6", to: "#6a3fe0", ink: "#ffffff" } as const;

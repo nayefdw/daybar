@@ -41,7 +41,7 @@ function outsideAsyncTransaction(write: boolean) {
 // PRAGMA user_version: a restore refuses a backup from a newer version
 // (lib/setup-restore.ts); older ones are brought up to date by migrate().
 // Raise it together with the "Schema NN" step at the end of migrate().
-export const SCHEMA_VERSION = 140;
+export const SCHEMA_VERSION = 141;
 // Tables with an explicit insertion order (schema 94): `ORDER BY …,seq`
 // (pages have one as well, filled by the trigger pages_created_at).
 // Schema 97 (workflows): tables created with their seq column (and its
@@ -1719,11 +1719,56 @@ function migrate(d: DatabaseSync) {
   // a new nullable column an older version leaves alone, so the schema
   // number stays.
   migrateRelatedPref(d);
+  // Schema 141 – Daybar's planner (docs/daybar/architecture.md,
+  // lib/daybar/store.ts): tasks, events, habits and notes per person and
+  // workspace, their folders, tags and habit check-ins, and the planner's
+  // settings (ThisDay sync state among them).
+  migrateDaybarPlanner(d);
   // A database from a newer version keeps its number.
   if (Number((d.prepare("PRAGMA user_version").get() as { user_version: number }).user_version) < SCHEMA_VERSION)
     d.exec(`PRAGMA user_version=${SCHEMA_VERSION}`);
   forgetStatements(d);
   globalDb.flowplanSchema = SCHEMA_VERSION;
+}
+// Schema 141 – Daybar's planner (docs/daybar/architecture.md). Everything
+// is personal: user_id is the person whose planner it is, workspace_id the
+// workspace it lives in (notes are pages of that workspace).
+// - planner_items: one row per task, event, habit or note (kind). `day`
+//   and `time` are the person's local day and time (YYYY-MM-DD, HH:MM):
+//   a task's due day (or the first day of its week or month with
+//   `period`, none with period 'someday'), an event's start, a habit's
+//   first day, the day a note is pinned to. Events end at end_day/end_time
+//   or are all-day. Subtasks point at their task (parent_id). A note is a
+//   flowplan document (page_id); its title is the page's. `repeat` holds a
+//   habit's rule as JSON (lib/daybar/repeat.ts). `source`/`external_id`
+//   name where an imported item came from ('thisday' with ThisDay's id,
+//   'legacy' for the single-page Daybar); `source_done` keeps ThisDay's own
+//   done days of the last import (JSON), so ticks made here are sent back
+//   until ThisDay has them (lib/daybar/thisday.ts). Deleted items keep
+//   deleted_at (ms) until purged.
+// - planner_habit_log: a habit's check-ins, one per day; on_time is 0 for a
+//   day logged afterwards (streaks count on-time check-ins only).
+// - planner_folders, planner_tags (unique per person by lower(name)),
+//   planner_item_tags.
+// - planner_settings: the planner's settings per person and workspace as
+//   JSON (week start, the notes page and day-note journal, ThisDay sync).
+// New tables only; an older version leaves them alone, but would not
+// show the planner – hence the number.
+function migrateDaybarPlanner(d: DatabaseSync) {
+  d.exec(`CREATE TABLE IF NOT EXISTS planner_folders(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,name TEXT NOT NULL,color TEXT NOT NULL DEFAULT 'gray',position REAL NOT NULL DEFAULT 0,created_at INTEGER NOT NULL);
+    CREATE INDEX IF NOT EXISTS planner_folders_user ON planner_folders(user_id,workspace_id);
+    CREATE TABLE IF NOT EXISTS planner_tags(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,name TEXT NOT NULL,color TEXT NOT NULL DEFAULT 'gray',position REAL NOT NULL DEFAULT 0,created_at INTEGER NOT NULL);
+    CREATE UNIQUE INDEX IF NOT EXISTS planner_tags_name ON planner_tags(user_id,workspace_id,lower(name));
+    CREATE TABLE IF NOT EXISTS planner_items(id TEXT PRIMARY KEY,workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,kind TEXT NOT NULL CHECK(kind IN ('task','event','habit','note')),title TEXT NOT NULL DEFAULT '',body TEXT NOT NULL DEFAULT '',page_id TEXT REFERENCES pages(id) ON DELETE CASCADE,parent_id TEXT REFERENCES planner_items(id) ON DELETE CASCADE,day TEXT,time TEXT,end_day TEXT,end_time TEXT,all_day INTEGER NOT NULL DEFAULT 0,period TEXT,duration INTEGER,priority INTEGER NOT NULL DEFAULT 0,in_progress INTEGER NOT NULL DEFAULT 0,waiting_until TEXT,follow_ups INTEGER NOT NULL DEFAULT 0,location TEXT NOT NULL DEFAULT '',link TEXT,remind_at TEXT,repeat TEXT,folder_id TEXT REFERENCES planner_folders(id) ON DELETE SET NULL,favorite INTEGER NOT NULL DEFAULT 0,favorite_position REAL,done_at INTEGER,done_day TEXT,position REAL NOT NULL DEFAULT 0,source TEXT NOT NULL DEFAULT '',external_id TEXT,source_done TEXT,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,deleted_at INTEGER);
+    CREATE INDEX IF NOT EXISTS planner_items_user ON planner_items(user_id,workspace_id,day);
+    CREATE INDEX IF NOT EXISTS planner_items_parent ON planner_items(parent_id);
+    CREATE INDEX IF NOT EXISTS planner_items_page ON planner_items(page_id);
+    CREATE INDEX IF NOT EXISTS planner_items_folder ON planner_items(folder_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS planner_items_external ON planner_items(user_id,workspace_id,source,external_id) WHERE external_id IS NOT NULL;
+    CREATE TABLE IF NOT EXISTS planner_item_tags(item_id TEXT NOT NULL REFERENCES planner_items(id) ON DELETE CASCADE,tag_id TEXT NOT NULL REFERENCES planner_tags(id) ON DELETE CASCADE,PRIMARY KEY(item_id,tag_id));
+    CREATE INDEX IF NOT EXISTS planner_item_tags_tag ON planner_item_tags(tag_id);
+    CREATE TABLE IF NOT EXISTS planner_habit_log(item_id TEXT NOT NULL REFERENCES planner_items(id) ON DELETE CASCADE,day TEXT NOT NULL,done_at INTEGER NOT NULL,on_time INTEGER NOT NULL DEFAULT 1,PRIMARY KEY(item_id,day));
+    CREATE TABLE IF NOT EXISTS planner_settings(user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,data TEXT NOT NULL DEFAULT '{}',updated_at INTEGER NOT NULL,PRIMARY KEY(user_id,workspace_id));`);
 }
 // Schema 140 – workspaces.navigation (#564, lib/workspace-navigation.ts):
 // JSON { library, hidden }, NULL = every space as it is set, every place of

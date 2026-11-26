@@ -128,6 +128,12 @@ export const USER_REFERENCES: Record<string, MergeStrategy> = {
   "doc_tasks.updated_by": "move",
   // The own task page per workspace (#208): the target's stays when it has one.
   "personal_task_pages.user_id": "move",
+  // Daybar's planner (lib/daybar/store.ts): the source's items, folders and
+  // tags move; its settings move unless the target has its own.
+  "planner_items.user_id": "move",
+  "planner_folders.user_id": "move",
+  "planner_tags.user_id": "move",
+  "planner_settings.user_id": "move",
   // Where "Aufgabe hinzufügen" writes (#457): the target's choice stays when it has one.
   "my_task_targets.user_id": "move",
   "task_done_log.user_id": "move",

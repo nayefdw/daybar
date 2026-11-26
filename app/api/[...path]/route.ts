@@ -76,6 +76,7 @@ import * as movePath from "../move/[...path]/handler";
 import * as openapiJson from "../openapi.json/handler";
 import * as pagesIdInk from "../pages/[id]/ink/handler";
 import * as pagesIdRecordings from "../pages/[id]/recordings/handler";
+import * as plannerPath from "../planner/[[...path]]/handler";
 import * as printToken from "../print/[token]/handler";
 import * as print from "../print/handler";
 import * as publicTemplatesIdFilesFileId from "../public-templates/[id]/files/[fileId]/handler";
@@ -166,6 +167,7 @@ const routes = apiRoutes([
   ["openapi.json", openapiJson],
   ["pages/[id]/ink", pagesIdInk],
   ["pages/[id]/recordings", pagesIdRecordings],
+  ["planner/[[...path]]", plannerPath],
   ["print/[token]", printToken],
   ["print", print],
   ["public-templates/[id]/files/[fileId]", publicTemplatesIdFilesFileId],

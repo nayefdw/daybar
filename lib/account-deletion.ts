@@ -144,6 +144,13 @@ const PERSONAL = [
   "card_states",
   "review_log",
   "study_prefs",
+  // Daybar's planner (lib/daybar/store.ts): the person's items (their tags
+  // and check-ins go with them), folders, tags and settings. Notes stay
+  // pages and follow the rules for pages.
+  "planner_items",
+  "planner_folders",
+  "planner_tags",
+  "planner_settings",
 ];
 
 // Disabling an account (Administration → Users, SCIM "active": false, the
