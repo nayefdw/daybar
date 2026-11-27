@@ -18,7 +18,7 @@
 // belong to.
 import { serverError } from "@/lib/request-context";
 import { z } from "zod";
-import { checkOrigin, HttpError, requireUser } from "@/lib/auth";
+import { checkOrigin, HttpError, refuseReadToken, requireUser } from "@/lib/auth";
 import { withRequestLocale } from "@/lib/content-locale";
 import { readJsonLimited } from "@/lib/request-body";
 import { all } from "@/lib/db";
@@ -114,6 +114,8 @@ export const POST = withRequestLocale(async (req: Request, { params }: Context) 
     if (path) throw new HttpError(404, "Nicht gefunden.");
     await checkOrigin(req);
     const user = await requireUser();
+    // Before reading a body of up to 25 MB (lib/daybar/store.ts refuses too).
+    refuseReadToken(user);
     const body = await readJsonLimited(req, BODY_LIMIT);
     const { plannerCommand } = await import("@/lib/daybar/store");
     return Response.json(await plannerCommand(user, body), { headers: NO_STORE });

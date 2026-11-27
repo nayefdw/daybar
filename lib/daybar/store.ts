@@ -722,8 +722,10 @@ export async function plannerCommand(user: Identity, body: unknown): Promise<unk
     const target = () => uuid.parse(input.id);
     switch (action) {
       case "item.create": {
-        const fields = itemFields.parse(input.item);
-        const clientId = input.item && typeof input.item === "object" && "id" in input.item ? uuid.parse((input.item as { id: unknown }).id) : undefined;
+        // The browser makes the id of what it creates (it shows it at once).
+        const { id: rawId, ...item } = (input.item && typeof input.item === "object" ? input.item : {}) as Record<string, unknown>;
+        const fields = itemFields.parse(item);
+        const clientId = rawId === undefined ? undefined : uuid.parse(rawId);
         if (fields.kind === "note") return await createNote(ctx, { ...fields, id: clientId });
         return await createItem(ctx, { ...fields, id: clientId });
       }

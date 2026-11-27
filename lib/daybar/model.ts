@@ -3,10 +3,20 @@
 // day arithmetic on YYYY-MM-DD strings, and the questions every view asks
 // ("what is on this day", "what is overdue", "which group is this task
 // in"). Pure functions, no database, no DOM.
-import { addDays, weekStart, weekdayOf } from "./quick-add";
 import type { RepeatRule } from "./repeat";
 
-export { addDays, weekStart, weekdayOf };
+// Day arithmetic on YYYY-MM-DD in UTC (no time zone can shift a day).
+const utcDate = (day: string) => new Date(`${day}T00:00:00Z`);
+export function addDays(day: string, n: number) {
+  const d = utcDate(day);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+// 0 = Sunday … 6 = Saturday.
+export const weekdayOf = (day: string) => utcDate(day).getUTCDay();
+export function weekStart(day: string, weekStartsOn: 0 | 1 = 1) {
+  return addDays(day, -((weekdayOf(day) - weekStartsOn + 7) % 7));
+}
 export type ItemKind = "task" | "event" | "habit" | "note";
 export const ITEM_KINDS: readonly ItemKind[] = ["task", "event", "habit", "note"];
 export type Period = "week" | "month" | "someday";

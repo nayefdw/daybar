@@ -59,6 +59,16 @@ test("a task, an event and a habit, shaped by their kind", async () => {
   assert.ok(s.items.some((i: { id: string }) => i.id === task.id));
 });
 
+test("the browser's own id: kept, never twice, never another shape", async () => {
+  const id1 = "0b8f6a2e-6c1d-4f5e-9a3b-2d7c8e9f0a1b";
+  const made = await create({ id: id1, kind: "task", title: "Made in the browser" });
+  assert.equal(made.id, id1);
+  await assert.rejects(create({ id: id1, kind: "task", title: "Again" }), /gibt es schon/);
+  await assert.rejects(create({ id: "not-a-uuid", kind: "task", title: "Bad id" }));
+  // Fields the planner does not know are refused.
+  await assert.rejects(create({ kind: "task", title: "x", owner: "someone" }));
+});
+
 test("only the person's own planner: others neither read nor change it", async () => {
   const mine = await create({ kind: "task", title: "Private plan" });
   assert.equal((await state(ben)).items.some((i: { id: string }) => i.id === mine.id), false);
