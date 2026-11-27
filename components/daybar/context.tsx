@@ -8,6 +8,7 @@ import type { ItemKind, PlannerItem } from "@/lib/daybar/model";
 import { tr } from "@/lib/locale-tag";
 import { usePlanner, useToday, type ItemDraft, type PlannerStore } from "./store";
 import type { MenuAt } from "./item-menu";
+import { useUpdateNotice } from "./update-notice";
 
 const QuickAddDialog = dynamic(() => import("./quick-add").then((m) => m.QuickAddDialog));
 const ItemMenu = dynamic(() => import("./item-menu"));
@@ -53,6 +54,8 @@ export function PlannerProvider({
 }) {
   const planner = usePlanner(workspaceId);
   const today = useToday();
+  // "Daybar has been updated – Reload" (components/daybar/update-notice.ts).
+  useUpdateNotice();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [request, setRequest] = useState<QuickAddRequest | null>(null);
