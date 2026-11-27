@@ -8,6 +8,7 @@ import { useT } from "../i18n";
 import { isFollowUp, isWaiting, subtaskProgress, taskDay, type PlannerItem } from "@/lib/daybar/model";
 import { countdown, dayLabel, durationLabel, spanLabel, timeLabel } from "./format";
 import { usePlannerUi } from "./context";
+import { ChosenIcon } from "./item-icon";
 
 export const PRIORITY_CLASS = ["", "pri-low", "pri-medium", "pri-high"] as const;
 type T = (de: string, en: string) => string;
@@ -79,7 +80,13 @@ export function ItemMeta({ item, showDay = false, hideTime = false }: { item: Pl
   if (item.remindAt) parts.push(<Bell key="remind" size={12} aria-label={t("Erinnerung", "Reminder")} />);
   if (item.location) parts.push(<span key="loc" className="db-meta-icon"><MapPin size={12} aria-hidden />{item.location}</span>);
   if (item.link) parts.push(<Link key="link" size={12} aria-label={t("Link", "Link")} />);
-  if (folder) parts.push(<span key="folder" className={`db-folder opt-${folder.color}`}>{folder.name}</span>);
+  if (folder)
+    parts.push(
+      <span key="folder" className={`db-folder opt-${folder.color}`}>
+        {folder.icon && <ChosenIcon name={folder.icon} size={11} />}
+        {folder.name}
+      </span>,
+    );
   for (const tag of tags) parts.push(<span key={`tag-${tag.id}`} className="db-tag">#{tag.name}</span>);
   if (item.favorite) parts.push(<Star key="fav" size={12} fill="currentColor" className="db-fav" aria-label={t("Favorit", "Favourite")} />);
   if (!parts.length) return null;
@@ -106,17 +113,21 @@ export function ItemRow({
   className?: string;
   trailing?: ReactNode;
 }) {
-  const { select, selectedId } = usePlannerUi();
+  const { select, selectedId, openMenu } = usePlannerUi();
   return (
     <div
       className={`db-row kind-${item.kind}${item.doneAt ? " is-done" : ""}${selectedId === item.id ? " is-selected" : ""} ${className}`}
       draggable={draggable}
       onDragStart={onDragStart}
+      onContextMenu={(e) => openMenu(e, item)}
       data-item={item.id}
     >
       <ItemMark item={item} />
       <button type="button" className="db-row-main" onClick={() => select(item.id)}>
-        <span className="db-row-title">{item.title || "…"}</span>
+        <span className="db-row-title">
+          {item.icon && <ChosenIcon name={item.icon} size={15} className="db-title-icon" />}
+          {item.title || "…"}
+        </span>
         <ItemMeta item={item} showDay={showDay} hideTime={hideTime} />
       </button>
       {trailing}

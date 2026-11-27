@@ -6,7 +6,9 @@
 // subtasks, folder, tags, favourite. Events: start, end, all-day. Habits:
 // the repeat rule and the record. Notes open their page.
 import { useEffect, useId, useState, type ReactNode } from "react";
-import { Copy, ExternalLink, Plus, Star, Trash2, X } from "lucide-react";
+import { Copy, ExternalLink, Plus, Shapes, Star, Trash2, X } from "lucide-react";
+import { IconPicker } from "./icon-picker";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { addDays, monthStart, subtasksOf, weekStart, type PlannerItem } from "@/lib/daybar/model";
@@ -73,6 +75,14 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
       )}
       <div className="db-details-title">
         {item.kind === "task" && <TaskCheck item={item} onToggle={() => void store.setDone(item.id, !item.doneAt)} size={22} />}
+        <IconPicker
+          value={item.icon}
+          onChange={(icon) => update({ icon })}
+          label={item.icon ? t(`Symbol von „${item.title}“ ändern`, `Change the icon of “${item.title}”`) : t(`Symbol für „${item.title}“ wählen`, `Choose an icon for “${item.title}”`)}
+          className={item.icon ? "has-icon" : "is-empty"}
+        >
+          {item.icon ? <ChosenIcon name={item.icon} size={20} /> : <Shapes size={17} aria-hidden />}
+        </IconPicker>
         <TextField label={t("Titel", "Title")} value={item.title} onSave={(title) => title.trim() && update({ title })} />
       </div>
       <div className="db-details-kind">
@@ -343,10 +353,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
           <button
             type="button"
             className="button"
-            onClick={() => {
-              const { id: _id, tags: _tags, createdAt: _c, updatedAt: _u, doneAt: _d, doneDay: _dd, ...rest } = item;
-              void store.create({ ...rest, title: `${item.title}`, tags, source: undefined, externalId: undefined, deletedAt: undefined } as never).then((copy) => copy && select(copy.id));
-            }}
+            onClick={() => void store.duplicate(item).then((copy) => copy && select(copy.id))}
           >
             <Copy size={15} aria-hidden />
             {t("Duplizieren", "Duplicate")}

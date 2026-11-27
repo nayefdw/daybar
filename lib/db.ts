@@ -1724,6 +1724,9 @@ function migrate(d: DatabaseSync) {
   // workspace, their folders, tags and habit check-ins, and the planner's
   // settings (ThisDay sync state among them).
   migrateDaybarPlanner(d);
+  // The icons of planner items and folders: new nullable columns an older
+  // version leaves alone, so the schema number stays.
+  migrateDaybarIcons(d);
   // A database from a newer version keeps its number.
   if (Number((d.prepare("PRAGMA user_version").get() as { user_version: number }).user_version) < SCHEMA_VERSION)
     d.exec(`PRAGMA user_version=${SCHEMA_VERSION}`);
@@ -1769,6 +1772,13 @@ function migrateDaybarPlanner(d: DatabaseSync) {
     CREATE INDEX IF NOT EXISTS planner_item_tags_tag ON planner_item_tags(tag_id);
     CREATE TABLE IF NOT EXISTS planner_habit_log(item_id TEXT NOT NULL REFERENCES planner_items(id) ON DELETE CASCADE,day TEXT NOT NULL,done_at INTEGER NOT NULL,on_time INTEGER NOT NULL DEFAULT 1,PRIMARY KEY(item_id,day));
     CREATE TABLE IF NOT EXISTS planner_settings(user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,workspace_id TEXT NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,data TEXT NOT NULL DEFAULT '{}',updated_at INTEGER NOT NULL,PRIMARY KEY(user_id,workspace_id));`);
+}
+// planner_items.icon and planner_folders.icon: the Lucide icon a person put
+// in front of an item or a folder (lib/daybar/icons.ts), NULL for none.
+function migrateDaybarIcons(d: DatabaseSync) {
+  for (const table of ["planner_items", "planner_folders"])
+    if (!(d.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).some((c) => c.name === "icon"))
+      d.exec(`ALTER TABLE ${table} ADD COLUMN icon TEXT`);
 }
 // Schema 140 – workspaces.navigation (#564, lib/workspace-navigation.ts):
 // JSON { library, hidden }, NULL = every space as it is set, every place of

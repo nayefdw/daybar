@@ -598,6 +598,7 @@ const exact: Record<string, string> = {
   "Ungültige Uhrzeit.": "Invalid time.",
   "Ungültiger Link.": "Invalid link.",
   "Ungültige Erinnerung.": "Invalid reminder.",
+  "Unbekanntes Symbol.": "Unknown icon.",
   "Keine Eigenschaft für Zeiterfassung.": "No time tracking property.",
   "Zeiteintrag nicht gefunden.": "Time entry not found.",
   "Nur eigene Zeiteinträge löschen.": "Only delete your own time entries.",

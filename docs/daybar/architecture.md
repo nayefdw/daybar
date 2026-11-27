@@ -34,11 +34,11 @@ All are personal: `user_id` is the person whose planner it is, `workspace_id` th
   - Tasks: `priority` 0–3, `in_progress`, `waiting_until` with `follow_ups` (each new wait counts one), `duration` (minutes), `location`, `link`, `remind_at` (`YYYY-MM-DDTHH:MM`, apart from the due day), nested subtasks through `parent_id` (at most four levels), `done_at`/`done_day`.
   - Habits: `repeat` holds the rule as JSON (`lib/daybar/repeat.ts`).
   - Notes: `page_id` is the flowplan document; the planner shows the page's title and renames the page when the note is renamed. Notes imported from ThisDay or the old page are plain text (`body`, no page).
-  - Organizing: `folder_id` (one), tags through `planner_item_tags`, `favorite` with `favorite_position`, `position`.
+  - Organizing: `folder_id` (one), tags through `planner_item_tags`, `favorite` with `favorite_position`, `position`, and `icon`: a Lucide icon by name shown in front of the title (`lib/daybar/icons.ts` lists the names the server accepts; the browser loads their drawings when one shows, `components/daybar/icon-set.tsx`).
   - Imports: `source` (`thisday`, `legacy`) with `external_id` (unique per person and source); `source_done` keeps ThisDay's own done days as of the last import.
   - The trash: `deleted_at` (ms). Subtasks go and come back with their task; a note's page goes to flowplan's trash with it.
 - **`planner_habit_log`**: a habit's check-ins, one per day; `on_time` is 0 for a day logged afterwards (streaks count on-time check-ins only).
-- **`planner_folders`**, **`planner_tags`** (unique per person by `lower(name)`), **`planner_item_tags`**.
+- **`planner_folders`** (with an optional `icon` like items), **`planner_tags`** (unique per person by `lower(name)`), **`planner_item_tags`**. The `icon` columns came after schema 141 as nullable columns an older version leaves alone, so the schema number stayed.
 - **`planner_settings`**: per person and workspace, JSON: week start, default event length, working hours, the calendar's last view, the notes page, the day-note journal, and the ThisDay sync state (last export, sent outbox keys, the folder of each ThisDay category).
 
 PostgreSQL gets the same tables from `lib/db-driver/postgres-schema.json` (regenerated with `node --import tsx scripts/db-pg-schema.mjs`). Account deletion removes the planner (`lib/account-deletion.ts`), an account merge moves it (`lib/account-merge.ts`).

@@ -4,6 +4,7 @@
 // Folders and Tags with five items each and "View all (N)".
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Calendar, CalendarCheck, CalendarDays, ChevronRight, Folder, Plus, RefreshCw, Repeat, SquareCheck, Star, StickyNote, Sun, Tag } from "lucide-react";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { isOverdue, itemsOnDay } from "@/lib/daybar/model";
 import { habitDue } from "@/lib/daybar/repeat";
@@ -22,7 +23,7 @@ function readFolds(): Set<Fold> {
 
 export function PlannerNav({ active, onNavigate }: { active: string | null; onNavigate?: () => void }) {
   const t = useT();
-  const { state, today, go, select } = usePlannerUi();
+  const { state, today, go, select, openMenu } = usePlannerUi();
   const [folds, setFolds] = useState<Set<Fold>>(() => new Set());
   useEffect(() => setFolds(readFolds()), []);
   const toggle = (f: Fold) => {
@@ -101,8 +102,8 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
         <Star size={13} aria-hidden="true" />,
         favorites.length,
         favorites.slice(0, SHOWN).map((i) => (
-          <button key={i.id} type="button" className="favorite-nav" onClick={() => [select(i.id), onNavigate?.()]}>
-            <span className={`planner-dot kind-${i.kind}`} aria-hidden />
+          <button key={i.id} type="button" className="favorite-nav" data-item={i.id} onContextMenu={(e) => openMenu(e, i)} onClick={() => [select(i.id), onNavigate?.()]}>
+            {i.icon ? <ChosenIcon name={i.icon} size={16} className="planner-item-icon" /> : <span className={`planner-dot kind-${i.kind}`} aria-hidden />}
             <span>{i.title}</span>
           </button>
         )),
@@ -115,7 +116,11 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
         state?.folders.length ?? 0,
         (state?.folders || []).slice(0, SHOWN).map((f) => (
           <button key={f.id} type="button" className={`favorite-nav${active === `folder/${f.id}` ? " selected" : ""}`} onClick={() => open(`folder/${f.id}`)}>
-            <Folder size={16} fill="currentColor" className={`planner-folder opt-${f.color}`} aria-hidden />
+            {f.icon ? (
+              <ChosenIcon name={f.icon} size={16} className={`planner-folder opt-${f.color}`} />
+            ) : (
+              <Folder size={16} fill="currentColor" className={`planner-folder opt-${f.color}`} aria-hidden />
+            )}
             <span>{f.name}</span>
           </button>
         )),

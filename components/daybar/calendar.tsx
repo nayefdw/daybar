@@ -9,6 +9,7 @@
 // (undo in the toast).
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import {
@@ -82,7 +83,7 @@ type Drag =
 
 export default function CalendarScreen() {
   const t = useT();
-  const { state, today, store, select, quickAdd } = usePlannerUi();
+  const { state, today, store, select, quickAdd, openMenu } = usePlannerUi();
   const settings = state?.settings;
   const [view, setView] = useState<CalendarView>(settings?.calendarView ?? "week");
   const [count, setCount] = useState(settings?.calendarDays ?? 3);
@@ -285,12 +286,15 @@ export default function CalendarScreen() {
                     key={i.id}
                     type="button"
                     className={`db-month-item kind-${i.kind}${i.doneAt ? " is-done" : ""}`}
+                    data-item={i.id}
+                    onContextMenu={(e) => openMenu(e, i)}
                     draggable
                     onDragStart={(e) => e.dataTransfer.setData(DRAG_TYPE, i.id)}
                     onClick={() => select(i.id)}
                     onKeyDown={(e) => removeKey(e, i)}
                   >
                     {i.time && !i.allDay && <span>{timeLabel(i.time)}</span>}
+                    {i.icon && <ChosenIcon name={i.icon} size={12} className="db-title-icon" />}
                     {i.title}
                   </button>
                 ))}
@@ -339,12 +343,15 @@ export default function CalendarScreen() {
               key={i.id}
               type="button"
               className="db-allday-event kind-event"
+              data-item={i.id}
+              onContextMenu={(e) => openMenu(e, i)}
               style={{ gridColumn: `${from + 1} / ${to + 2}`, gridRow: row + 1 }}
               draggable
               onDragStart={(e) => e.dataTransfer.setData(DRAG_TYPE, i.id)}
               onClick={() => select(i.id)}
               onKeyDown={(e) => removeKey(e, i)}
             >
+              {i.icon && <ChosenIcon name={i.icon} size={12} className="db-title-icon" />}
               {i.title}
             </button>
           );
@@ -365,9 +372,17 @@ export default function CalendarScreen() {
             {state.items
               .filter((i) => taskOnDay(i, d, today) && !i.time)
               .map((i) => (
-                <div key={i.id} className={`db-allday-task${i.doneAt ? " is-done" : ""}`} draggable onDragStart={(e) => e.dataTransfer.setData(DRAG_TYPE, i.id)}>
+                <div
+                  key={i.id}
+                  className={`db-allday-task${i.doneAt ? " is-done" : ""}`}
+                  data-item={i.id}
+                  onContextMenu={(e) => openMenu(e, i)}
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData(DRAG_TYPE, i.id)}
+                >
                   <TaskCheck item={i} onToggle={() => void store.setDone(i.id, !i.doneAt)} size={14} />
                   <button type="button" onClick={() => select(i.id)} onKeyDown={(e) => removeKey(e, i)}>
+                    {i.icon && <ChosenIcon name={i.icon} size={12} className="db-title-icon" />}
                     {i.title}
                   </button>
                 </div>
@@ -410,13 +425,18 @@ export default function CalendarScreen() {
                         role="button"
                         tabIndex={0}
                         className={`db-block kind-${seg.item.kind}${seg.item.doneAt ? " is-done" : ""}${live ? " is-dragging" : ""}${end - start < 45 ? " is-short" : ""}`}
+                        data-item={seg.item.id}
+                        onContextMenu={(e) => openMenu(e, seg.item)}
                         style={{ top: (start / 60) * HOUR, height: Math.max(18, ((end - start) / 60) * HOUR - 2), left: `calc(${(seg.lane / seg.lanes) * 100}% + 2px)`, width: `calc(${100 / seg.lanes}% - 4px)` }}
                         onPointerDown={(e) => startItem(e, seg, "move")}
                         onClick={() => !dragged.current && select(seg.item.id)}
                         onKeyDown={(e) => (e.key === "Enter" || e.key === " " ? (e.preventDefault(), select(seg.item.id)) : removeKey(e, seg.item))}
                         aria-label={`${seg.item.title}, ${timeLabel(timeOf(start))}–${timeLabel(timeOf(end % 1440))}`}
                       >
-                        <strong>{seg.item.title}</strong>
+                        <strong>
+                          {seg.item.icon && <ChosenIcon name={seg.item.icon} size={12} className="db-title-icon" />}
+                          {seg.item.title}
+                        </strong>
                         <span>{`${timeLabel(timeOf(start))}–${timeLabel(timeOf(end % 1440))}`}</span>
                         <span className="db-block-resize" onPointerDown={(e) => startItem(e, seg, "resize")} aria-hidden />
                       </div>

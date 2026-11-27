@@ -6,8 +6,10 @@
 import { useState } from "react";
 import { Folder as FolderIcon, Pencil, Plus, Star, Tag as TagIcon, Trash2 } from "lucide-react";
 import { useT } from "../i18n";
-import { addDays, type PlannerItem } from "@/lib/daybar/model";
+import { addDays, type Folder, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
+import { IconPicker } from "./icon-picker";
+import { ChosenIcon } from "./item-icon";
 import { CaptureLine } from "./quick-add";
 import { Empty, ItemRow, PlannerStatus, Section } from "./parts";
 import { dayLabel, dayMonth, weekdayShort } from "./format";
@@ -105,7 +107,12 @@ function Collection({ kind, id }: { kind: "folder" | "tag"; id: string }) {
   const title = kind === "folder" ? meta.name : `#${meta.name}`;
   return (
     <>
-      <TasksScreen folderId={kind === "folder" ? id : undefined} tagId={kind === "tag" ? id : undefined} title={title} />
+      <TasksScreen
+        folderId={kind === "folder" ? id : undefined}
+        tagId={kind === "tag" ? id : undefined}
+        title={title}
+        lead={kind === "folder" ? <FolderIconPicker folder={meta as Folder} size={22} /> : undefined}
+      />
       <div className="db-screen db-collection-rest">
         {notes.length > 0 && (
           <Section title={t("Notizen", "Notes")} count={notes.length}>
@@ -166,6 +173,22 @@ export function FavoritesScreen() {
   );
 }
 
+// A folder's icon in its colour; choosing another (or none: the folder symbol).
+function FolderIconPicker({ folder, size }: { folder: Folder; size: number }) {
+  const t = useT();
+  const { store } = usePlannerUi();
+  return (
+    <IconPicker
+      value={folder.icon}
+      onChange={(icon) => void store.updateFolder(folder.id, { icon })}
+      label={t(`Symbol von „${folder.name}“ wählen`, `Choose the icon of “${folder.name}”`)}
+      className={`opt-${folder.color} db-folder-icon-button`}
+    >
+      {folder.icon ? <ChosenIcon name={folder.icon} size={size} className="planner-folder" /> : <FolderIcon size={size} fill="currentColor" className="planner-folder" aria-hidden />}
+    </IconPicker>
+  );
+}
+
 // "View all" of folders or tags: counts, colours, rename, delete, new.
 export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
   const t = useT();
@@ -213,7 +236,7 @@ export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
         <ul className="db-meta-list">
           {list.map((m) => (
             <li key={m.id}>
-              <Icon size={16} aria-hidden className={`opt-${m.color} db-meta-swatch`} />
+              {kind === "folders" ? <FolderIconPicker folder={m as Folder} size={16} /> : <Icon size={16} aria-hidden className={`opt-${m.color} db-meta-swatch`} />}
               {editing === m.id ? (
                 <input
                   className="db-input"

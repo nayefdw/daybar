@@ -55,6 +55,8 @@ export type PlannerItem = {
   // Habits.
   repeat: RepeatRule | null;
   folderId: string | null;
+  // The icon in front of the title (lib/daybar/icons.ts), none by default.
+  icon: string | null;
   // Tag ids.
   tags: string[];
   favorite: boolean;
@@ -71,7 +73,8 @@ export type PlannerItem = {
 
 // A habit's check-in; onTime is false for a day logged afterwards.
 export type HabitLog = { itemId: string; day: string; onTime: boolean };
-export type Folder = { id: string; name: string; color: string; position: number };
+// `icon`: shown instead of the folder symbol (lib/daybar/icons.ts).
+export type Folder = { id: string; name: string; color: string; icon: string | null; position: number };
 export type Tag = { id: string; name: string; color: string; position: number };
 export type CalendarView = "day" | "days" | "week" | "month";
 export type PlannerSettings = {
@@ -137,6 +140,7 @@ export function blankItem(kind: ItemKind, at = Date.now()): PlannerItem {
     remindAt: null,
     repeat: null,
     folderId: null,
+    icon: null,
     tags: [],
     favorite: false,
     favoritePosition: null,

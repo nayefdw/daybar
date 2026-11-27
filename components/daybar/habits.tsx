@@ -6,6 +6,7 @@
 // its repeat editor opens in the right panel.
 import { useMemo, useState } from "react";
 import { Check, Flame } from "lucide-react";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { bestStreak, habitDue, habitFinished, monthRate, ruleLabel, streak, weekStrip } from "@/lib/daybar/repeat";
@@ -20,7 +21,7 @@ type GroupBy = "today" | "folder" | "tag";
 
 export default function HabitsScreen() {
   const t = useT();
-  const { state, today, store, select } = usePlannerUi();
+  const { state, today, store, select, openMenu } = usePlannerUi();
   const [groupBy, setGroupBy] = useState<GroupBy>("today");
   const weekStartsOn = state?.settings.weekStart ?? 1;
   const rows = useMemo(() => {
@@ -73,7 +74,7 @@ export default function HabitsScreen() {
               </header>
               <ul className="db-habit-list">
                 {g.rows.map(({ habit, checkins, due, done }) => (
-                  <HabitRow key={habit.id} habit={habit} checkins={checkins} due={due} done={done} onOpen={() => select(habit.id)} onToggle={(day, on) => void store.checkHabit(habit.id, day, on)} today={today} weekStartsOn={weekStartsOn} />
+                  <HabitRow key={habit.id} habit={habit} checkins={checkins} due={due} done={done} onOpen={() => select(habit.id)} onMenu={(e) => openMenu(e, habit)} onToggle={(day, on) => void store.checkHabit(habit.id, day, on)} today={today} weekStartsOn={weekStartsOn} />
                 ))}
               </ul>
             </section>
@@ -89,6 +90,7 @@ function HabitRow({
   due,
   done,
   onOpen,
+  onMenu,
   onToggle,
   today,
   weekStartsOn,
@@ -98,6 +100,7 @@ function HabitRow({
   due: boolean;
   done: boolean;
   onOpen: () => void;
+  onMenu: (e: React.MouseEvent) => void;
   onToggle: (day: string, on: boolean) => void;
   today: string;
   weekStartsOn: 0 | 1;
@@ -108,7 +111,7 @@ function HabitRow({
   const best = bestStreak(h, checkins, today, weekStartsOn);
   const rate = monthRate(h, checkins, today, weekStartsOn);
   return (
-    <li className={`db-habit${done ? " is-done" : ""}${due ? "" : " is-off"}`}>
+    <li className={`db-habit${done ? " is-done" : ""}${due ? "" : " is-off"}`} data-item={habit.id} onContextMenu={onMenu}>
       <button
         type="button"
         role="checkbox"
@@ -120,7 +123,10 @@ function HabitRow({
         {done && <Check size={16} strokeWidth={2.75} aria-hidden />}
       </button>
       <button type="button" className="db-habit-main" onClick={onOpen}>
-        <span className="db-row-title">{habit.title}</span>
+        <span className="db-row-title">
+          {habit.icon && <ChosenIcon name={habit.icon} size={15} className="db-title-icon" />}
+          {habit.title}
+        </span>
         <span className="db-meta">
           <span>{habit.repeat ? ruleLabel(habit.repeat, t, weekdayName, weekStartsOn) : ""}</span>
           {habit.time && <span>{timeLabel(habit.time)}</span>}

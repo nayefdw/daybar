@@ -5,6 +5,7 @@
 // earlier days with "Move to today" and "Move all".
 import { useEffect, useMemo, useState, type DragEvent } from "react";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, NotebookPen } from "lucide-react";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { api } from "../ui";
 import { showToast } from "../toast";
@@ -180,7 +181,7 @@ export default function TodayScreen() {
               return (
                 <li key={h.id} className="db-line kind-habit">
                   <span className="db-line-time">{timeLabel(h.time)}</span>
-                  <div className={`db-row kind-habit${done ? " is-done" : ""}`}>
+                  <div className={`db-row kind-habit${done ? " is-done" : ""}`} data-item={h.id} onContextMenu={(e) => ui.openMenu(e, h)}>
                     <button
                       type="button"
                       role="checkbox"
@@ -193,7 +194,10 @@ export default function TodayScreen() {
                       {done && <Check size={12} strokeWidth={2.75} aria-hidden />}
                     </button>
                     <button type="button" className="db-row-main" onClick={() => ui.select(h.id)}>
-                      <span className="db-row-title">{h.title}</span>
+                      <span className="db-row-title">
+                        {h.icon && <ChosenIcon name={h.icon} size={15} className="db-title-icon" />}
+                        {h.title}
+                      </span>
                       <ItemMeta item={h} hideTime />
                     </button>
                   </div>

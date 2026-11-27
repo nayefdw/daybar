@@ -36,6 +36,7 @@ const FIELDS = [
   "remindAt",
   "repeat",
   "folderId",
+  "icon",
   "tags",
   "favorite",
   "position",
@@ -119,6 +120,12 @@ export class PlannerStore {
       await this.failed(e);
       return null;
     }
+  }
+  // A copy of an item: open, with its tags, without its import link.
+  async duplicate(item: PlannerItem) {
+    const names = item.tags.map((tid) => this.state?.tags.find((t) => t.id === tid)?.name).filter((n): n is string => !!n);
+    const { id: _id, tags: _tags, createdAt: _c, updatedAt: _u, doneAt: _d, doneDay: _dd, source: _s, externalId: _e, deletedAt: _x, ...rest } = item;
+    return await this.create({ ...rest, tags: names });
   }
   async update(id: string, patch: ItemPatch) {
     const before = this.state?.items.find((i) => i.id === id);

@@ -30,6 +30,7 @@ import {
   type Tag,
 } from "./model";
 import { DAILY, repeatRuleSchema, type RepeatRule } from "./repeat";
+import { isIconName } from "./icons";
 
 const api = import("../api");
 export { blankItem };
@@ -65,6 +66,7 @@ type Row = {
   remind_at: string | null;
   repeat: string | null;
   folder_id: string | null;
+  icon?: string | null;
   favorite: number;
   favorite_position: number | null;
   done_at: number | null;
@@ -112,6 +114,7 @@ export function itemOf(row: Row, tags: string[] = []): PlannerItem {
     remindAt: row.remind_at,
     repeat: row.kind === "habit" ? parseRule(row.repeat) ?? DAILY : null,
     folderId: row.folder_id,
+    icon: isIconName(row.icon) ? row.icon : null,
     tags,
     favorite: !!row.favorite,
     favoritePosition: row.favorite_position,
@@ -217,7 +220,8 @@ export async function plannerState(user: Identity, workspaceId: string, today: s
   };
 }
 async function listFolders(userId: string, workspaceId: string): Promise<Folder[]> {
-  return await all<Folder>("SELECT id,name,color,position FROM planner_folders WHERE user_id=? AND workspace_id=? ORDER BY position,created_at", userId, workspaceId);
+  const rows = await all<Folder>("SELECT id,name,color,icon,position FROM planner_folders WHERE user_id=? AND workspace_id=? ORDER BY position,created_at", userId, workspaceId);
+  return rows.map((f) => ({ ...f, icon: isIconName(f.icon) ? f.icon : null }));
 }
 async function listTags(userId: string, workspaceId: string): Promise<Tag[]> {
   return await all<Tag>("SELECT id,name,color,position FROM planner_tags WHERE user_id=? AND workspace_id=? ORDER BY position,created_at", userId, workspaceId);
@@ -236,6 +240,8 @@ export async function readItem(user: Identity, workspaceId: string, itemId: stri
 // ---- Validation ----
 
 const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, "Ungültige ID.").transform((v) => v.toLowerCase());
+// An icon of lib/daybar/icons.ts by its name.
+const iconName = z.string().refine(isIconName, "Unbekanntes Symbol.");
 const dayText = z.string().refine(isDay, "Ungültiges Datum.");
 const timeText = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Ungültige Uhrzeit.");
 const httpUrl = z
@@ -276,6 +282,7 @@ export const itemFields = z
       .nullable(),
     repeat: repeatRuleSchema.nullable(),
     folderId: uuid.nullable(),
+    icon: iconName.nullable(),
     tags: z.array(tagName).max(30),
     favorite: z.boolean(),
     position: z.number().finite(),
@@ -408,6 +415,7 @@ const COLUMNS: [keyof PlannerItem, string, (v: unknown) => unknown][] = [
   ["remindAt", "remind_at", (v) => v],
   ["repeat", "repeat", (v) => (v ? JSON.stringify(v) : null)],
   ["folderId", "folder_id", (v) => v],
+  ["icon", "icon", (v) => v],
   ["favorite", "favorite", (v) => (v ? 1 : 0)],
   ["favoritePosition", "favorite_position", (v) => v],
   ["doneAt", "done_at", (v) => v],
@@ -660,18 +668,20 @@ export function htmlLines(html: string) {
 
 // ---- Folders and tags ----
 
-const folderInput = z.object({ name: z.string().trim().min(1).max(80), color: color.default("gray") });
+const folderInput = z.object({ name: z.string().trim().min(1).max(80), color: color.default("gray"), icon: iconName.nullable().default(null) });
 export async function createFolder(ctx: Ctx, input: unknown) {
-  const { name, color: c } = folderInput.parse(input);
+  const { name, color: c, icon } = folderInput.parse(input);
   const count = (await one<{ n: number }>("SELECT COUNT(*) n FROM planner_folders WHERE user_id=? AND workspace_id=?", ctx.user.id, ctx.workspaceId))?.n ?? 0;
   if (count >= MAX_FOLDERS) throw new HttpError(400, "Höchstens 200 Ordner.");
-  const folder: Folder = { id: id(), name, color: c, position: count + 1 };
-  await run("INSERT INTO planner_folders(id,workspace_id,user_id,name,color,position,created_at) VALUES(?,?,?,?,?,?,?)", folder.id, ctx.workspaceId, ctx.user.id, name, c, folder.position, Date.now());
+  const folder: Folder = { id: id(), name, color: c, icon, position: count + 1 };
+  await run("INSERT INTO planner_folders(id,workspace_id,user_id,name,color,icon,position,created_at) VALUES(?,?,?,?,?,?,?,?)", folder.id, ctx.workspaceId, ctx.user.id, name, c, icon, folder.position, Date.now());
   return folder;
 }
 const patchMeta = z.object({ name: z.string().trim().min(1).max(80), color, position: z.number().finite() }).partial().strict();
+// A folder also takes an icon (shown instead of the folder symbol).
+const folderPatch = z.object({ name: z.string().trim().min(1).max(80), color, position: z.number().finite(), icon: iconName.nullable() }).partial().strict();
 export async function updateFolder(ctx: Ctx, folderId: string, input: unknown) {
-  const patch = patchMeta.parse(input);
+  const patch = folderPatch.parse(input);
   await checkFolder(ctx, folderId);
   for (const [key, value] of Object.entries(patch)) await run(`UPDATE planner_folders SET ${key}=? WHERE id=? AND user_id=?`, value as never, folderId, ctx.user.id);
   return (await listFolders(ctx.user.id, ctx.workspaceId)).find((f) => f.id === folderId)!;

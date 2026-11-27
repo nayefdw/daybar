@@ -69,6 +69,34 @@ test("the browser's own id: kept, never twice, never another shape", async () =>
   await assert.rejects(create({ kind: "task", title: "x", owner: "someone" }));
 });
 
+test("icons in front of items and folders: one of the list, or none", async () => {
+  const cart = await create({ kind: "task", title: "Groceries", icon: "shopping-cart" });
+  assert.equal(cart.icon, "shopping-cart");
+  const changed = await act({ action: "item.update", id: cart.id, patch: { icon: "carrot" } });
+  assert.equal(changed.icon, "carrot");
+  const cleared = await act({ action: "item.update", id: cart.id, patch: { icon: null } });
+  assert.equal(cleared.icon, null);
+  // Only names of lib/daybar/icons.ts.
+  await assert.rejects(create({ kind: "task", title: "x", icon: "not-an-icon" }), /Symbol/);
+  await assert.rejects(act({ action: "item.update", id: cart.id, patch: { icon: "<svg>" } }), /Symbol/);
+  assert.equal((await create({ kind: "event", title: "Flight", day: "2026-12-04", time: "07:00", icon: "plane" })).icon, "plane");
+  // Folders: an icon when made or later, none by default.
+  const errands = await act({ action: "folder.create", folder: { name: "Errands", color: "orange" } });
+  assert.equal(errands.icon, null);
+  const trips = await act({ action: "folder.create", folder: { name: "Trips", color: "blue", icon: "luggage" } });
+  assert.equal(trips.icon, "luggage");
+  assert.equal((await act({ action: "folder.update", id: errands.id, patch: { icon: "store" } })).icon, "store");
+  await assert.rejects(act({ action: "folder.update", id: errands.id, patch: { icon: "nope" } }), /Symbol/);
+  const s = await state();
+  assert.deepEqual(
+    s.folders.filter((f: { id: string }) => [errands.id, trips.id].includes(f.id)).map((f: { icon: string | null }) => f.icon),
+    ["store", "luggage"],
+  );
+  // Tags take no icon.
+  const tag = s.tags[0];
+  if (tag) await assert.rejects(act({ action: "tag.update", id: tag.id, patch: { icon: "star" } }));
+});
+
 test("only the person's own planner: others neither read nor change it", async () => {
   const mine = await create({ kind: "task", title: "Private plan" });
   assert.equal((await state(ben)).items.some((i: { id: string }) => i.id === mine.id), false);

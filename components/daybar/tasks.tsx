@@ -4,8 +4,9 @@
 // list, a board (one column per group; drop on a day to move there) or a
 // table. Sorted by time, priority, title or creation; filtered by text,
 // priority, folder and tag, the filters shown as pills.
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Kanban, List, Table, X } from "lucide-react";
+import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { addDays, monthStart, movedToDay, taskDay, taskGroups, weekStart, type PlannerItem, type TaskGroup } from "@/lib/daybar/model";
@@ -33,7 +34,7 @@ const keep = (key: string, value: string) => {
   } catch {}
 };
 
-export default function TasksScreen({ folderId, tagId, title }: { folderId?: string; tagId?: string; title?: string }) {
+export default function TasksScreen({ folderId, tagId, title, lead }: { folderId?: string; tagId?: string; title?: string; lead?: ReactNode }) {
   const t = useT();
   const { state, today, store } = usePlannerUi();
   const [layout, setLayout] = useState<Layout>(() => read("daybar-tasks-layout", ["list", "board", "table"], "list"));
@@ -126,6 +127,7 @@ export default function TasksScreen({ folderId, tagId, title }: { folderId?: str
     <div className={`db-screen db-tasks is-${layout}`}>
       <header className="db-screen-head">
         <h1>
+          {lead}
           {title || t("Aufgaben", "Tasks")} <span className="db-count">{total}</span>
         </h1>
         <div className="db-segmented" role="radiogroup" aria-label={t("Darstellung", "Layout")}>
@@ -267,16 +269,17 @@ export default function TasksScreen({ folderId, tagId, title }: { folderId?: str
 
 function TableRow({ item }: { item: PlannerItem }) {
   const t = useT();
-  const { state, today, store, select } = usePlannerUi();
+  const { state, today, store, select, openMenu } = usePlannerUi();
   const folder = item.folderId ? state!.folders.find((f) => f.id === item.folderId) : null;
   const day = taskDay(item);
   return (
-    <tr className={item.doneAt ? "is-done" : undefined}>
+    <tr className={item.doneAt ? "is-done" : undefined} data-item={item.id} onContextMenu={(e) => openMenu(e, item)}>
       <td className="db-col-check">
         <TaskCheck item={item} onToggle={() => void store.setDone(item.id, !item.doneAt)} size={16} />
       </td>
       <td>
         <button type="button" className="db-table-title" onClick={() => select(item.id)}>
+          {item.icon && <ChosenIcon name={item.icon} size={14} className="db-title-icon" />}
           {item.title}
         </button>
         <ItemMeta item={{ ...item, folderId: null, tags: [], time: null }} />

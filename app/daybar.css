@@ -2038,3 +2038,295 @@ label.db-field-label,
     transition: none;
   }
 }
+
+/* ---------- Chosen icons (components/daybar/icon-picker.tsx, item-icon.tsx) ---------- */
+.db-title-icon {
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 6px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+:is(.db-block, .db-month-item, .db-allday-event, .db-allday-task) .db-title-icon {
+  vertical-align: -1px;
+  margin-right: 4px;
+  color: currentColor;
+  opacity: 0.85;
+}
+.db-icon-box {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.db-folder .db-item-icon {
+  vertical-align: -1px;
+  margin-right: 3px;
+}
+.planner-item-icon {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+.db-icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary);
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease-out, ease), color 0.15s var(--ease-out, ease);
+}
+.db-icon-button:hover,
+.db-icon-button[aria-expanded="true"] {
+  background: var(--hover);
+  color: var(--text);
+}
+.db-icon-button.is-empty {
+  color: var(--muted);
+}
+.db-icon-button.db-folder-icon-button {
+  color: var(--opt-fg, var(--secondary));
+}
+.db-meta-list .db-icon-button {
+  width: 28px;
+  height: 28px;
+}
+.db-screen-head h1 .db-icon-button {
+  margin-right: 4px;
+  vertical-align: -6px;
+}
+.db-icon-panel {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(28, 22, 10, 0.14), 0 2px 6px rgba(28, 22, 10, 0.06);
+  animation: db-pop 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top left;
+}
+@keyframes db-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+.db-icon-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--muted);
+}
+.db-icon-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  padding: 0;
+}
+.db-icon-search input::-webkit-search-cancel-button {
+  display: none;
+}
+.db-icon-clear {
+  border: 0;
+  background: var(--hover);
+  color: var(--secondary);
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  gap: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.db-icon-clear:hover {
+  color: var(--text);
+}
+.db-icon-groups {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 8px 10px;
+}
+.db-icon-group h3 {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin: 10px 4px 6px;
+}
+.db-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+.db-icon-cell {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background-color 0.12s var(--ease-out, ease);
+}
+.db-icon-cell:hover,
+.db-icon-cell:focus-visible {
+  background: var(--hover);
+  outline: none;
+}
+.db-icon-cell.is-on {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+.db-icon-cell .db-icon-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--hover);
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-icon-panel {
+    animation: none;
+  }
+}
+
+/* ---------- Right-click menu of an item (components/daybar/item-menu.tsx) ---------- */
+.db-menu {
+  position: fixed;
+  z-index: 1001;
+  min-width: 228px;
+  max-width: 280px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(28, 22, 10, 0.16), 0 2px 6px rgba(28, 22, 10, 0.06);
+  animation: db-menu-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  font-size: 13px;
+}
+@keyframes db-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+.db-menu-title {
+  padding: 4px 8px 6px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.db-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+.db-menu-item svg {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+.db-menu-item:hover,
+.db-menu-item:focus-visible,
+.db-menu-chip:hover,
+.db-menu-chip:focus-visible {
+  background: var(--blue);
+  color: var(--on-accent);
+  outline: none;
+}
+.db-menu-item:hover svg,
+.db-menu-item:focus-visible svg {
+  color: inherit;
+}
+.db-menu-item.is-danger {
+  color: var(--pri-high);
+}
+.db-menu-item.is-danger svg {
+  color: currentColor;
+}
+.db-menu-item.is-danger:hover,
+.db-menu-item.is-danger:focus-visible {
+  background: var(--pri-high);
+  color: #fff;
+}
+.db-menu-separator {
+  height: 1px;
+  margin: 5px 8px;
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+}
+.db-menu-label {
+  padding: 4px 8px 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.db-menu-row {
+  display: flex;
+  gap: 4px;
+  padding: 0 4px 4px;
+}
+.db-menu-chip {
+  flex: 1 1 auto;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: default;
+}
+.db-menu-chip[aria-checked="true"] {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+.db-menu-priority {
+  flex: 1 1 0;
+}
+.db-menu-priority.pri-0 {
+  color: var(--muted);
+}
+.db-menu-priority.pri-1 {
+  color: var(--pri-low);
+}
+.db-menu-priority.pri-2 {
+  color: var(--pri-medium);
+}
+.db-menu-priority.pri-3 {
+  color: var(--pri-high);
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-menu {
+    animation: none;
+  }
+}
