@@ -4,6 +4,7 @@
 // never, on a date or after N check-ins; a reminder time.
 import { useId } from "react";
 import { useT } from "../i18n";
+import { DurationPicker, fromTime, toTime } from "./duration-picker";
 import { Select } from "../select";
 import { DAILY, type RepeatRule } from "@/lib/daybar/repeat";
 import { weekdayName } from "./format";
@@ -106,8 +107,8 @@ export function RepeatEditor({ rule, onChange, weekStartsOn }: { rule: RepeatRul
         )}
       </div>
       <div className="db-field-row">
-        <label htmlFor={`${id}-remind`}>{t("Erinnerung", "Reminder")}</label>
-        <input id={`${id}-remind`} type="time" className="db-input" value={r.remind ?? ""} onChange={(e) => set({ remind: e.target.value || null })} />
+        <span className="db-field-row-label">{t("Erinnerung", "Reminder")}</span>
+        <DurationPicker mode="time" label={t("Erinnerung", "Reminder")} value={fromTime(r.remind)} onChange={(v) => set({ remind: toTime(v) })} />
       </div>
     </div>
   );

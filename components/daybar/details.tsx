@@ -9,6 +9,7 @@ import { useEffect, useId, useState, type ReactNode } from "react";
 import { Copy, ExternalLink, Plus, Shapes, Star, Trash2, X } from "lucide-react";
 import { IconPicker } from "./icon-picker";
 import { DeleteButton } from "./delete-button";
+import { DurationPicker, fromMinutes, fromTime, toMinutes, toTime } from "./duration-picker";
 import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
@@ -17,10 +18,9 @@ import { bestStreak, monthRate, streak, weekStrip } from "@/lib/daybar/repeat";
 import { usePlannerUi } from "./context";
 import { RepeatEditor } from "./repeat-editor";
 import { TaskCheck, kindName, priorityName } from "./parts";
-import { dayLabel, durationLabel, weekdayNarrow } from "./format";
+import { dayLabel, weekdayNarrow } from "./format";
 import { checkinsOf, type ItemPatch } from "./store";
 
-const DURATIONS = [15, 30, 45, 60, 90, 120, 180, 240];
 
 function Field({ label, children, htmlFor }: { label: string; children: ReactNode; htmlFor?: string }) {
   return (
@@ -79,6 +79,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
         <IconPicker
           value={item.icon}
           onChange={(icon) => update({ icon })}
+          quick={{ title: item.title, kind: item.kind }}
           label={item.icon ? t(`Symbol von „${item.title}“ ändern`, `Change the icon of “${item.title}”`) : t(`Symbol für „${item.title}“ wählen`, `Choose an icon for “${item.title}”`)}
           className={item.icon ? "has-icon" : "is-empty"}
         >
@@ -146,7 +147,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
             {(when === "day" || when === "week" || when === "month") && (
               <input type="date" className="db-input" aria-label={t("Tag", "Day")} value={item.day ?? ""} onChange={(e) => e.target.value && update({ day: e.target.value })} />
             )}
-            {when === "day" && <input type="time" className="db-input" aria-label={t("Uhrzeit", "Time")} value={item.time ?? ""} onChange={(e) => update({ time: e.target.value || null })} />}
+            {when === "day" && <DurationPicker mode="time" label={t("Uhrzeit", "Time")} value={fromTime(item.time)} onChange={(v) => update({ time: toTime(v) })} />}
           </Field>
           <Field label={t("Priorität", "Priority")}>
             <div className="db-segmented" role="radiogroup" aria-label={t("Priorität", "Priority")}>
@@ -184,15 +185,8 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
             </div>
             {item.followUps > 0 && <small className="db-hint">{t(`Nachgefasst: ${item.followUps}-mal`, `Followed up ${item.followUps} times`)}</small>}
           </Field>
-          <Field label={t("Dauer", "Duration")} htmlFor={`${id}-dur`}>
-            <Select id={`${id}-dur`} value={String(item.duration ?? "")} onChange={(e) => update({ duration: e.target.value ? Number(e.target.value) : null })}>
-              <option value="">{t("Keine", "None")}</option>
-              {DURATIONS.map((m) => (
-                <option key={m} value={m}>
-                  {durationLabel(m, t)}
-                </option>
-              ))}
-            </Select>
+          <Field label={t("Dauer", "Duration")}>
+            <DurationPicker mode="duration" label={t("Dauer", "Duration")} value={fromMinutes(item.duration)} onChange={(v) => update({ duration: toMinutes(v) || null })} />
           </Field>
         </>
       )}
@@ -207,11 +201,11 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
           </Field>
           <Field label={t("Beginn", "Starts")}>
             <input type="date" className="db-input" aria-label={t("Starttag", "Start day")} value={item.day ?? ""} onChange={(e) => e.target.value && update({ day: e.target.value })} />
-            {!item.allDay && <input type="time" className="db-input" aria-label={t("Startzeit", "Start time")} value={item.time ?? ""} onChange={(e) => e.target.value && update({ time: e.target.value })} />}
+            {!item.allDay && <DurationPicker mode="time" clearable={false} label={t("Startzeit", "Start time")} value={fromTime(item.time)} onChange={(v) => v && update({ time: toTime(v) })} />}
           </Field>
           <Field label={t("Ende", "Ends")}>
             <input type="date" className="db-input" aria-label={t("Endtag", "End day")} min={item.day ?? undefined} value={item.endDay ?? item.day ?? ""} onChange={(e) => update({ endDay: e.target.value || null })} />
-            {!item.allDay && <input type="time" className="db-input" aria-label={t("Endzeit", "End time")} value={item.endTime ?? ""} onChange={(e) => e.target.value && update({ endTime: e.target.value })} />}
+            {!item.allDay && <DurationPicker mode="time" clearable={false} label={t("Endzeit", "End time")} value={fromTime(item.endTime)} onChange={(v) => v && update({ endTime: toTime(v) })} />}
           </Field>
         </>
       )}
@@ -224,7 +218,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
           </Field>
           <Field label={t("Ab", "Starts")} htmlFor={`${id}-start`}>
             <input id={`${id}-start`} type="date" className="db-input" value={item.day ?? ""} onChange={(e) => e.target.value && update({ day: e.target.value })} />
-            <input type="time" className="db-input" aria-label={t("Bevorzugte Uhrzeit", "Preferred time")} value={item.time ?? ""} onChange={(e) => update({ time: e.target.value || null })} />
+            <DurationPicker mode="time" label={t("Bevorzugte Uhrzeit", "Preferred time")} value={fromTime(item.time)} onChange={(v) => update({ time: toTime(v) })} />
           </Field>
         </>
       )}

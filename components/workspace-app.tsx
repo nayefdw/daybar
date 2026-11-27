@@ -163,6 +163,7 @@ import dynamic from "next/dynamic";
 // and the bridge for shortcuts and the ⌘K Create row live in the shell; its
 // screens and right panel load when opened.
 import { PlannerProvider, usePlannerUiMaybe } from "./daybar/context";
+import { BounceDot } from "./daybar/bounce-dot";
 import { PlannerNav } from "./daybar/nav";
 import { PlannerTopBar } from "./daybar/topbar";
 import { PlannerBridge, PaletteCreateRow, type PlannerBridgeApi } from "./daybar/bridge";
@@ -4922,6 +4923,8 @@ export default function WorkspaceApp({
           </Dropdown.Portal>
         </Dropdown.Root>
         <div className="sidebar-scroll" ref={treeRoot}>
+          {/* The open place's marker, hopping from place to place (components/daybar/bounce-dot.tsx). */}
+          <BounceDot watch={`${screen}:${planView}:${pageId ?? ""}`} />
           <PlannerNav active={screen === "plan" ? planView : null} onNavigate={() => setMobile(false)} />
           {/* The navigation folds into one row of icons (#452): g:nav, stored
               like the other sidebar folds. */}

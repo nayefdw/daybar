@@ -9,6 +9,8 @@ import { Search, X } from "lucide-react";
 import { ICON_GROUPS, type IconGroupId } from "@/lib/daybar/icons";
 import { useT } from "../i18n";
 import { useIconSet } from "./item-icon";
+import { IconReactions, rememberIcon } from "./icon-reactions";
+import type { ItemKind } from "@/lib/daybar/model";
 
 type T = (de: string, en: string) => string;
 export const iconGroupName = (id: IconGroupId, t: T) =>
@@ -37,9 +39,13 @@ export function IconPicker({
   disabled = false,
   open: openFrom,
   onOpenChange,
+  quick,
 }: {
   value: string | null;
   onChange: (icon: string | null) => void;
+  // An item's title and kind: the button first offers the quick pill of
+  // suggestions (icon-reactions.tsx), "More" opens the whole panel.
+  quick?: { title: string; kind: ItemKind };
   // The button's accessible name ("Icon of “Call Anna”").
   label: string;
   // What the button shows: the icon, or a placeholder.
@@ -51,6 +57,7 @@ export function IconPicker({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [ownOpen, setOwnOpen] = useState(false);
+  const [bar, setBar] = useState(false);
   const open = openFrom ?? ownOpen;
   const setOpen = (next: boolean) => {
     setOwnOpen(next);
@@ -66,15 +73,35 @@ export function IconPicker({
         aria-label={label}
         title={label}
         aria-haspopup="dialog"
-        aria-expanded={open}
+        aria-expanded={open || bar}
         disabled={disabled}
         onClick={(e) => {
           e.stopPropagation();
-          setOpen(!open);
+          if (open || bar) return [setOpen(false), setBar(false)];
+          if (quick) setBar(true);
+          else setOpen(true);
         }}
       >
         {children}
       </button>
+      {bar && quick && (
+        <IconReactions
+          anchor={() => trigger.current?.getBoundingClientRect() ?? null}
+          title={quick.title}
+          kind={quick.kind}
+          value={value}
+          onPick={(icon) => {
+            setBar(false);
+            trigger.current?.focus();
+            if (icon !== value) onChange(icon);
+          }}
+          onMore={() => {
+            setBar(false);
+            setOpen(true);
+          }}
+          onClose={() => setBar(false)}
+        />
+      )}
       {open && (
         <IconPanel
           anchor={() => trigger.current?.getBoundingClientRect() ?? null}
@@ -84,6 +111,7 @@ export function IconPicker({
           onPick={(icon) => {
             setOpen(false);
             trigger.current?.focus();
+            if (icon) rememberIcon(icon);
             if (icon !== value) onChange(icon);
           }}
           onClose={(refocus) => {

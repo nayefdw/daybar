@@ -4,7 +4,10 @@
 // icon, favourite, duplicate, delete. The arrow keys move through it,
 // Escape, scrolling or a click elsewhere close it.
 import { useEffect, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { ArrowUpRight, Check, CircleCheck, CircleDashed, Copy, ExternalLink, Flag, Shapes, Star, Trash2 } from "lucide-react";
+import { ArrowUpRight, Check, CircleCheck, CircleDashed, Copy, Ellipsis, ExternalLink, Flag, Star, Trash2 } from "lucide-react";
+import { suggestIcons } from "@/lib/daybar/icons";
+import { useIconSet } from "./item-icon";
+import { burst, recentIcons, rememberIcon } from "./icon-reactions";
 import { useT } from "../i18n";
 import { addDays, taskDay, weekStart, type PlannerItem } from "@/lib/daybar/model";
 import { checkinsOf } from "./store";
@@ -73,6 +76,8 @@ export default function ItemMenu({ at, onClose, onChooseIcon }: { at: MenuAt; on
   };
 
   const done = !!item.doneAt;
+  const icons = useIconSet(true);
+  const suggestions = suggestIcons(item.title, item.kind, recentIcons(), 5);
   const checkedToday = item.kind === "habit" && checkinsOf(state?.logs || [], item.id).has(today);
   const nextWeek = addDays(weekStart(today, state?.settings.weekStart ?? 1), 7);
   const day = item.kind === "task" ? taskDay(item) : item.day;
@@ -158,20 +163,47 @@ export default function ItemMenu({ at, onClose, onChooseIcon }: { at: MenuAt; on
       )}
 
       <div className="db-menu-separator" role="separator" />
-      <button
-        type="button"
-        role="menuitem"
-        className="db-menu-item"
-        onClick={() => {
-          const box = menu.current?.getBoundingClientRect();
-          onClose();
-          onChooseIcon(box?.left ?? at.x, box?.top ?? at.y);
-        }}
-        onKeyDown={moveKeys}
-      >
-        <Shapes size={16} aria-hidden />
-        <span>{item.icon ? t("Symbol ändern …", "Change icon…") : t("Symbol wählen …", "Choose icon…")}</span>
-      </button>
+      <div className="db-menu-label">{t("Symbol", "Icon")}</div>
+      <div className="db-menu-row" role="group" aria-label={t("Symbol", "Icon")}>
+        {suggestions.map((name) => {
+          const Icon = icons?.[name];
+          return (
+            <button
+              key={name}
+              type="button"
+              role="menuitemradio"
+              aria-checked={item.icon === name}
+              aria-label={name.replace(/-\d+$/, "").replace(/-/g, " ")}
+              title={name.replace(/-\d+$/, "").replace(/-/g, " ")}
+              className="db-menu-chip db-menu-icon"
+              onClick={(e) => {
+                rememberIcon(name);
+                burst(e.currentTarget);
+                onClose();
+                void store.update(item.id, { icon: item.icon === name ? null : name });
+              }}
+              onKeyDown={moveKeys}
+            >
+              {Icon ? <Icon size={16} aria-hidden /> : <span className="db-icon-box" aria-hidden />}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          role="menuitem"
+          className="db-menu-chip db-menu-icon"
+          aria-label={t("Alle Symbole …", "All icons…")}
+          title={t("Alle Symbole …", "All icons…")}
+          onClick={() => {
+            const box = menu.current?.getBoundingClientRect();
+            onClose();
+            onChooseIcon(box?.left ?? at.x, box?.top ?? at.y);
+          }}
+          onKeyDown={moveKeys}
+        >
+          <Ellipsis size={16} aria-hidden />
+        </button>
+      </div>
       {entry(<Star size={16} fill={item.favorite ? "currentColor" : "none"} aria-hidden />, item.favorite ? t("Aus Favoriten entfernen", "Remove from favourites") : t("Zu Favoriten", "Add to favourites"), () =>
         store.update(item.id, { favorite: !item.favorite }),
       )}

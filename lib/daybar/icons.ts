@@ -53,3 +53,62 @@ const KNOWN = new Set<string>(ICON_NAMES);
 export const isIconName = (value: unknown): value is IconName => typeof value === "string" && KNOWN.has(value);
 // "shopping-cart" → "ShoppingCart", the name lucide-react exports.
 export const iconExport = (name: string) => name.replace(/(^|-)([a-z0-9])/g, (_, __, c: string) => c.toUpperCase());
+
+// Icons to suggest for an item: from the words of its title (English and
+// German), then the person's recent picks, then the kind's usual ones.
+const WORDS: [string[], IconName][] = [
+  [["call", "phone", "ring", "anruf", "anrufen", "telefon"], "phone"],
+  [["mail", "email", "reply", "antwort", "antworten", "schreiben"], "mail"],
+  [["meet", "meeting", "standup", "stand", "sync", "team", "besprechung", "treffen"], "users"],
+  [["dentist", "doctor", "arzt", "zahnarzt", "physio", "therapy", "therapie", "clinic", "praxis"], "stethoscope"],
+  [["pill", "medicine", "medikament", "tablette"], "pill"],
+  [["gym", "workout", "training", "sport", "fitness"], "dumbbell"],
+  [["run", "running", "jog", "walk", "laufen", "joggen", "spaziergang", "steps"], "footprints"],
+  [["bike", "cycling", "fahrrad", "radfahren"], "bike"],
+  [["lunch", "dinner", "breakfast", "brunch", "essen", "mittagessen", "abendessen", "frühstück", "restaurant"], "utensils"],
+  [["coffee", "kaffee", "café", "cafe"], "coffee"],
+  [["cook", "cooking", "kochen", "recipe", "rezept", "bake", "backen"], "chef-hat"],
+  [["shop", "shopping", "buy", "groceries", "grocery", "kaufen", "einkaufen", "einkauf", "supermarkt"], "shopping-cart"],
+  [["pay", "rent", "bill", "invoice", "miete", "rechnung", "zahlen", "bezahlen", "tax", "taxes", "steuer", "steuern"], "wallet"],
+  [["bank", "budget", "money", "geld", "sparen", "savings"], "piggy-bank"],
+  [["flight", "fly", "plane", "airport", "flug", "flughafen"], "plane"],
+  [["trip", "travel", "vacation", "holiday", "urlaub", "reise", "pack", "packen", "koffer"], "luggage"],
+  [["train", "bahn", "zug"], "train-front"],
+  [["car", "auto", "drive", "fahren", "tanken", "fuel"], "car"],
+  [["read", "book", "buch", "lesen", "study", "lernen", "exam", "prüfung"], "book-open"],
+  [["course", "kurs", "class", "lecture", "vorlesung", "school", "schule", "uni", "university"], "graduation-cap"],
+  [["write", "blog", "draft", "entwurf", "notes", "notiz"], "pen-line"],
+  [["code", "deploy", "bug", "release", "merge", "review"], "code"],
+  [["clean", "cleaning", "putzen", "laundry", "wäsche", "wash", "waschen"], "washing-machine"],
+  [["fix", "repair", "reparieren", "reparatur"], "wrench"],
+  [["plant", "plants", "garden", "garten", "water", "gießen", "pflanzen"], "sprout"],
+  [["dog", "hund", "gassi"], "dog"],
+  [["cat", "katze"], "cat"],
+  [["birthday", "geburtstag", "party", "feier"], "cake"],
+  [["gift", "geschenk", "present"], "gift"],
+  [["music", "musik", "guitar", "gitarre", "piano", "klavier", "practice", "üben"], "music"],
+  [["photo", "photos", "foto", "fotos", "camera", "kamera"], "camera"],
+  [["movie", "film", "kino", "cinema"], "film"],
+  [["sleep", "schlafen", "bed", "bett", "nap"], "moon"],
+  [["drink", "hydrate", "trinken", "wasser"], "droplet"],
+  [["idea", "ideas", "idee", "ideen", "brainstorm"], "lightbulb"],
+  [["goal", "goals", "ziel", "ziele", "focus", "fokus"], "target"],
+  [["presentation", "präsentation", "slides", "vortrag", "pitch"], "presentation"],
+  [["parcel", "package", "paket", "delivery", "lieferung", "post"], "package"],
+  [["home", "house", "haus", "wohnung", "move", "umzug"], "house"],
+];
+const BY_KIND: Record<"task" | "event" | "habit" | "note", IconName[]> = {
+  task: ["circle-check", "star", "flag", "briefcase", "house", "shopping-cart"],
+  event: ["calendar", "users", "utensils", "plane", "phone", "map-pin"],
+  habit: ["dumbbell", "book-open", "droplet", "moon", "footprints", "heart-pulse"],
+  note: ["lightbulb", "file-text", "pen-line", "bookmark", "pin", "star"],
+};
+export function suggestIcons(title: string, kind: keyof typeof BY_KIND, recent: readonly string[] = [], count = 6): IconName[] {
+  const words = title.toLocaleLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const out: IconName[] = [];
+  const add = (name: string) => isIconName(name) && !out.includes(name) && out.push(name);
+  for (const [keys, icon] of WORDS) if (words.some((w) => keys.includes(w) || (w.length > 4 && keys.some((k) => k.length > 4 && w.startsWith(k))))) add(icon);
+  for (const name of recent) add(name);
+  for (const name of BY_KIND[kind]) add(name);
+  return out.slice(0, count);
+}

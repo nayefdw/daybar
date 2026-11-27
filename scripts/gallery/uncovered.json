@@ -19,6 +19,7 @@
     "components/database-timeline.tsx",
     "components/daybar/context.tsx",
     "components/daybar/icon-picker.tsx",
+    "components/daybar/icon-reactions.tsx",
     "components/daybar/item-menu.tsx",
     "components/daybar/quick-add.tsx",
     "components/dead-man-switch.tsx",

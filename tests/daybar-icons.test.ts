@@ -27,3 +27,15 @@ test("names: kebab-case to lucide-react's export, and only known ones", () => {
   assert.ok(!isIconName("constructor"));
   assert.ok(!isIconName(null));
 });
+
+test("suggestions: the title's words first, then recent picks, then the kind's own", async () => {
+  const { suggestIcons } = await import("../lib/daybar/icons");
+  assert.deepEqual(suggestIcons("Call Anna about the flight", "task").slice(0, 2), ["phone", "plane"]);
+  assert.equal(suggestIcons("Zahnarzt Freitag", "event")[0], "stethoscope");
+  assert.equal(suggestIcons("Wäsche waschen", "task")[0], "washing-machine");
+  // Recent picks come next; nothing twice; only known names.
+  assert.deepEqual(suggestIcons("Something", "habit", ["guitar", "nope", "guitar"]), ["guitar", "dumbbell", "book-open", "droplet", "moon", "footprints"]);
+  // Short words do not match by prefix ("card" is no car).
+  assert.ok(!suggestIcons("Card for Mia", "note").includes("car"));
+  assert.equal(suggestIcons("x", "event", [], 4).length, 4);
+});
