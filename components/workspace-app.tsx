@@ -178,6 +178,25 @@ import { PageCommentField } from "./page-comment-field";
 import { ViewBoundary, loadView } from "@/components/view-fallback";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as PageMenu from "./page-menu";
+// Daybar's chrome (sidebar places and tools, top bar) uses Lucide like the planner.
+import {
+  Bell as LuBell,
+  ChevronDown as LuChevronDown,
+  ChevronUp as LuChevronUp,
+  CircleHelp as LuCircleHelp,
+  House as LuHouse,
+  Images as LuImages,
+  Layers as LuLayers,
+  LayoutGrid as LuLayoutGrid,
+  Library as LuLibrary,
+  ListChecks as LuListChecks,
+  Network as LuNetwork,
+  PanelLeft as LuPanelLeft,
+  Search as LuSearch,
+  Settings as LuSettings,
+  Tag as LuTag,
+  Trash2 as LuTrash,
+} from "lucide-react";
 import {
   Images,
   Cards,
@@ -4661,22 +4680,22 @@ export default function WorkspaceApp({
   // The less used places at the sidebar's bottom: a row of symbols, on
   // phones behind "Mehr" (components/sidebar-tools.tsx).
   const sidebarTools: SidebarTool[] = [
-    { id: "templates", label: t("Vorlagen", "Templates"), icon: SquaresFour, onSelect: () => setTemplates(true) },
-    { id: "media", label: t("Medien", "Media"), icon: Images, selected: screen === "media", onSelect: () => go("media") },
+    { id: "templates", label: t("Vorlagen", "Templates"), icon: LuLayoutGrid, onSelect: () => setTemplates(true) },
+    { id: "media", label: t("Medien", "Media"), icon: LuImages, selected: screen === "media", onSelect: () => go("media") },
     ...((featureShown("flashcards") && placeShown("study")) || screen === "study"
-      ? [{ id: "study", label: t("Lernen", "Study"), title: t("Lernkarten: fällige Karten", "Flashcards: due cards") + hint("study"), icon: Cards, selected: screen === "study", onSelect: () => go("study") }]
+      ? [{ id: "study", label: t("Lernen", "Study"), title: t("Lernkarten: fällige Karten", "Flashcards: due cards") + hint("study"), icon: LuLayers, selected: screen === "study", onSelect: () => go("study") }]
       : []),
-    { id: "tags", label: t("Tags", "Tags"), title: t("Seiten nach Tags", "Pages by tag"), icon: TagIcon, selected: screen === "tags", onSelect: () => go("tags") },
+    { id: "tags", label: t("Tags", "Tags"), title: t("Seiten nach Tags", "Pages by tag"), icon: LuTag, selected: screen === "tags", onSelect: () => go("tags") },
     ...(placeShown("graph") || screen === "graph"
-      ? [{ id: "graph", label: t("Graph", "Graph"), title: t("Graph der Verlinkungen", "Graph of links"), icon: Graph, selected: screen === "graph", onSelect: () => go("graph") }]
+      ? [{ id: "graph", label: t("Graph", "Graph"), title: t("Graph der Verlinkungen", "Graph of links"), icon: LuNetwork, selected: screen === "graph", onSelect: () => go("graph") }]
       : []),
-    { id: "trash", label: t("Papierkorb", "Trash"), icon: Trash, selected: screen === "trash", onSelect: () => go("trash") },
-    { id: "settings", label: t("Einstellungen", "Settings"), icon: GearSix, selected: screen === "settings", onSelect: () => go("settings") },
+    { id: "trash", label: t("Papierkorb", "Trash"), icon: LuTrash, selected: screen === "trash", onSelect: () => go("trash") },
+    { id: "settings", label: t("Einstellungen", "Settings"), icon: LuSettings, selected: screen === "settings", onSelect: () => go("settings") },
     {
       id: "shortcuts",
       label: t("Tastenkürzel", "Keyboard shortcuts"),
       title: t("Tastenkürzel", "Keyboard shortcuts") + hint("shortcuts"),
-      icon: Question,
+      icon: LuCircleHelp,
       className: "sidebar-help",
       onSelect: () => setShortcuts(true),
     },
@@ -4907,24 +4926,14 @@ export default function WorkspaceApp({
           {/* The navigation folds into one row of icons (#452): g:nav, stored
               like the other sidebar folds. */}
           <nav className={`main-nav${navCompact ? " compact" : ""}`} aria-label={t("Navigation", "Navigation")}>
-            <button title={navCompact ? t("Suchen", "Search") : undefined} onClick={openSearch}>
-              <MagnifyingGlass size={19} />
-              <span className="main-nav-label">{t("Suchen", "Search")}</span>
-              {keyHints.visible && shortcutHint("search", mac) && <span className="keycap">{shortcutHint("search", mac)}</span>}
-            </button>
-            {canAsk && (
-              <button title={navCompact ? t("KI fragen", "Ask AI") : undefined} onClick={() => openAsk("")}>
-                <Sparkle size={19} />
-                <span className="main-nav-label">{t("KI fragen", "Ask AI")}</span>
-              </button>
-            )}
+            {/* Search and Ask AI are in the top bar (components/daybar/topbar.tsx). */}
             <button title={navCompact ? t("Startseite", "Home") : undefined}
               className={screen === "home" ? "selected" : ""}
               data-open-place=""
               onClick={(e) => !(tabs.on && openModeOf(e) !== "here" && tabs.openPlace("home", openModeOf(e))) && go("home")}
               onAuxClick={(e) => e.button === 1 && tabs.on && tabs.openPlace("home", openModeOf(e))}
             >
-              <House size={19} />
+              <LuHouse size={18} />
               <span className="main-nav-label">{t("Startseite", "Home")}</span>
             </button>
             {/* The library (#329): only with a space shown as a library. */}
@@ -4936,7 +4945,7 @@ export default function WorkspaceApp({
                 onClick={(e) => !(tabs.on && openModeOf(e) !== "here" && tabs.openPlace(LIBRARY_HOME, openModeOf(e))) && openLibraryHome()}
                 onAuxClick={(e) => e.button === 1 && tabs.on && tabs.openPlace(LIBRARY_HOME, openModeOf(e))}
               >
-                <Books size={19} />
+                <LuLibrary size={18} />
                 <span className="main-nav-label">{t("Bibliothek", "Library")}</span>
               </button>
             )}
@@ -4946,7 +4955,7 @@ export default function WorkspaceApp({
               onClick={(e) => !(tabs.on && openModeOf(e) !== "here" && tabs.openPlace("inbox", openModeOf(e))) && go("inbox")}
               onAuxClick={(e) => e.button === 1 && tabs.on && tabs.openPlace("inbox", openModeOf(e))}
             >
-              <Bell size={19} />
+              <LuBell size={18} />
               <span className="main-nav-label">{t("Posteingang", "Inbox")}</span>
               {unreadNotifications > 0 && (
                 <span className="notification-count">
@@ -4962,7 +4971,7 @@ export default function WorkspaceApp({
               onClick={(e) => !(tabs.on && openModeOf(e) !== "here" && tabs.openPlace("tasks", openModeOf(e))) && go("tasks")}
               onAuxClick={(e) => e.button === 1 && tabs.on && tabs.openPlace("tasks", openModeOf(e))}
             >
-              <CheckSquare size={19} />
+              <LuListChecks size={18} />
               <span className="main-nav-label">{t("Meine Aufgaben", "My tasks")}</span>
               {/* Given to me by others since I last opened My tasks (#208). */}
               {!!boot.newTasks && screen !== "tasks" && (
@@ -4988,11 +4997,11 @@ export default function WorkspaceApp({
               title={navCompact ? t("Navigation ausklappen", "Expand navigation") : t("Navigation einklappen", "Collapse navigation")}
               onClick={() => folds.change({ "g:nav": !navCompact })}
             >
-              {navCompact ? <CaretDown size={14} aria-hidden="true" /> : <CaretUp size={14} aria-hidden="true" />}
+              {navCompact ? <LuChevronDown size={14} aria-hidden="true" /> : <LuChevronUp size={14} aria-hidden="true" />}
             </button>
           </nav>
           <div className="tree-filter">
-            <MagnifyingGlass size={14} aria-hidden="true" />
+            <LuSearch size={14} aria-hidden="true" />
             <input
               type="search"
               value={treeFilter}
@@ -5521,7 +5530,7 @@ export default function WorkspaceApp({
                 if (!phoneLayout()) chooseCollapsed(false);
               }}
             >
-              <SidebarSimple size={21} />
+              <LuPanelLeft size={20} />
             </button>
             <HistoryButtons
               backHint={keyHints.visible ? preferredCombo("back", mac) : ""}
@@ -6077,7 +6086,9 @@ export default function WorkspaceApp({
               </PageMenu.Root>
               </>)}
             </div>
-          ) : screen === "plan" ? (
+          ) : (
+            // The planner and every other screen: search (with a Create
+            // row), New, AI; the right panel's switch where it shows.
             <PlannerTopBar
               onSearch={() => {
                 setPaletteSplit(false);
@@ -6088,12 +6099,8 @@ export default function WorkspaceApp({
               onNewPage={() => setCreate(true)}
               searchHint={shortcutHint("search", mac) || undefined}
               hint={(action) => shortcutHint(action, mac)}
+              panelToggle={screen === "plan"}
             />
-          ) : (
-            <span className="topbar-note">
-              <span className="subtle-dot" />
-              {t("Dein Raum für Ideen", "Your room for ideas")}
-            </span>
           )}
         </header>
         {/* Split view: the open page (left) and a second one (right). */}

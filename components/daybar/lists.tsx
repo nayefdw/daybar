@@ -4,7 +4,7 @@
 // events and tasks), Favorites, and "View all" of folders and tags with
 // creating, renaming and deleting them.
 import { useState } from "react";
-import { Folder as FolderIcon, PencilSimple, Plus, Star, Tag as TagIcon, Trash } from "@phosphor-icons/react";
+import { Folder as FolderIcon, Pencil, Plus, Star, Tag as TagIcon, Trash2 } from "lucide-react";
 import { useT } from "../i18n";
 import { addDays, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
@@ -150,7 +150,7 @@ export function FavoritesScreen() {
     <div className="db-screen">
       <header className="db-screen-head">
         <h1>
-          <Star size={20} weight="fill" aria-hidden /> {t("Favoriten", "Favourites")}
+          <Star size={20} fill="currentColor" aria-hidden /> {t("Favoriten", "Favourites")}
         </h1>
       </header>
       {favorites.length ? (
@@ -240,7 +240,7 @@ export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
                 </select>
               )}
               <button type="button" className="icon-button" aria-label={t(`„${m.name}“ umbenennen`, `Rename “${m.name}”`)} onClick={() => [setEditing(m.id), setDraft(m.name)]}>
-                <PencilSimple size={15} />
+                <Pencil size={15} />
               </button>
               <button
                 type="button"
@@ -252,7 +252,7 @@ export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
                   else void store.deleteTag(m.id);
                 }}
               >
-                <Trash size={15} />
+                <Trash2 size={15} />
               </button>
             </li>
           ))}

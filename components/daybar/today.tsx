@@ -4,7 +4,7 @@
 // capture line for the day and the journal's text – and what is left from
 // earlier days with "Move to today" and "Move all".
 import { useEffect, useMemo, useState, type DragEvent } from "react";
-import { ArrowRight, CaretLeft, CaretRight, Check, NotePencil } from "@phosphor-icons/react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, NotebookPen } from "lucide-react";
 import { useT } from "../i18n";
 import { api } from "../ui";
 import { showToast } from "../toast";
@@ -90,7 +90,7 @@ export default function TodayScreen() {
 
       <nav className="db-daystrip" aria-label={t("Tage", "Days")}>
         <button type="button" className="icon-button" aria-label={t("Frühere Tage", "Earlier days")} onClick={() => setStripStart(addDays(stripStart, -7))}>
-          <CaretLeft size={16} />
+          <ChevronLeft size={16} />
         </button>
         {strip.map((d) => {
           const n = itemsOnDay(state.items, d, today, due);
@@ -117,7 +117,7 @@ export default function TodayScreen() {
           );
         })}
         <button type="button" className="icon-button" aria-label={t("Spätere Tage", "Later days")} onClick={() => setStripStart(addDays(stripStart, 7))}>
-          <CaretRight size={16} />
+          <ChevronRight size={16} />
         </button>
         {day !== today && (
           <button type="button" className="button db-today-button" onClick={() => [setDay(today), setStripStart(addDays(today, -3))]}>
@@ -190,7 +190,7 @@ export default function TodayScreen() {
                       onClick={() => void store.checkHabit(h.id, day, !done)}
                       aria-label={done ? t(`„${h.title}“ nicht abgehakt`, `Uncheck “${h.title}”`) : t(`„${h.title}“ abhaken`, `Check off “${h.title}”`)}
                     >
-                      {done && <Check size={12} weight="bold" aria-hidden />}
+                      {done && <Check size={12} strokeWidth={2.75} aria-hidden />}
                     </button>
                     <button type="button" className="db-row-main" onClick={() => ui.select(h.id)}>
                       <span className="db-row-title">{h.title}</span>
@@ -213,7 +213,7 @@ export default function TodayScreen() {
           )}
           {day <= today && (
             <button type="button" className="button" disabled={opening} onClick={() => void openDayNote()}>
-              <NotePencil size={16} aria-hidden />
+              <NotebookPen size={16} aria-hidden />
               {note ? t("Tagesnotiz öffnen", "Open day note") : t("Tagesnotiz schreiben", "Write a day note")}
             </button>
           )}

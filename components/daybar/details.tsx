@@ -6,7 +6,7 @@
 // subtasks, folder, tags, favourite. Events: start, end, all-day. Habits:
 // the repeat rule and the record. Notes open their page.
 import { useEffect, useId, useState, type ReactNode } from "react";
-import { ArrowSquareOut, Copy, Plus, Star, Trash, X } from "@phosphor-icons/react";
+import { Copy, ExternalLink, Plus, Star, Trash2, X } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { addDays, monthStart, subtasksOf, weekStart, type PlannerItem } from "@/lib/daybar/model";
@@ -90,7 +90,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
           </Select>
         )}
         <button type="button" className={`icon-button${item.favorite ? " is-on" : ""}`} aria-pressed={item.favorite} onClick={() => update({ favorite: !item.favorite })} title={t("Favorit", "Favourite")}>
-          <Star size={16} weight={item.favorite ? "fill" : "regular"} />
+          <Star size={16} fill={item.favorite ? "currentColor" : "none"} />
         </button>
       </div>
 
@@ -98,7 +98,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
         <>
           {item.pageId ? (
             <button type="button" className="button primary db-open-note" onClick={() => openPage(item.pageId!)}>
-              <ArrowSquareOut size={16} aria-hidden />
+              <ExternalLink size={16} aria-hidden />
               {t("Notiz öffnen", "Open note")}
             </button>
           ) : (
@@ -360,7 +360,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
             void store.remove(item.id, item.title);
           }}
         >
-          <Trash size={15} aria-hidden />
+          <Trash2 size={15} aria-hidden />
           {t("Löschen", "Delete")}
         </button>
       </div>

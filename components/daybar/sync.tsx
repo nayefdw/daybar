@@ -6,7 +6,7 @@
 // (to-thisday.json, with a personal API token). The old page's own JSON
 // backup moves its items over.
 import { useEffect, useRef, useState } from "react";
-import { ArrowsClockwise, Copy, DownloadSimple, UploadSimple } from "@phosphor-icons/react";
+import { Copy, Download, RefreshCw, Upload } from "lucide-react";
 import { useT } from "../i18n";
 import { api } from "../ui";
 import { showToast } from "../toast";
@@ -94,7 +94,7 @@ export default function SyncScreen() {
         <div className="db-actions">
           <input ref={thisdayInput} type="file" accept="application/json,.json" hidden onChange={(e) => void pickThisDay(e.target.files?.[0]).finally(() => (e.target.value = ""))} />
           <button type="button" className="button primary" disabled={busy} onClick={() => thisdayInput.current?.click()}>
-            <UploadSimple size={16} aria-hidden />
+            <Upload size={16} aria-hidden />
             {t("Export hochladen …", "Upload export…")}
           </button>
           {state.settings.thisday.lastExport && <span className="db-hint">{t(`Zuletzt importiert: Export vom ${new Date(state.settings.thisday.lastExport).toLocaleString()}`, `Last imported: export of ${new Date(state.settings.thisday.lastExport).toLocaleString()}`)}</span>}
@@ -117,7 +117,7 @@ export default function SyncScreen() {
         count={status?.pending}
         actions={
           <button type="button" className="icon-button" aria-label={t("Aktualisieren", "Refresh")} onClick={() => void refresh()}>
-            <ArrowsClockwise size={16} />
+            <RefreshCw size={16} />
           </button>
         }
       >
@@ -140,7 +140,7 @@ export default function SyncScreen() {
         </div>
         <div className="db-actions">
           <a className="button" href={`${outboxUrl}&peek=1`} target="_blank" rel="noopener">
-            <DownloadSimple size={16} aria-hidden />
+            <Download size={16} aria-hidden />
             {t("Ansehen, ohne zu senden", "View without sending")}
           </a>
           <button
@@ -175,7 +175,7 @@ export default function SyncScreen() {
         </p>
         <input ref={legacyInput} type="file" accept="application/json,.json" hidden onChange={(e) => void pickLegacy(e.target.files?.[0]).finally(() => (e.target.value = ""))} />
         <button type="button" className="button" disabled={busy} onClick={() => legacyInput.current?.click()}>
-          <UploadSimple size={16} aria-hidden />
+          <Upload size={16} aria-hidden />
           {t("Sicherung hochladen …", "Upload backup…")}
         </button>
       </Section>

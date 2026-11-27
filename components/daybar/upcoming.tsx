@@ -3,7 +3,7 @@
 // to another day and it keeps its time; a long day shows its first items
 // and "Show more". As a list, the days with something on them.
 import { useState } from "react";
-import { Kanban, ListBullets } from "@phosphor-icons/react";
+import { Kanban, List } from "lucide-react";
 import { useT } from "../i18n";
 import { movedToDay, upcomingDays, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
@@ -51,7 +51,7 @@ export default function UpcomingScreen() {
             <Kanban size={15} aria-hidden /> {t("Board", "Board")}
           </button>
           <button type="button" role="radio" aria-checked={layout === "list"} onClick={() => choose("list")}>
-            <ListBullets size={15} aria-hidden /> {t("Liste", "List")}
+            <List size={15} aria-hidden /> {t("Liste", "List")}
           </button>
         </div>
       </header>

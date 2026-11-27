@@ -3,7 +3,7 @@
 // New, Inbox and Menu (the drawer with the full page tree). It steps aside
 // while the on-screen keyboard is open, so the formatting toolbar that docks
 // at the bottom of a document never shares the space with it.
-import { Bell, List, MagnifyingGlass, Plus, Sun, X } from "@phosphor-icons/react";
+import { Bell, Menu, Plus, Search, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useT } from "./i18n";
 import { coveredBelow } from "@/lib/keyboard-caret";
@@ -327,11 +327,11 @@ export function MobileTabBar({
         onClick={onHome}
       >
         {/* Daybar: the start is the planner's Today. */}
-        <Sun size={22} weight={active === "home" ? "fill" : "regular"} aria-hidden="true" />
+        <Sun size={22} fill={active === "home" ? "currentColor" : "none"} aria-hidden="true" />
         <span>{t("Heute", "Today")}</span>
       </button>
       <button type="button" className="mobile-tab" aria-haspopup="dialog" onClick={onSearch}>
-        <MagnifyingGlass size={22} aria-hidden="true" />
+        <Search size={22} aria-hidden="true" />
         <span>{t("Suchen", "Search")}</span>
       </button>
       <button
@@ -344,7 +344,7 @@ export function MobileTabBar({
         title={onNew ? t("Neue Seite", "New page") : t("Du kannst hier keine Seiten anlegen.", "You cannot create pages here.")}
       >
         <span className="mobile-tab-new-icon" aria-hidden="true">
-          <Plus size={24} weight="bold" />
+          <Plus size={24} strokeWidth={2.5} />
         </span>
       </button>
       <button
@@ -355,7 +355,7 @@ export function MobileTabBar({
         onClick={onInbox}
       >
         <span className="mobile-tab-icon" aria-hidden="true">
-          <Bell size={22} weight={active === "inbox" ? "fill" : "regular"} />
+          <Bell size={22} fill={active === "inbox" ? "currentColor" : "none"} />
           {unread > 0 && <span className="mobile-tab-badge">{unread > 99 ? "99+" : unread}</span>}
         </span>
         <span aria-hidden="true">{t("Posteingang", "Inbox")}</span>
@@ -374,7 +374,7 @@ export function MobileTabBar({
         onClick={onMenu}
       >
         <span className="mobile-tab-icon" aria-hidden="true">
-          {menuOpen ? <X size={22} /> : <List size={22} />}
+          {menuOpen ? <X size={22} /> : <Menu size={22} />}
           {newTasks > 0 && !menuOpen && <span className="mobile-tab-badge">{newTasks > 99 ? "99+" : newTasks}</span>}
         </span>
         {/* Part of the name ("Navigation öffnen"), as WCAG 2.5.3 asks of a visible label. */}

@@ -5,7 +5,7 @@
 // table. Sorted by time, priority, title or creation; filtered by text,
 // priority, folder and tag, the filters shown as pills.
 import { useMemo, useState } from "react";
-import { Kanban, ListBullets, Table, X } from "@phosphor-icons/react";
+import { Kanban, List, Table, X } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { addDays, monthStart, movedToDay, taskDay, taskGroups, weekStart, type PlannerItem, type TaskGroup } from "@/lib/daybar/model";
@@ -131,7 +131,7 @@ export default function TasksScreen({ folderId, tagId, title }: { folderId?: str
         <div className="db-segmented" role="radiogroup" aria-label={t("Darstellung", "Layout")}>
           {(
             [
-              ["list", ListBullets, t("Liste", "List")],
+              ["list", List, t("Liste", "List")],
               ["board", Kanban, t("Board", "Board")],
               ["table", Table, t("Tabelle", "Table")],
             ] as const

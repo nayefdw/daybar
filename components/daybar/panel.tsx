@@ -4,7 +4,7 @@
 // Upcoming, Overdue, Waiting, Today, Calendar – lists items; an item opened
 // anywhere in the planner shows its details here.
 import { useState } from "react";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { SidePanel } from "../side-panel";

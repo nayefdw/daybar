@@ -8,7 +8,7 @@
 // right panel onto a slot to schedule it. Delete removes the focused item
 // (undo in the toast).
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import {
@@ -222,13 +222,13 @@ export default function CalendarScreen() {
       <h1>{title}</h1>
       <div className="db-cal-nav">
         <button type="button" className="icon-button" aria-label={t("Zurück", "Previous")} onClick={() => step(-1)}>
-          <CaretLeft size={16} />
+          <ChevronLeft size={16} />
         </button>
         <button type="button" className="button" onClick={() => setAnchor(today)}>
           {t("Heute", "Today")}
         </button>
         <button type="button" className="icon-button" aria-label={t("Weiter", "Next")} onClick={() => step(1)}>
-          <CaretRight size={16} />
+          <ChevronRight size={16} />
         </button>
       </div>
       <div className="db-segmented" role="radiogroup" aria-label={t("Ansicht", "View")}>

@@ -4,7 +4,7 @@
 // page of flowplan), AI and the right panel's switch. Back, forward and the
 // sidebar button are the shell's (components/workspace-app.tsx).
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import { CalendarBlank, CaretDown, CheckCircle, FilePlus, MagnifyingGlass, NoteBlank, Plus, Repeat, SidebarSimple, Sparkle } from "@phosphor-icons/react";
+import { Bot, Calendar, ChevronDown, CircleCheck, FilePlus, PanelRight, Plus, Repeat, Search, StickyNote } from "lucide-react";
 import { useT } from "../i18n";
 import { usePlannerUi } from "./context";
 
@@ -15,6 +15,7 @@ export function PlannerTopBar({
   searchHint,
   hint = () => "",
   canAsk,
+  panelToggle = true,
 }: {
   onSearch: () => void;
   onAsk?: () => void;
@@ -23,13 +24,15 @@ export function PlannerTopBar({
   // The combination of a shortcut on this device ("⌘N", "Ctrl + N").
   hint?: (action: "newTask" | "newEvent" | "newNote") => string;
   canAsk: boolean;
+  // The right panel's switch (the planner's screens).
+  panelToggle?: boolean;
 }) {
   const t = useT();
   const { quickAdd, panelOpen, setPanelOpen, canWritePages } = usePlannerUi();
   return (
     <div className="planner-topbar">
       <button type="button" className="planner-search" onClick={onSearch}>
-        <MagnifyingGlass size={16} aria-hidden />
+        <Search size={16} aria-hidden />
         <span>{t("Suchen oder erstellen …", "Search, or create anything…")}</span>
         {searchHint && <kbd>{searchHint}</kbd>}
       </button>
@@ -38,25 +41,25 @@ export function PlannerTopBar({
           <button type="button" className="button primary planner-new">
             <Plus size={15} aria-hidden />
             <span className="planner-new-label">{t("Neu", "New")}</span>
-            <CaretDown size={12} aria-hidden />
+            <ChevronDown size={12} aria-hidden />
           </button>
         </Dropdown.Trigger>
         <Dropdown.Portal>
           {/* Focus goes to the Quick Add dialog, not back to the button. */}
           <Dropdown.Content className="dropdown" align="end" sideOffset={4} onCloseAutoFocus={(e) => e.preventDefault()}>
             <Dropdown.Item className="dropdown-item" onSelect={() => quickAdd({ kind: "task" })}>
-              <CheckCircle className="kind-task-ink" />
+              <CircleCheck className="kind-task-ink" />
               {t("Aufgabe", "Task")}
               {hint("newTask") && <span className="dropdown-shortcut">{hint("newTask")}</span>}
             </Dropdown.Item>
             <Dropdown.Item className="dropdown-item" onSelect={() => quickAdd({ kind: "event" })}>
-              <CalendarBlank className="kind-event-ink" />
+              <Calendar className="kind-event-ink" />
               {t("Termin", "Event")}
               {hint("newEvent") && <span className="dropdown-shortcut">{hint("newEvent")}</span>}
             </Dropdown.Item>
             {canWritePages && (
               <Dropdown.Item className="dropdown-item" onSelect={() => quickAdd({ kind: "note" })}>
-                <NoteBlank className="kind-note-ink" />
+                <StickyNote className="kind-note-ink" />
                 {t("Notiz", "Note")}
                 {hint("newNote") && <span className="dropdown-shortcut">{hint("newNote")}</span>}
               </Dropdown.Item>
@@ -79,9 +82,10 @@ export function PlannerTopBar({
       </Dropdown.Root>
       {canAsk && onAsk && (
         <button type="button" className="icon-button" onClick={onAsk} aria-label={t("KI fragen", "Ask AI")} title={t("KI fragen", "Ask AI")}>
-          <Sparkle size={18} />
+          <Bot size={18} />
         </button>
       )}
+      {panelToggle && (
       <button
         type="button"
         className={`icon-button${panelOpen ? " is-on" : ""}`}
@@ -90,8 +94,9 @@ export function PlannerTopBar({
         aria-label={panelOpen ? t("Seitenleiste rechts schließen", "Close the right panel") : t("Seitenleiste rechts öffnen", "Open the right panel")}
         title={t("Rechte Seitenleiste", "Right panel")}
       >
-        <SidebarSimple size={18} style={{ transform: "scaleX(-1)" }} />
+        <PanelRight size={18} />
       </button>
+      )}
     </div>
   );
 }

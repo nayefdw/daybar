@@ -3,7 +3,7 @@
 // colour, a ring for subtasks, half filled while in progress), an item's row
 // with its badges, a section heading and the empty state.
 import type { CSSProperties, DragEvent, ReactNode } from "react";
-import { Bell, CalendarBlank, Check, Hourglass, LinkSimple, MapPin, NoteBlank, Repeat, Star } from "@phosphor-icons/react";
+import { Bell, Calendar, Check, Hourglass, Link, MapPin, Repeat, Star, StickyNote } from "lucide-react";
 import { useT } from "../i18n";
 import { isFollowUp, isWaiting, subtaskProgress, taskDay, type PlannerItem } from "@/lib/daybar/model";
 import { countdown, dayLabel, durationLabel, spanLabel, timeLabel } from "./format";
@@ -36,7 +36,7 @@ export function TaskCheck({ item, onToggle, size = 18 }: { item: PlannerItem; on
       aria-label={done ? t(`„${item.title}“ wieder öffnen`, `Reopen “${item.title}”`) : t(`„${item.title}“ erledigen`, `Complete “${item.title}”`)}
       title={progress.total ? t(`${progress.done} von ${progress.total} Unteraufgaben erledigt`, `${progress.done} of ${progress.total} subtasks done`) : undefined}
     >
-      {done && <Check size={size - 6} weight="bold" aria-hidden />}
+      {done && <Check size={size - 6} strokeWidth={2.75} aria-hidden />}
     </button>
   );
 }
@@ -47,7 +47,7 @@ export function ItemMark({ item }: { item: PlannerItem }) {
   const { store } = usePlannerUi();
   if (item.kind === "task") return <TaskCheck item={item} onToggle={() => void store.setDone(item.id, !item.doneAt)} />;
   if (item.kind === "event") return <span className="db-mark kind-event" aria-hidden />;
-  if (item.kind === "note") return <NoteBlank className="db-mark-icon kind-note" size={17} aria-hidden />;
+  if (item.kind === "note") return <StickyNote className="db-mark-icon kind-note" size={17} aria-hidden />;
   return <Repeat className="db-mark-icon kind-habit" size={17} aria-hidden />;
 }
 
@@ -78,10 +78,10 @@ export function ItemMeta({ item, showDay = false, hideTime = false }: { item: Pl
   else if (item.kind === "task" && isFollowUp(item, today) && !item.doneAt) parts.push(<span key="fu" className="db-badge db-badge-followup">{t(`Nachfassen #${item.followUps}`, `Follow-up #${item.followUps}`)}</span>);
   if (item.remindAt) parts.push(<Bell key="remind" size={12} aria-label={t("Erinnerung", "Reminder")} />);
   if (item.location) parts.push(<span key="loc" className="db-meta-icon"><MapPin size={12} aria-hidden />{item.location}</span>);
-  if (item.link) parts.push(<LinkSimple key="link" size={12} aria-label={t("Link", "Link")} />);
+  if (item.link) parts.push(<Link key="link" size={12} aria-label={t("Link", "Link")} />);
   if (folder) parts.push(<span key="folder" className={`db-folder opt-${folder.color}`}>{folder.name}</span>);
   for (const tag of tags) parts.push(<span key={`tag-${tag.id}`} className="db-tag">#{tag.name}</span>);
-  if (item.favorite) parts.push(<Star key="fav" size={12} weight="fill" className="db-fav" aria-label={t("Favorit", "Favourite")} />);
+  if (item.favorite) parts.push(<Star key="fav" size={12} fill="currentColor" className="db-fav" aria-label={t("Favorit", "Favourite")} />);
   if (!parts.length) return null;
   return <span className="db-meta">{parts}</span>;
 }
@@ -140,7 +140,7 @@ export function Section({ title, count, actions, children, className = "" }: { t
 export function Empty({ title, hint, icon }: { title: string; hint?: ReactNode; icon?: ReactNode }) {
   return (
     <div className="db-empty">
-      {icon ?? <CalendarBlank size={22} aria-hidden />}
+      {icon ?? <Calendar size={22} aria-hidden />}
       <strong>{title}</strong>
       {hint && <span>{hint}</span>}
     </div>

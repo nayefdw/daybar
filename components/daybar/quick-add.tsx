@@ -8,7 +8,7 @@
 // ~ duration, * repeat, $ folders. Used by the dialog (⌘N, ⇧⌘N, ⌥⌘N, the
 // top bar's New), the capture lines of the screens and the ⌘K palette.
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { CalendarBlank, Check, CheckCircle, Hash, NoteBlank, Repeat, X } from "@phosphor-icons/react";
+import { Calendar, Check, CircleCheck, Hash, Repeat, StickyNote, X } from "lucide-react";
 import { useT } from "../i18n";
 import { PAGE_LOCALE } from "@/lib/locale-tag";
 import { parseQuickAdd, type QuickAdd, type QuickKind, type QuickRole } from "@/lib/daybar/quick-add";
@@ -21,7 +21,7 @@ import type { ItemDraft } from "./store";
 type T = (de: string, en: string) => string;
 export const KIND_ORDER: QuickKind[] = ["task", "event", "note", "habit"];
 export const kindLabel = (kind: QuickKind, t: T) => ({ task: t("Aufgabe", "Task"), event: t("Termin", "Event"), note: t("Notiz", "Note"), habit: t("Gewohnheit", "Habit") })[kind];
-const KIND_ICON = { task: CheckCircle, event: CalendarBlank, note: NoteBlank, habit: Repeat } as const;
+const KIND_ICON = { task: CircleCheck, event: Calendar, note: StickyNote, habit: Repeat } as const;
 
 // The parse with the planner's context (folders, week start, event length).
 export function useQuickParse(text: string, kind: QuickKind | undefined) {
@@ -303,7 +303,7 @@ export function KindBadge({ kind, fixed, onPick }: { kind: QuickKind; fixed: boo
       title={fixed ? t("Art festgelegt – klicken zum Wechseln", "Kind fixed – click to switch") : t("Art erkannt – klicken zum Festlegen", "Kind detected – click to choose")}
       aria-label={t(`Art: ${kindLabel(kind, t)}`, `Kind: ${kindLabel(kind, t)}`)}
     >
-      <Icon size={14} weight="bold" aria-hidden />
+      <Icon size={14} strokeWidth={2.75} aria-hidden />
       {kindLabel(kind, t)}
     </button>
   );
@@ -438,7 +438,7 @@ export function QuickAddDialog({ request, onClose }: { request: QuickAddRequest;
         {parsed.title.trim() ? (
           <button type="button" className="qa-create" onClick={() => void submit()} disabled={busy}>
             <span className={`qa-create-icon kind-${parsed.kind}`}>
-              <Check size={14} weight="bold" aria-hidden />
+              <Check size={14} strokeWidth={2.75} aria-hidden />
             </span>
             <span className="qa-create-text">
               {t(`${kindLabel(parsed.kind, t)} anlegen:`, `Create ${kindLabel(parsed.kind, t).toLowerCase()}:`)} <strong>{parsed.title}</strong>

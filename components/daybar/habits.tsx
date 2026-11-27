@@ -5,7 +5,7 @@
 // by folder or by tag. A new habit is a sentence ("Walk every day 7:00");
 // its repeat editor opens in the right panel.
 import { useMemo, useState } from "react";
-import { Check, Fire } from "@phosphor-icons/react";
+import { Check, Flame } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
 import { bestStreak, habitDue, habitFinished, monthRate, ruleLabel, streak, weekStrip } from "@/lib/daybar/repeat";
@@ -117,7 +117,7 @@ function HabitRow({
         onClick={() => onToggle(today, !done)}
         aria-label={done ? t(`„${habit.title}“ heute nicht abgehakt`, `Uncheck “${habit.title}” for today`) : t(`„${habit.title}“ heute abhaken`, `Check off “${habit.title}” for today`)}
       >
-        {done && <Check size={16} weight="bold" aria-hidden />}
+        {done && <Check size={16} strokeWidth={2.75} aria-hidden />}
       </button>
       <button type="button" className="db-habit-main" onClick={onOpen}>
         <span className="db-row-title">{habit.title}</span>
@@ -125,7 +125,7 @@ function HabitRow({
           <span>{habit.repeat ? ruleLabel(habit.repeat, t, weekdayName, weekStartsOn) : ""}</span>
           {habit.time && <span>{timeLabel(habit.time)}</span>}
           <span className="db-badge" title={t(`Beste Serie: ${best}`, `Best streak: ${best}`)}>
-            <Fire size={12} aria-hidden />
+            <Flame size={12} aria-hidden />
             {current}
           </span>
           <span>{rate.rate === null ? "" : t(`${Math.round(rate.rate * 100)} % im Monat`, `${Math.round(rate.rate * 100)} % this month`)}</span>

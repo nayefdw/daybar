@@ -3,7 +3,7 @@
 // Upcoming, Calendar, Notes, Tasks, Events and Habits, then Favorites,
 // Folders and Tags with five items each and "View all (N)".
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowsClockwise, CalendarBlank, CalendarCheck, CalendarDots, CaretRight, CheckSquare, Folder, NoteBlank, Plus, Repeat, Star, Sun, Tag } from "@phosphor-icons/react";
+import { Calendar, CalendarCheck, CalendarDays, ChevronRight, Folder, Plus, RefreshCw, Repeat, SquareCheck, Star, StickyNote, Sun, Tag } from "lucide-react";
 import { useT } from "../i18n";
 import { isOverdue, itemsOnDay } from "@/lib/daybar/model";
 import { habitDue } from "@/lib/daybar/repeat";
@@ -61,7 +61,7 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
     <section className={`nav-section planner-section${folds.has(fold) ? " space-collapsed" : ""}`} aria-label={title}>
       <div className="nav-section-title">
         <button type="button" className="space-toggle" aria-expanded={!folds.has(fold)} onClick={() => toggle(fold)}>
-          <CaretRight size={10} className="space-caret" aria-hidden="true" />
+          <ChevronRight size={10} className="space-caret" aria-hidden="true" />
           <span className="space-name">{title}</span>
           {icon}
         </button>
@@ -88,10 +88,10 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
     <div className="planner-nav">
       <nav className="main-nav planner-main" aria-label={t("Planer", "Planner")}>
         {entry("today", t("Heute", "Today"), <Sun size={19} />, counts.today)}
-        {entry("upcoming", t("Demnächst", "Upcoming"), <CalendarDots size={19} />)}
-        {entry("calendar", t("Kalender", "Calendar"), <CalendarBlank size={19} />)}
-        {entry("notes", t("Notizen", "Notes"), <NoteBlank size={19} />)}
-        {entry("tasks", t("Aufgaben", "Tasks"), <CheckSquare size={19} />, counts.tasks)}
+        {entry("upcoming", t("Demnächst", "Upcoming"), <CalendarDays size={19} />)}
+        {entry("calendar", t("Kalender", "Calendar"), <Calendar size={19} />)}
+        {entry("notes", t("Notizen", "Notes"), <StickyNote size={19} />)}
+        {entry("tasks", t("Aufgaben", "Tasks"), <SquareCheck size={19} />, counts.tasks)}
         {entry("events", t("Termine", "Events"), <CalendarCheck size={19} />)}
         {entry("habits", t("Gewohnheiten", "Habits"), <Repeat size={19} />, counts.habits)}
       </nav>
@@ -115,7 +115,7 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
         state?.folders.length ?? 0,
         (state?.folders || []).slice(0, SHOWN).map((f) => (
           <button key={f.id} type="button" className={`favorite-nav${active === `folder/${f.id}` ? " selected" : ""}`} onClick={() => open(`folder/${f.id}`)}>
-            <Folder size={16} weight="fill" className={`planner-folder opt-${f.color}`} aria-hidden />
+            <Folder size={16} fill="currentColor" className={`planner-folder opt-${f.color}`} aria-hidden />
             <span>{f.name}</span>
           </button>
         )),
@@ -138,7 +138,7 @@ export function PlannerNav({ active, onNavigate }: { active: string | null; onNa
         "tags",
       )}
       <button type="button" className={`favorite-nav planner-sync${base === "sync" ? " selected" : ""}`} onClick={() => open("sync")}>
-        <ArrowsClockwise size={16} aria-hidden />
+        <RefreshCw size={16} aria-hidden />
         <span>{t("ThisDay und Import", "ThisDay and import")}</span>
       </button>
     </div>

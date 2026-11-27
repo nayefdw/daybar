@@ -6,7 +6,7 @@
 // Disabled where there is nothing to go to.
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import { ArrowLeft, ArrowRight } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useT } from "./i18n";
 import { safeCollisionPadding } from "./safe-area";
 import { goToStep, historySteps, NO_STEPS, rememberTitle, subscribeHistory, type Step } from "@/lib/history-nav";
