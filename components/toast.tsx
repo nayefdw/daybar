@@ -199,11 +199,18 @@ export function Toaster() {
   return (
     <>
       <div className="toast-live" role="status" aria-live="polite" aria-atomic="true">
-        {toast && toast.tone !== "error" ? body : null}
+        {live && live.tone !== "error" ? body : null}
       </div>
       <div className="toast-live" role="alert" aria-live="assertive" aria-atomic="true">
-        {toast && toast.tone === "error" ? body : null}
+        {live && live.tone === "error" ? body : null}
       </div>
+      {/* The dismissed toast sinks away outside the live regions: screen
+          readers hear it go at once, nothing in it can be reached. */}
+      {!live && leaving && (
+        <div className="toast-live" aria-hidden="true" inert>
+          {body}
+        </div>
+      )}
     </>
   );
 }
