@@ -10,6 +10,7 @@ import { showToast } from "../toast";
 import { useT } from "../i18n";
 import { addDays, type Folder, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
+import { GooeyNav } from "./gooey-nav";
 import { IconPicker } from "./icon-picker";
 import { DeleteButton } from "./delete-button";
 import { ChosenIcon } from "./item-icon";
@@ -88,13 +89,16 @@ export function EventsScreen() {
     <div className="db-screen db-events">
       <header className="db-screen-head">
         <h1>{t("Termine", "Events")}</h1>
-        <div className="db-segmented" role="radiogroup" aria-label={t("Anzeigen", "Show")}>
-          {(["upcoming", "past", "all"] as const).map((v) => (
-            <button key={v} type="button" role="radio" aria-checked={show === v} onClick={() => setShow(v)}>
-              {{ upcoming: t("Kommende", "Upcoming"), past: t("Vergangene", "Past"), all: t("Alle", "All") }[v]}
-            </button>
-          ))}
-        </div>
+        <GooeyNav
+          label={t("Anzeigen", "Show")}
+          value={show}
+          onChange={setShow}
+          options={[
+            { value: "upcoming", label: t("Kommende", "Upcoming") },
+            { value: "past", label: t("Vergangene", "Past") },
+            { value: "all", label: t("Alle", "All") },
+          ]}
+        />
       </header>
       <CaptureLine kind="event" placeholder={t("Neuer Termin … („Zahnarzt Freitag 14:00“)", "New event… (“Dentist friday 14:00”)")} />
       {byDay.size ? (

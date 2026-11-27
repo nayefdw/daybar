@@ -3622,3 +3622,79 @@ label.db-field-label,
 svg.lucide[stroke-width="2"]:not([width="12"]):not([width="13"]) {
   stroke-width: 1.75;
 }
+
+/* ---------- Gooey nav (components/daybar/gooey-nav.tsx), after rareui's ---------- */
+:root {
+  --gooey-bar: var(--surface);
+  --gooey-r: 10px;
+}
+[data-theme="dark"] {
+  --gooey-bar: var(--hover);
+}
+.db-gooey {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+.db-gooey-seg {
+  position: relative;
+  display: flex;
+  background: var(--gooey-bar);
+  border-radius: 0;
+  transition: border-radius 0.45s var(--db-ease), background-color 0s;
+}
+.db-gooey-seg.is-open-left {
+  border-top-left-radius: var(--gooey-r);
+  border-bottom-left-radius: var(--gooey-r);
+}
+.db-gooey-seg.is-open-right {
+  border-top-right-radius: var(--gooey-r);
+  border-bottom-right-radius: var(--gooey-r);
+}
+.db-gooey-seg.is-on {
+  background: var(--blue);
+  transition: border-radius 0.45s var(--db-ease), background-color 0.4s var(--db-ease);
+}
+.db-gooey-neck {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.db-gooey-seg > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0s;
+}
+.db-gooey-seg > button:hover {
+  color: var(--text);
+}
+.db-gooey-seg.is-on > button {
+  color: var(--on-accent);
+  transition: color 0.4s var(--db-ease);
+}
+.db-gooey-seg > button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-gooey-seg,
+  .db-gooey-seg > button {
+    transition: none;
+  }
+}

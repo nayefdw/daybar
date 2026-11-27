@@ -7,6 +7,7 @@ import { Kanban, List } from "lucide-react";
 import { useT } from "../i18n";
 import { movedToDay, upcomingDays, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
+import { GooeyNav } from "./gooey-nav";
 import { CaptureLine } from "./quick-add";
 import { DayGroup, Empty, ItemRow, PlannerStatus } from "./parts";
 import { dayLabel, dayMonth, weekdayShort } from "./format";
@@ -46,14 +47,15 @@ export default function UpcomingScreen() {
     <div className={`db-screen db-upcoming is-${layout}`}>
       <header className="db-screen-head">
         <h1>{t("Demnächst", "Upcoming")}</h1>
-        <div className="db-segmented" role="radiogroup" aria-label={t("Darstellung", "Layout")}>
-          <button type="button" role="radio" aria-checked={layout === "board"} onClick={() => choose("board")}>
-            <Kanban size={15} aria-hidden /> {t("Board", "Board")}
-          </button>
-          <button type="button" role="radio" aria-checked={layout === "list"} onClick={() => choose("list")}>
-            <List size={15} aria-hidden /> {t("Liste", "List")}
-          </button>
-        </div>
+        <GooeyNav
+          label={t("Darstellung", "Layout")}
+          value={layout}
+          onChange={choose}
+          options={[
+            { value: "board", label: t("Board", "Board"), icon: <Kanban size={15} aria-hidden /> },
+            { value: "list", label: t("Liste", "List"), icon: <List size={15} aria-hidden /> },
+          ]}
+        />
       </header>
       {layout === "board" ? (
         <div className="db-board" role="list" aria-label={t("Die nächsten 30 Tage", "The next 30 days")}>

@@ -29,6 +29,7 @@ import {
   type PlannerItem,
 } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
+import { GooeyNav } from "./gooey-nav";
 import { Empty, ItemRow, PlannerStatus, TaskCheck } from "./parts";
 import { dayLabel, dayMonth, dayNumber, hourLabel, monthYear, timeLabel, weekdayShort } from "./format";
 import { DRAG_TYPE, dropToDay } from "./today";
@@ -232,13 +233,17 @@ export default function CalendarScreen() {
           <ChevronRight size={16} />
         </button>
       </div>
-      <div className="db-segmented" role="radiogroup" aria-label={t("Ansicht", "View")}>
-        {(["day", "days", "week", "month"] as const).map((v) => (
-          <button key={v} type="button" role="radio" aria-checked={view === v} onClick={() => choose(v)}>
-            {{ day: t("Tag", "Day"), days: t("Tage", "Days"), week: t("Woche", "Week"), month: t("Monat", "Month") }[v]}
-          </button>
-        ))}
-      </div>
+      <GooeyNav
+        label={t("Ansicht", "View")}
+        value={view}
+        onChange={(v) => choose(v)}
+        options={[
+          { value: "day", label: t("Tag", "Day") },
+          { value: "days", label: t("Tage", "Days") },
+          { value: "week", label: t("Woche", "Week") },
+          { value: "month", label: t("Monat", "Month") },
+        ]}
+      />
       {view === "days" && (
         <Select aria-label={t("Anzahl der Tage", "Number of days")} value={String(count)} onChange={(e) => choose("days", Number(e.target.value))}>
           {[2, 3, 4, 5].map((n) => (

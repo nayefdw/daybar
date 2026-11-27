@@ -12,6 +12,7 @@ import { useT } from "../i18n";
 import { Select } from "../select";
 import { addDays, monthStart, movedToDay, taskDay, taskGroups, weekStart, type PlannerItem, type TaskGroup } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
+import { GooeyNav } from "./gooey-nav";
 import { CaptureLine } from "./quick-add";
 import { Empty, Group, ItemMeta, ItemRow, PlannerStatus, TaskCheck, priorityName } from "./parts";
 import { FoldButton, useFolded } from "./fold";
@@ -135,19 +136,16 @@ export default function TasksScreen({ folderId, tagId, title, lead }: { folderId
           {lead}
           {title || t("Aufgaben", "Tasks")} <span className="db-count">{total}</span>
         </h1>
-        <div className="db-segmented" role="radiogroup" aria-label={t("Darstellung", "Layout")}>
-          {(
-            [
-              ["list", List, t("Liste", "List")],
-              ["board", Kanban, t("Board", "Board")],
-              ["table", Table, t("Tabelle", "Table")],
-            ] as const
-          ).map(([v, Icon, label]) => (
-            <button key={v} type="button" role="radio" aria-checked={layout === v} onClick={() => pickLayout(v)}>
-              <Icon size={15} aria-hidden /> {label}
-            </button>
-          ))}
-        </div>
+        <GooeyNav
+          label={t("Darstellung", "Layout")}
+          value={layout}
+          onChange={pickLayout}
+          options={[
+            { value: "list", label: t("Liste", "List"), icon: <List size={15} aria-hidden /> },
+            { value: "board", label: t("Board", "Board"), icon: <Kanban size={15} aria-hidden /> },
+            { value: "table", label: t("Tabelle", "Table"), icon: <Table size={15} aria-hidden /> },
+          ]}
+        />
       </header>
       <div className="db-toolbar">
         <input type="search" className="db-input db-search" placeholder={t("Filtern …", "Filter…")} aria-label={t("Aufgaben filtern", "Filter tasks")} value={query} onChange={(e) => setQuery(e.target.value)} />

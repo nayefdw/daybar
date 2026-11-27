@@ -18,6 +18,7 @@ import { Select } from "../select";
 import { addDays, monthStart, subtasksOf, weekStart, type PlannerItem } from "@/lib/daybar/model";
 import { bestStreak, monthRate, streak, weekStrip } from "@/lib/daybar/repeat";
 import { usePlannerUi } from "./context";
+import { GooeyNav } from "./gooey-nav";
 import { RepeatEditor } from "./repeat-editor";
 import { TaskCheck, kindName, priorityName } from "./parts";
 import { dayLabel, weekdayNarrow } from "./format";
@@ -186,13 +187,12 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
             {when === "day" && <DurationPicker mode="time" label={t("Uhrzeit", "Time")} value={fromTime(item.time)} onChange={(v) => update({ time: toTime(v) })} />}
           </Field>
           <Field label={t("Priorität", "Priority")}>
-            <div className="db-segmented" role="radiogroup" aria-label={t("Priorität", "Priority")}>
-              {[0, 1, 2, 3].map((p) => (
-                <button key={p} type="button" role="radio" aria-checked={item.priority === p} className={`pri-${p}`} onClick={() => update({ priority: p as PlannerItem["priority"] })}>
-                  {priorityName(p, t)}
-                </button>
-              ))}
-            </div>
+            <GooeyNav
+              label={t("Priorität", "Priority")}
+              value={String(item.priority) as "0" | "1" | "2" | "3"}
+              onChange={(p) => update({ priority: Number(p) as PlannerItem["priority"] })}
+              options={([0, 1, 2, 3] as const).map((p) => ({ value: String(p) as "0" | "1" | "2" | "3", label: priorityName(p, t), color: ["var(--secondary)", "var(--pri-low)", "var(--pri-medium)", "var(--pri-high)"][p] }))}
+            />
           </Field>
           <Field label={t("Status", "Status")}>
             <label className="db-toggle">
