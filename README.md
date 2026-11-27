@@ -26,7 +26,21 @@ docker run -d --name daybar -p 3000:3000 -v daybar-data:/app/data ghcr.io/nayefd
 
 Then open `http://localhost:3000` and sign up: the first account administers the instance. Configuration is flowplan's (`.env.example`, [docs/upstream/README.md](docs/upstream/README.md)); the defaults suit a small server (SQLite, one container).
 
-## Develop
+## Windows desktop
+
+Daybar can also run as a self-contained Windows 10/11 x64 application.
+The Windows build includes the local server, SQLite support and Node.js;
+Docker and a separate Node installation are not needed to use it.
+
+Download the **Daybar-Windows-x64** artifact from a successful
+[Windows desktop build](https://github.com/nayefdw/daybar/actions/workflows/windows-desktop.yml),
+extract it, and run `Daybar-0.12.0-Setup-x64.exe`. The separate Windows ZIP
+can be extracted and launched with `Daybar.exe` instead.
+
+See the [Windows guide](docs/daybar/windows.md) for first launch, data,
+backups, limitations and building from source.
+
+## Develop from source
 
 ```bash
 npm ci
@@ -46,3 +60,4 @@ npm test
 Daybar is free software under the [GNU AGPL-3.0](LICENSE), like flowplan. Whoever runs a changed version for others offers them its source code; Settings → About Daybar links the source of what runs.
 
 flowplan © Yannic Schuller and contributors. flowplan's own README, with its documentation, notices and credits, is kept in [docs/upstream/README.md](docs/upstream/README.md) ([Deutsch](docs/upstream/README.de.md)); third-party notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [licenses/](licenses).
+
