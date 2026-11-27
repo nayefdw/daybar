@@ -3703,7 +3703,7 @@ export type CommandNotificationWeeklyResult = {
   timeZone: string;
 };
 
-/** Save your own keyboard shortcuts. Replaces the whole set. Keys are actions (search, find, newPage, capture, shortcuts, readMode, sidebar, focusMode, comments, ask, theme, splitView, present, journalToday, foldAll, unfoldAll, back, forward, study), values up to 3 combinations such as `Mod+Alt+N` (`Mod` is ⌘ on Apple devices, Ctrl elsewhere); an empty list removes the shortcut, a missing action uses its default. `{}` resets everything. */
+/** Save your own keyboard shortcuts. Replaces the whole set. Keys are actions (search, find, newPage, capture, shortcuts, readMode, sidebar, focusMode, comments, ask, theme, splitView, present, journalToday, foldAll, unfoldAll, back, forward, study, newTask, newEvent, newNote), values up to 3 combinations such as `Mod+Alt+N` (`Mod` is ⌘ on Apple devices, Ctrl elsewhere); an empty list removes the shortcut, a missing action uses its default. `{}` resets everything. */
 export type CommandShortcutsSave = {
   action: "shortcuts.save";
   bindings: Record<string, string[]>;
@@ -5917,6 +5917,106 @@ export class FlowplanClient {
     return this.json<{
     ok: boolean;
   }>("POST", `/api/workflow-approvals/${encodeURIComponent(approvalId)}`, { json: body }, options);
+  }
+
+  /** Your planner — Your own planner in a workspace: `items` (tasks, events, habits and notes; done tasks of the last 120 days), `logs` (habit check-ins of the last 800 days, `onTime` when checked on the day itself), `folders`, `tags` and `settings`. `today`: your local day (YYYY-MM-DD; the server's day otherwise). Answered with `Cache-Control: no-store`. (GET /api/planner/state) */
+  async plannerState(query: { workspace: string; today?: string }, options?: RequestOptions): Promise<{
+    items: Record<string, unknown>[];
+    logs: {
+      itemId: string;
+      day: string;
+      onTime: boolean;
+      [key: string]: unknown;
+    }[];
+    folders: Record<string, unknown>[];
+    tags: Record<string, unknown>[];
+    settings: Record<string, unknown>;
+    [key: string]: unknown;
+  }> {
+    return this.json<{
+    items: Record<string, unknown>[];
+    logs: {
+      itemId: string;
+      day: string;
+      onTime: boolean;
+      [key: string]: unknown;
+    }[];
+    folders: Record<string, unknown>[];
+    tags: Record<string, unknown>[];
+    settings: Record<string, unknown>;
+    [key: string]: unknown;
+  }>("GET", `/api/planner/state`, { query }, options);
+  }
+
+  /** The text of your day notes — The plain text of the day notes (the days of your "Day notes" journal) from `from` to `to` (at most a year), by day. Answered with `Cache-Control: no-store`. (GET /api/planner/day-notes) */
+  async plannerDayNotes(query: { workspace: string; from: string; to: string }, options?: RequestOptions): Promise<Record<string, {
+    pageId: string;
+    text: string;
+    [key: string]: unknown;
+  }>> {
+    return this.json<Record<string, {
+    pageId: string;
+    text: string;
+    [key: string]: unknown;
+  }>>("GET", `/api/planner/day-notes`, { query }, options);
+  }
+
+  /** Change your planner — One JSON object with `action`, `workspaceId`, `today` (your local day) and the action's fields: `item.create` (`item`: kind, title, day, time, …; an `id` of your own is kept), `item.update` (`id`, `patch`), `items.update` (`ids`, `patch`), `item.done` (`id`, `done`), `item.delete`, `item.restore`, `habit.check` (`id`, `day`, `done`), `folder.create|update|delete`, `tag.create|update|delete`, `settings.update`, `dayNote.open` (`day`), `thisday.import` (`export`: a ThisDay export of format 2; `force` to accept one that removes many items), `thisday.resend` and `legacy.import` (`backup`: the old Daybar page's JSON backup). Write tokens only; bodies up to 25 MB. (POST /api/planner) */
+  async plannerCommand(body: {
+    action: string;
+    workspaceId: string;
+    today?: string;
+    [key: string]: unknown;
+  }, options?: RequestOptions): Promise<Record<string, unknown>> {
+    return this.json<Record<string, unknown>>("POST", `/api/planner`, { json: body }, options);
+  }
+
+  /** The ThisDay sync's state — What waits in the outbox for ThisDay (`pending`), what was fetched but ThisDay does not show yet (`sent`), the first 200 changes, and the export last imported (`lastExport`: its time stamp). Answered with `Cache-Control: no-store`. (GET /api/planner/thisday/status) */
+  async thisDayStatus(query: { workspace: string }, options?: RequestOptions): Promise<{
+    pending: number;
+    sent: number;
+    lastExport?: string | null;
+    /** When an export was last imported (ms) */
+    lastImport?: number | null;
+    changes: Record<string, unknown>[];
+    [key: string]: unknown;
+  }> {
+    return this.json<{
+    pending: number;
+    sent: number;
+    lastExport?: string | null;
+    /** When an export was last imported (ms) */
+    lastImport?: number | null;
+    changes: Record<string, unknown>[];
+    [key: string]: unknown;
+  }>("GET", `/api/planner/thisday/status`, { query }, options);
+  }
+
+  /** The outbox for ThisDay (iPhone Shortcut) — For the iPhone Shortcut ("Get Contents of URL" with `Authorization: Bearer fp_…`): `{ app: "Daybar", kind: "to-thisday", version: 1, createdAt, changes }` – the items to add to ThisDay and the ThisDay items to tick off, each with its `key`. Fetching counts them as sent, except with `peek=1` or a read token. Without `workspace`, the only workspace you belong to. Answered with `Cache-Control: no-store`. (GET /api/planner/thisday/to-thisday.json) */
+  async thisDayOutbox(query?: { workspace?: string; peek?: "1" }, options?: RequestOptions): Promise<{
+    app: "Daybar";
+    kind: "to-thisday";
+    version: number;
+    createdAt?: string;
+    changes: ({
+      key: string;
+      action: "add" | "tick";
+      [key: string]: unknown;
+    })[];
+    [key: string]: unknown;
+  }> {
+    return this.json<{
+    app: "Daybar";
+    kind: "to-thisday";
+    version: number;
+    createdAt?: string;
+    changes: ({
+      key: string;
+      action: "add" | "tick";
+      [key: string]: unknown;
+    })[];
+    [key: string]: unknown;
+  }>("GET", `/api/planner/thisday/to-thisday.json`, { query }, options);
   }
 
   /** MCP server (Streamable HTTP, JSON answers) — For AI assistants. Only API tokens sign in; read tokens get the reading tools, write tokens all. 120 calls per person and minute, then 429 with `Retry-After`. Tools: list_workspaces, list_pages, search, list_collections, run_collection, read_page, query_database, get_record, my_tasks, get_meeting_note (reading); create_page, append_to_page, update_page, move_page, trash_page, set_task, create_record, update_record, trash_record, save_collection, delete_collection, create_meeting_note (writing; nothing is deleted permanently – trash_page and trash_record move to the trash); and the workflow tools. (POST /api/mcp) */

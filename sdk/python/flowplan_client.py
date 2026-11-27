@@ -2313,7 +2313,7 @@ CommandNotificationWeeklyResult = TypedDict("CommandNotificationWeeklyResult", {
     "timeZone": Required[str],
 }, total=False)
 
-# Save your own keyboard shortcuts. Replaces the whole set. Keys are actions (search, find, newPage, capture, shortcuts, readMode, sidebar, focusMode, comments, ask, theme, splitView, present, journalToday, foldAll, unfoldAll, back, forward, study), values up to 3 combinations such as `Mod+Alt+N` (`Mod` is ⌘ on Apple devices, Ctrl elsewhere); an empty list removes the shortcut, a missing action uses its default. `{}` resets everything.
+# Save your own keyboard shortcuts. Replaces the whole set. Keys are actions (search, find, newPage, capture, shortcuts, readMode, sidebar, focusMode, comments, ask, theme, splitView, present, journalToday, foldAll, unfoldAll, back, forward, study, newTask, newEvent, newNote), values up to 3 combinations such as `Mod+Alt+N` (`Mod` is ⌘ on Apple devices, Ctrl elsewhere); an empty list removes the shortcut, a missing action uses its default. `{}` resets everything.
 CommandShortcutsSave = TypedDict("CommandShortcutsSave", {
     "action": Required[Literal["shortcuts.save"]],
     "bindings": Required[dict[str, list[str]]],
@@ -2912,6 +2912,26 @@ WorkflowStartInfoQuery = TypedDict("WorkflowStartInfoQuery", {
 
 MyWorkflowApprovalsQuery = TypedDict("MyWorkflowApprovalsQuery", {
     "workspaceId": str,  # Only this workspace
+}, total=False)
+
+PlannerStateQuery = TypedDict("PlannerStateQuery", {
+    "workspace": Required[str],  # Workspace ID
+    "today": str,  # Your local day (YYYY-MM-DD)
+}, total=False)
+
+PlannerDayNotesQuery = TypedDict("PlannerDayNotesQuery", {
+    "workspace": Required[str],  # Workspace ID
+    "from": Required[str],  # First day (YYYY-MM-DD)
+    "to": Required[str],  # Last day (YYYY-MM-DD)
+}, total=False)
+
+ThisDayStatusQuery = TypedDict("ThisDayStatusQuery", {
+    "workspace": Required[str],  # Workspace ID
+}, total=False)
+
+ThisDayOutboxQuery = TypedDict("ThisDayOutboxQuery", {
+    "workspace": str,  # Workspace ID (optional with one workspace)
+    "peek": Literal["1"],  # 1: only look, nothing counts as sent
 }, total=False)
 
 # ---- Client ----
@@ -3748,6 +3768,26 @@ class FlowplanClient:
     def decide_workflow_approval(self, approval_id: str, body: dict[str, Any], headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
         """Approve or reject (signed in only) — A person's decision: refused for every API token (403) and not offered over MCP. The first decision wins (409 afterwards). (POST /api/workflow-approvals/{approvalId})"""
         return self._json("POST", "/api/workflow-approvals/" + _p(approval_id), json_body=body, headers=headers)
+
+    def planner_state(self, query: "PlannerStateQuery", headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
+        """Your planner — Your own planner in a workspace: `items` (tasks, events, habits and notes; done tasks of the last 120 days), `logs` (habit check-ins of the last 800 days, `onTime` when checked on the day itself), `folders`, `tags` and `settings`. `today`: your local day (YYYY-MM-DD; the server's day otherwise). Answered with `Cache-Control: no-store`. (GET /api/planner/state)"""
+        return self._json("GET", "/api/planner/state", query=dict(query) if query else None, headers=headers)
+
+    def planner_day_notes(self, query: "PlannerDayNotesQuery", headers: Optional[dict[str, str]] = None) -> dict[str, dict[str, Any]]:
+        """The text of your day notes — The plain text of the day notes (the days of your "Day notes" journal) from `from` to `to` (at most a year), by day. Answered with `Cache-Control: no-store`. (GET /api/planner/day-notes)"""
+        return self._json("GET", "/api/planner/day-notes", query=dict(query) if query else None, headers=headers)
+
+    def planner_command(self, body: dict[str, Any], headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
+        """Change your planner — One JSON object with `action`, `workspaceId`, `today` (your local day) and the action's fields: `item.create` (`item`: kind, title, day, time, …; an `id` of your own is kept), `item.update` (`id`, `patch`), `items.update` (`ids`, `patch`), `item.done` (`id`, `done`), `item.delete`, `item.restore`, `habit.check` (`id`, `day`, `done`), `folder.create|update|delete`, `tag.create|update|delete`, `settings.update`, `dayNote.open` (`day`), `thisday.import` (`export`: a ThisDay export of format 2; `force` to accept one that removes many items), `thisday.resend` and `legacy.import` (`backup`: the old Daybar page's JSON backup). Write tokens only; bodies up to 25 MB. (POST /api/planner)"""
+        return self._json("POST", "/api/planner", json_body=body, headers=headers)
+
+    def this_day_status(self, query: "ThisDayStatusQuery", headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
+        """The ThisDay sync's state — What waits in the outbox for ThisDay (`pending`), what was fetched but ThisDay does not show yet (`sent`), the first 200 changes, and the export last imported (`lastExport`: its time stamp). Answered with `Cache-Control: no-store`. (GET /api/planner/thisday/status)"""
+        return self._json("GET", "/api/planner/thisday/status", query=dict(query) if query else None, headers=headers)
+
+    def this_day_outbox(self, query: Optional["ThisDayOutboxQuery"] = None, headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
+        """The outbox for ThisDay (iPhone Shortcut) — For the iPhone Shortcut ("Get Contents of URL" with `Authorization: Bearer fp_…`): `{ app: "Daybar", kind: "to-thisday", version: 1, createdAt, changes }` – the items to add to ThisDay and the ThisDay items to tick off, each with its `key`. Fetching counts them as sent, except with `peek=1` or a read token. Without `workspace`, the only workspace you belong to. Answered with `Cache-Control: no-store`. (GET /api/planner/thisday/to-thisday.json)"""
+        return self._json("GET", "/api/planner/thisday/to-thisday.json", query=dict(query) if query else None, headers=headers)
 
     def mcp(self, body: "McpRequest", headers: Optional[dict[str, str]] = None) -> "McpResponse":
         """MCP server (Streamable HTTP, JSON answers) — For AI assistants. Only API tokens sign in; read tokens get the reading tools, write tokens all. 120 calls per person and minute, then 429 with `Retry-After`. Tools: list_workspaces, list_pages, search, list_collections, run_collection, read_page, query_database, get_record, my_tasks, get_meeting_note (reading); create_page, append_to_page, update_page, move_page, trash_page, set_task, create_record, update_record, trash_record, save_collection, delete_collection, create_meeting_note (writing; nothing is deleted permanently – trash_page and trash_record move to the trash); and the workflow tools. (POST /api/mcp)"""
