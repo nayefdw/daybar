@@ -197,7 +197,7 @@ export default function TodayScreen() {
                     <button type="button" className="db-row-main" onClick={() => ui.select(h.id)}>
                       <span className="db-row-title">
                         {h.icon && <ChosenIcon name={h.icon} size={15} className="db-title-icon" />}
-                        {h.title}
+                        <span className="db-row-label">{h.title}</span>
                       </span>
                       <ItemMeta item={h} hideTime />
                     </button>

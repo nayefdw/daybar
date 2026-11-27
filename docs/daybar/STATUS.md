@@ -22,6 +22,23 @@ What is built on top of flowplan, and what comes next. The plan is the build ord
 | Image | `ghcr.io/nayefdw/daybar:latest` and `:sha-…` for linux/amd64 on every push to `main`; one worker thread and a 640 MB heap cap by default | `.github/workflows/docker.yml`, `Dockerfile` |
 | Tests | Habit rules and streaks, the model's groups and scopes, the server store (ownership, kinds, subtasks, waiting, trash, notes, day notes, settings), ThisDay and the old backup with synthetic exports | `tests/daybar-*.test.ts` |
 
+### After Phase 1: the look and the details
+
+| Area | What works | Where |
+| --- | --- | --- |
+| Icons | Lucide (one stroke, one size per role) in the planner, the sidebar, the top bars and the phone's tab bar; flowplan's pages and editor keep Phosphor | `lucide-react`, `components/daybar/*`, `components/workspace-app.tsx` |
+| Top bar | The same top bar ("Search, or create anything…", New, AI) on every screen but a page; the sidebar drops its duplicate Search and Ask AI | `components/daybar/topbar.tsx` |
+| Choosable icons | Every item and folder can carry one of 146 icons in front of its name; chosen from a quick pill of suggestions (the title's words, recent picks, the kind) or the whole set; shown in rows, the calendar, habits, the table, the sidebar and folder chips | `lib/daybar/icons.ts`, `components/daybar/icon-picker.tsx`, `icon-reactions.tsx` |
+| Right-click | Every item's menu: complete or check off, details, move to Today, Tomorrow, Next week or Someday, priority, icon, favourite, duplicate, delete | `components/daybar/item-menu.tsx` |
+| Click away | A click elsewhere or Escape lets go of the selected item and closes the panel it opened; menus, pickers and pop-ups close the same way | `components/daybar/context.tsx` |
+| Folding | Every group folds from its heading and stays folded on the device | `components/daybar/fold.tsx` |
+| Apple-style polish | One blue, one title weight, no tracked capitals, soft-filled buttons that sink when pressed, frosted menus, Quick Add and tab bar; phones without duplicate buttons | `app/daybar.css` |
+| From rareui.com | Toast Feedback (the app's toast), task list animation (tick, strike, nudge, rows glide), Delete button, Theme selector (Settings, Appearance), Duration picker (durations and every time of day), Emoji reaction (the icon pill), Bounce sidebar (the sidebar's dot), Voice note (record onto a note, play it) – ported to plain CSS and React without new libraries | `components/toast.tsx`, `components/theme-selector.tsx`, `components/daybar/*` |
+| Voice notes | Record on the Notes screen or in a note; the file is uploaded to the note's page and only such a file is accepted (`planner_items.audio`) | `components/daybar/voice-note.tsx`, `lib/daybar/store.ts` |
+| Unslop pass | Warm ramp for the new pieces, one red and one green, no tracking under 16 px, single-sentence labels without full stops, 4 px spacing, three motion curves | `app/daybar.css` |
+
+Still to come from rareui (waiting for their code): the notification bell, the gooey nav and the folder component.
+
 ### How Phase 1 was checked
 
 - `npm run typecheck` and `npm test` (4,894 tests) pass.
