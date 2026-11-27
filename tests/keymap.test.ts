@@ -119,10 +119,13 @@ test("conflicts with other actions, the editor and the browser", () => {
   assert.deepEqual(conflictsOf(map, "theme", false), [{ combo: "Mod+B", kind: "editor", with: "bold" }]);
   assert.deepEqual(conflictsOf(map, "present", false), [{ combo: "Mod+W", kind: "browser" }]);
   const all = allConflicts(map, false);
-  assert.deepEqual(Object.keys(all).sort(), ["newPage", "present", "search", "theme"]);
-  // The defaults collide with nothing.
-  assert.deepEqual(allConflicts(DEFAULT_KEYMAP, false), {});
-  assert.deepEqual(allConflicts(DEFAULT_KEYMAP, true), {});
+  assert.deepEqual(Object.keys(all).sort(), ["newEvent", "newPage", "present", "search", "theme"]);
+  // The defaults collide with nothing – but Daybar's new event, ⇧⌘N as the
+  // planner asks for it: a browser tab keeps it for a private window, the
+  // installed and desktop apps get it (the overview shows the warning).
+  const eventOnly = { newEvent: [{ combo: "Mod+Shift+N", kind: "browser" }] };
+  assert.deepEqual(allConflicts(DEFAULT_KEYMAP, false), eventOnly);
+  assert.deepEqual(allConflicts(DEFAULT_KEYMAP, true), eventOnly);
 });
 
 test("the action of an event; bare keys only outside of text", () => {
@@ -131,8 +134,9 @@ test("the action of an event; bare keys only outside of text", () => {
   assert.equal(actionForEvent(key("?", { shiftKey: true }, "Slash"), map, false, false), "shortcuts");
   assert.equal(actionForEvent(key("?", { shiftKey: true }, "Slash"), map, false, true), null);
   assert.equal(actionForEvent(key("/", { metaKey: true }, "Slash"), map, true, true), "shortcuts");
-  assert.equal(actionForEvent(key("n", { ctrlKey: true, altKey: true }), map, false, false), "capture");
-  assert.equal(actionForEvent(key("n", { ctrlKey: true }), map, false, false), "newPage");
+  // Daybar: ⌘N a task, ⌥⌘N a note (components/daybar/quick-add.tsx).
+  assert.equal(actionForEvent(key("n", { ctrlKey: true, altKey: true }), map, false, false), "newNote");
+  assert.equal(actionForEvent(key("n", { ctrlKey: true }), map, false, false), "newTask");
   assert.equal(actionForEvent(key("\\", { ctrlKey: true, altKey: true }, "Backslash"), map, false, false), "splitView");
   assert.equal(actionForEvent(key("x", { ctrlKey: true }), map, false, false), null);
   // "KI fragen" (#59): ⌘⌥A / Ctrl+Alt+A, also while typing in the document;
@@ -161,7 +165,7 @@ test("shortcuts are stored per person (shortcuts.save)", async () => {
   assert.deepEqual((await bootstrap(me, mine)).shortcuts, {});
   const saved = (await command(me, {
     action: "shortcuts.save",
-    bindings: { search: ["mod+shift+k"], present: [], newPage: ["Mod+N"] },
+    bindings: { search: ["mod+shift+k"], present: [], newTask: ["Mod+N"] },
   })) as { bindings: Record<string, string[]> };
   assert.deepEqual(saved.bindings, { search: ["Mod+Shift+K"], present: [] });
   assert.deepEqual((await bootstrap(me, mine)).shortcuts, { search: ["Mod+Shift+K"], present: [] });

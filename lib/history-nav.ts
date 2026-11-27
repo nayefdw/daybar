@@ -32,6 +32,7 @@ export const TRAIL_SIZE = 100;
 
 const SCREENS = ["home", "inbox", "tasks", "graph", "trash", "media", "settings", "admin", "tags", "study", "library"];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const PLAN_VIEWS = ["today", "upcoming", "calendar", "notes", "tasks", "events", "habits", "favorites", "folders", "tags", "sync"];
 
 // The place an address stands for, as a hash without "#" – or null when it
 // is no place to return to (#search, #new, a broken link). A page keeps its
@@ -48,6 +49,14 @@ export function stepOf(fragment: string): string | null {
   if (settings) return settingsHash(settings).slice(1);
   if (SCREENS.includes(hash)) return hash;
   const [base, id, ...rest] = hash.split("/");
+  // Daybar's planner (components/daybar/screen.tsx): #plan/<view>, a folder
+  // or a tag; #plan/add only opens Quick Add.
+  if (base === "plan") {
+    if (!id) return "plan/today";
+    if (PLAN_VIEWS.includes(id) && !rest.length) return `plan/${id}`;
+    if ((id === "folder" || id === "tag") && rest.length === 1 && UUID.test(rest[0])) return `plan/${id}/${rest[0].toLowerCase()}`;
+    return null;
+  }
   if ((base === "tags" || base === "collection") && id && UUID.test(id) && !rest.length) return `${base}/${id.toLowerCase()}`;
   // A library, a book's and a chapter's overview (#329, lib/library.ts).
   if (base === "library" && id && UUID.test(id) && rest.length <= 2 && rest.every((r) => UUID.test(r))) return [base, id, ...rest].join("/").toLowerCase();

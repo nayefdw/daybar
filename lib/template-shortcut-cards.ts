@@ -23,22 +23,6 @@ export const shortcutCards: { de: CatalogRow[]; en: CatalogRow[] } = {
     },
     {
       "cells": {
-        "title": "Neue Seite",
-        "mac": "⌘ N",
-        "pc": "Ctrl + N",
-        "area": "App"
-      }
-    },
-    {
-      "cells": {
-        "title": "Schnell erfassen",
-        "mac": "⌥ ⌘ N",
-        "pc": "Ctrl + Alt + N",
-        "area": "App"
-      }
-    },
-    {
-      "cells": {
         "title": "Übersicht der Tastenkürzel",
         "mac": "? / ⌘ /",
         "pc": "? / Ctrl + /",
@@ -138,6 +122,30 @@ export const shortcutCards: { de: CatalogRow[]; en: CatalogRow[] } = {
         "title": "Vorwärts zur nächsten Seite",
         "mac": "⌘ ] / ⌥ →",
         "pc": "Ctrl + ] / Alt + →",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "Neue Aufgabe",
+        "mac": "⌘ N",
+        "pc": "Ctrl + N",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "Neuer Termin",
+        "mac": "⇧ ⌘ N",
+        "pc": "Ctrl + Shift + N",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "Neue Notiz",
+        "mac": "⌥ ⌘ N",
+        "pc": "Ctrl + Alt + N",
         "area": "App"
       }
     },
@@ -385,22 +393,6 @@ export const shortcutCards: { de: CatalogRow[]; en: CatalogRow[] } = {
     },
     {
       "cells": {
-        "title": "New page",
-        "mac": "⌘ N",
-        "pc": "Ctrl + N",
-        "area": "App"
-      }
-    },
-    {
-      "cells": {
-        "title": "Quick capture",
-        "mac": "⌥ ⌘ N",
-        "pc": "Ctrl + Alt + N",
-        "area": "App"
-      }
-    },
-    {
-      "cells": {
         "title": "Keyboard shortcut overview",
         "mac": "? / ⌘ /",
         "pc": "? / Ctrl + /",
@@ -500,6 +492,30 @@ export const shortcutCards: { de: CatalogRow[]; en: CatalogRow[] } = {
         "title": "Forward to the next page",
         "mac": "⌘ ] / ⌥ →",
         "pc": "Ctrl + ] / Alt + →",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "New task",
+        "mac": "⌘ N",
+        "pc": "Ctrl + N",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "New event",
+        "mac": "⇧ ⌘ N",
+        "pc": "Ctrl + Shift + N",
+        "area": "App"
+      }
+    },
+    {
+      "cells": {
+        "title": "New note",
+        "mac": "⌥ ⌘ N",
+        "pc": "Ctrl + Alt + N",
         "area": "App"
       }
     },

@@ -3,7 +3,7 @@
 // New, Inbox and Menu (the drawer with the full page tree). It steps aside
 // while the on-screen keyboard is open, so the formatting toolbar that docks
 // at the bottom of a document never shares the space with it.
-import { Bell, House, List, MagnifyingGlass, Plus, X } from "@phosphor-icons/react";
+import { Bell, List, MagnifyingGlass, Plus, Sun, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { useT } from "./i18n";
 import { coveredBelow } from "@/lib/keyboard-caret";
@@ -326,8 +326,9 @@ export function MobileTabBar({
         aria-current={active === "home" ? "page" : undefined}
         onClick={onHome}
       >
-        <House size={22} weight={active === "home" ? "fill" : "regular"} aria-hidden="true" />
-        <span>{t("Start", "Home")}</span>
+        {/* Daybar: the start is the planner's Today. */}
+        <Sun size={22} weight={active === "home" ? "fill" : "regular"} aria-hidden="true" />
+        <span>{t("Heute", "Today")}</span>
       </button>
       <button type="button" className="mobile-tab" aria-haspopup="dialog" onClick={onSearch}>
         <MagnifyingGlass size={22} aria-hidden="true" />

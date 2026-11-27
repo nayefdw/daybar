@@ -15,6 +15,17 @@ const A = "11111111-1111-4111-8111-111111111111",
 const at = (hash: string, path = "/") => `https://flowplan.example${path}${hash ? `#${hash}` : ""}`;
 const entries = (...urls: string[]): EntryLike[] => urls.map((url, index) => ({ key: `k${index}`, url, index }));
 
+test("Daybar's planner: its views, a folder and a tag are places; #plan/add is not", () => {
+  assert.equal(stepOf("#plan"), "plan/today");
+  assert.equal(stepOf("plan/calendar"), "plan/calendar");
+  assert.equal(stepOf("plan/tasks"), "plan/tasks");
+  assert.equal(stepOf(`plan/folder/${A.toUpperCase()}`), `plan/folder/${A}`);
+  assert.equal(stepOf(`plan/tag/${B}`), `plan/tag/${B}`);
+  assert.equal(stepOf("plan/add"), null);
+  assert.equal(stepOf("plan/folder/nope"), null);
+  assert.equal(stepOf("plan/calendar/extra"), null);
+});
+
 test("places: pages with their record, screens, settings sections – not quick actions", () => {
   assert.equal(stepOf(""), "home");
   assert.equal(stepOf("#home"), "home");

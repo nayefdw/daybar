@@ -43,6 +43,12 @@ export function actionLabel(action: ShortcutAction, t: T): string {
       return t("Neue Seite", "New page");
     case "capture":
       return t("Schnell erfassen", "Quick capture");
+    case "newTask":
+      return t("Neue Aufgabe", "New task");
+    case "newEvent":
+      return t("Neuer Termin", "New event");
+    case "newNote":
+      return t("Neue Notiz", "New note");
     case "shortcuts":
       return t("Diese Übersicht", "This overview");
     case "readMode":

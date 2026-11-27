@@ -8,7 +8,8 @@ const title = (action: string) => `T:${action}`;
 test("the global shortcuts become the app's key commands, with ⌘ on the iPad", () => {
   const commands = appKeyCommands(DEFAULT_KEYMAP, title);
   assert.deepEqual(commands.find((c) => c.action === "search"), { action: "search", title: "T:search", input: "k", modifiers: ["command"] });
-  assert.deepEqual(commands.find((c) => c.action === "capture"), { action: "capture", title: "T:capture", input: "n", modifiers: ["alternate", "command"] });
+  // Daybar: ⌥⌘N makes a note (flowplan's quick capture has no default).
+  assert.deepEqual(commands.find((c) => c.action === "newNote"), { action: "newNote", title: "T:newNote", input: "n", modifiers: ["alternate", "command"] });
   // "?" stays with the page (typing), ⌘/ is the key command of the overview.
   assert.deepEqual(commands.filter((c) => c.action === "shortcuts"), [{ action: "shortcuts", title: "T:shortcuts", input: "/", modifiers: ["command"] }]);
   // Actions without a combination have no key command.

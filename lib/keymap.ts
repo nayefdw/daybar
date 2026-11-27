@@ -33,6 +33,10 @@ export const SHORTCUT_ACTIONS = [
   "forward",
   // The screen #study, flashcards of all decks (no combination by default).
   "study",
+  // Daybar's Quick Add for a task, an event or a note (components/daybar/quick-add.tsx).
+  "newTask",
+  "newEvent",
+  "newNote",
 ] as const;
 export type ShortcutAction = (typeof SHORTCUT_ACTIONS)[number];
 export type Keymap = Record<ShortcutAction, string[]>;
@@ -44,8 +48,10 @@ export const DEFAULT_KEYMAP: Keymap = {
   // Find on the page (components/find-in-page.tsx) instead of the
   // browser's: it also works in the desktop app and the apps.
   find: ["Mod+F"],
-  newPage: ["Mod+N"],
-  capture: ["Mod+Alt+N"],
+  // Daybar: ⌘N, ⇧⌘N and ⌥⌘N make a task, an event and a note (below); a
+  // page and flowplan's quick capture keep their entries, without a default.
+  newPage: [],
+  capture: [],
   shortcuts: ["?", "Mod+/"],
   readMode: ["Mod+Alt+E"],
   sidebar: ["Mod+Alt+B"],
@@ -73,6 +79,11 @@ export const DEFAULT_KEYMAP: Keymap = {
   back: ["Mod+[", "Alt+ArrowLeft"],
   forward: ["Mod+]", "Alt+ArrowRight"],
   study: [],
+  // ⇧⌘N is the browser's private window in a tab; the installed app and the
+  // desktop app get it.
+  newTask: ["Mod+N"],
+  newEvent: ["Mod+Shift+N"],
+  newNote: ["Mod+Alt+N"],
 };
 // At most this many combinations per action.
 export const MAX_COMBOS = 3;

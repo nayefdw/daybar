@@ -159,6 +159,21 @@ import { anyOf, byBlockId, byText, bySelector, jumpTo, snippetHit } from "@/lib/
 import { flipList, installTaskFeedback, sameRelativeOrder, type Point } from "@/lib/motion";
 import { Collapse, useLeaving } from "./motion";
 import dynamic from "next/dynamic";
+// Daybar's planner (components/daybar): its context, sidebar part, top bar
+// and the bridge for shortcuts and the ⌘K Create row live in the shell; its
+// screens and right panel load when opened.
+import { PlannerProvider, usePlannerUiMaybe } from "./daybar/context";
+import { PlannerNav } from "./daybar/nav";
+import { PlannerTopBar } from "./daybar/topbar";
+import { PlannerBridge, PaletteCreateRow, type PlannerBridgeApi } from "./daybar/bridge";
+import { planView as planViewOf } from "./daybar/screen";
+const PlannerScreen = dynamic(() => import("./daybar/screen"));
+const PlannerPanel = dynamic(() => import("./daybar/panel").then((m) => m.PlannerPanel), { ssr: false });
+// The planner's right panel while a planner screen is open and the panel is on.
+function PlannerPanelHost({ shown }: { shown: boolean }) {
+  const ui = usePlannerUiMaybe();
+  return shown && ui?.panelOpen ? <PlannerPanel /> : null;
+}
 import { PageCommentField } from "./page-comment-field";
 import { ViewBoundary, loadView } from "@/components/view-fallback";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
@@ -529,7 +544,9 @@ type CommandAction = {
 type PaletteItem =
   | { kind: "result"; id: string; result: SearchResult }
   | { kind: "recent"; id: string; result: RecentVisit }
-  | { kind: "command"; id: string; action: CommandAction };
+  | { kind: "command"; id: string; action: CommandAction }
+  // Daybar: what was typed, made by Quick Add (components/daybar/bridge.tsx).
+  | { kind: "create"; id: string };
 // Typing there: "?" is a character, not the shortcut overlay.
 const isTyping = (el: EventTarget | null) =>
   el instanceof HTMLElement &&
@@ -558,7 +575,9 @@ type Screen =
   // shelves with the library search (components/library-home.tsx): #library.
   | "library"
   // Flashcards of all decks (components/study/screen.tsx): #study.
-  | "study";
+  | "study"
+  // Daybar's planner (components/daybar/screen.tsx): #plan/<view>, the start page.
+  | "plan";
 export default function WorkspaceApp({
   initial,
   useTemplate,
@@ -581,6 +600,12 @@ export default function WorkspaceApp({
   const toggleReadingRef = useRef(() => {});
   // What a global shortcut does (set each render, see runShortcut).
   const shortcutRef = useRef((_action: ShortcutAction) => {});
+  // The planner, for the shortcuts and the ⌘K Create row (components/daybar/bridge.tsx).
+  const plannerRef = useRef<PlannerBridgeApi | null>(null);
+  // A note or a day note of the planner opens as a page of the workspace.
+  const openPlannerPage = useCallback((id: string) => {
+    location.hash = pageLocationHash({ pageId: id });
+  }, []);
   const printOpenPageRef = useRef(() => {});
   const printOpenPage = () => printOpenPageRef.current();
   const t = useT();
@@ -618,7 +643,9 @@ export default function WorkspaceApp({
   // still on their way (optimistic layers, see `mutate` below).
   const [bootState, setBoot] = useState(initial),
     [pageId, setPageId] = useState<string | null>(null),
-    [screen, setScreen] = useState<Screen>("home"),
+    // Daybar starts on the planner's Today (#plan/today); #home is flowplan's start page.
+    [screen, setScreen] = useState<Screen>("plan"),
+    [planView, setPlanView] = useState("today"),
     // The placeholder drawn with the server's start page for a reload on
     // another place (lib/route-pending.ts): gone once the app shows the
     // place in the address.
@@ -2268,6 +2295,21 @@ export default function WorkspaceApp({
             },
           });
         }
+      } else if (planViewOf(fragment) || fragment === "") {
+        // Daybar's planner; an address without a place is its Today (and
+        // says so, for back and forward).
+        if (fragment === "") window.history.replaceState(window.history.state, "", `${location.pathname}${location.search}#plan/today`);
+        setPlanView(planViewOf(fragment) ?? "today");
+        if (screenRef.current !== "plan") {
+          screenRef.current = "plan";
+          transitionView(
+            () => {
+              setScreen("plan");
+              if (!keepNav) setMobile(false);
+            },
+            { kind: "page" },
+          );
+        } else if (!keepNav) setMobile(false);
       } else if (fragment === LIBRARY_HOME || parseLibraryHash(fragment)) {
         setLibraryPlace(parseLibraryHash(fragment));
         if (screenRef.current !== "library") {
@@ -2615,6 +2657,12 @@ export default function WorkspaceApp({
       case "newPage":
         setCreate(true);
         break;
+      // Daybar's Quick Add (components/daybar/quick-add.tsx).
+      case "newTask":
+      case "newEvent":
+      case "newNote":
+        plannerRef.current?.quickAdd({ kind: action === "newTask" ? "task" : action === "newEvent" ? "event" : "note" });
+        break;
       case "capture":
         setCapture(true);
         break;
@@ -2724,6 +2772,26 @@ export default function WorkspaceApp({
       return { title: name || kept?.title || t("Sammlung", "Collection"), icon: <FolderSimple size={16} />, remember: name ? { title: name } : undefined };
     }
     if (base === "tags" && id) return { title: kept?.title || t("Tag", "Tag"), detail: t("Tags", "Tags"), icon: <TagIcon size={16} /> };
+    // Daybar's planner.
+    if (base === "plan") {
+      const view = hash.split("/")[1] || "today";
+      const titles: Record<string, string> = {
+        today: t("Heute", "Today"),
+        upcoming: t("Demnächst", "Upcoming"),
+        calendar: t("Kalender", "Calendar"),
+        notes: t("Notizen", "Notes"),
+        tasks: t("Aufgaben", "Tasks"),
+        events: t("Termine", "Events"),
+        habits: t("Gewohnheiten", "Habits"),
+        favorites: t("Favoriten", "Favourites"),
+        folders: t("Ordner", "Folders"),
+        tags: t("Tags", "Tags"),
+        folder: t("Ordner", "Folder"),
+        tag: t("Tag", "Tag"),
+        sync: t("ThisDay und Import", "ThisDay and import"),
+      };
+      return screenLook(titles[view] || t("Planer", "Planner"), view === "calendar" ? CalendarBlank : CheckSquare);
+    }
     switch (base) {
       case "inbox":
         return screenLook(t("Posteingang", "Inbox"), Bell);
@@ -4515,7 +4583,11 @@ export default function WorkspaceApp({
     const ms = Date.parse(value.includes("T") ? value : `${value.replace(" ", "T")}Z`);
     return Number.isFinite(ms) ? t(`Bearbeitet ${ago(ms, clock ?? Date.now(), locale)}`, `Edited ${ago(ms, clock ?? Date.now(), locale)}`) : "";
   };
+  // The Create row comes first while something is typed (not "> commands").
+  const createShown = !!query.trim() && !commandsOnly && !query.trim().startsWith(">");
+  const lead = createShown ? 1 : 0;
   const paletteItems: PaletteItem[] = [
+    ...(createShown ? [{ kind: "create", id: "create" } as PaletteItem] : []),
     ...recentGroups.flatMap((group) => group.items).map((result): PaletteItem => ({ kind: "recent", id: `recent-${result.id}-${result.rowId || ""}`, result })),
     ...paletteResults.map((result): PaletteItem => ({ kind: "result", id: `result-${result.kind}-${result.id}-${result.rowId || ""}`, result })),
     ...shownActions.map((action, i): PaletteItem => ({ kind: "command", id: `command-${i}`, action })),
@@ -4531,6 +4603,12 @@ export default function WorkspaceApp({
   }, [search, activeItem]);
   const runItem = (item: PaletteItem, mode: OpenMode = "here") => {
     if (item.kind === "command") return runCommand(item.action);
+    if (item.kind === "create") {
+      const text = query.trim();
+      closeSearch();
+      void plannerRef.current?.createFromText(text);
+      return;
+    }
     const intoSplit = paletteSplit,
       intoTab = paletteTab;
     closeSearch();
@@ -4550,11 +4628,11 @@ export default function WorkspaceApp({
   };
   // Hovering or highlighting a hit loads its page ahead (components/prefetch.ts).
   const prefetchOf = (item: PaletteItem) =>
-    item.kind === "command"
+    item.kind === "command" || item.kind === "create"
       ? {}
       : { "data-prefetch-page": item.result.id, ...(item.result.rowId ? { "data-prefetch-row": item.result.rowId } : {}) };
   useEffect(() => {
-    if (!search || !activeItem || activeItem.kind === "command") return;
+    if (!search || !activeItem || activeItem.kind === "command" || activeItem.kind === "create") return;
     const timer = setTimeout(() => {
       const target = { id: activeItem.result.id, row: activeItem.result.rowId };
       if (target.row) prefetchRecord(target.id, target.row);
@@ -4657,6 +4735,12 @@ export default function WorkspaceApp({
   const signOutItem: SidebarAccountItem = { id: "sign-out", label: t("Abmelden", "Sign out"), icon: SignOut, onSelect: () => void signOut() };
   return (
     <AiProvider status={uiAi || null} workspaceId={boot.workspace.id}>
+    <PlannerProvider
+      workspaceId={boot.workspace.id}
+      view={screen === "plan" ? planView : null}
+      openPage={openPlannerPage}
+      canWritePages={boot.workspace.role !== "viewer" && !boot.workspace.guest}
+    >
     <TagOptionsContext.Provider value={tagOptions}>
     <DatabaseLabelsContext.Provider value={databaseLabels}>
     <div
@@ -4708,11 +4792,11 @@ export default function WorkspaceApp({
       <aside className="sidebar" tabIndex={mobile ? -1 : undefined} aria-label={mobile ? t("Navigation", "Navigation") : undefined}>
         <div className="sidebar-top">
           <a
-            href="#home"
+            href="#plan/today"
             className="brand"
             onClick={(e) => {
               e.preventDefault();
-              go("home");
+              location.hash = "plan/today";
             }}
           >
             <BrandMark size={28} />
@@ -4819,6 +4903,7 @@ export default function WorkspaceApp({
           </Dropdown.Portal>
         </Dropdown.Root>
         <div className="sidebar-scroll" ref={treeRoot}>
+          <PlannerNav active={screen === "plan" ? planView : null} onNavigate={() => setMobile(false)} />
           {/* The navigation folds into one row of icons (#452): g:nav, stored
               like the other sidebar folds. */}
           <nav className={`main-nav${navCompact ? " compact" : ""}`} aria-label={t("Navigation", "Navigation")}>
@@ -5426,7 +5511,7 @@ export default function WorkspaceApp({
             </a>
           </div>
         )}
-        <header className="topbar" ref={guardChromeTouches}>
+        <header className={`topbar${screen === "plan" ? " planner-bar" : ""}`} ref={guardChromeTouches}>
           <div className="breadcrumb">
             <button
               className="icon-button mobile-menu"
@@ -5492,6 +5577,7 @@ export default function WorkspaceApp({
                     media: t("Medien", "Media"),
                     study: t("Lernen", "Study"),
                     settings: t("Einstellungen", "Settings"),
+                    plan: t("Planer", "Planner"),
                     page: missingPage && missingPage.id === pageId && !busy ? t("Seite nicht gefunden", "Page not found") : t("Seite", "Page"),
                   }[screen]
                 }
@@ -5991,6 +6077,18 @@ export default function WorkspaceApp({
               </PageMenu.Root>
               </>)}
             </div>
+          ) : screen === "plan" ? (
+            <PlannerTopBar
+              onSearch={() => {
+                setPaletteSplit(false);
+                openSearch();
+              }}
+              onAsk={() => openAsk("")}
+              canAsk={canAsk}
+              onNewPage={() => setCreate(true)}
+              searchHint={shortcutHint("search", mac) || undefined}
+              hint={(action) => shortcutHint(action, mac)}
+            />
           ) : (
             <span className="topbar-note">
               <span className="subtle-dot" />
@@ -6024,6 +6122,7 @@ export default function WorkspaceApp({
           role={tabBars ? "tabpanel" : undefined}
           aria-labelledby={tabBars && tabs.layout ? `tab-${tabs.layout.frames[0].active}` : undefined}
         >
+          {screen === "plan" && <PlannerScreen view={planView} />}
           {screen === "home" && !routeSettled && <RoutePendingPlaceholder />}
           {screen === "home" && (
             <HomeScreen
@@ -6773,6 +6872,8 @@ export default function WorkspaceApp({
       </main>
       {/* The docked side panel's place (components/side-panel.tsx). */}
       <div id="side-dock-root" className="side-dock-root" />
+      <PlannerPanelHost shown={screen === "plan"} />
+      <PlannerBridge apiRef={plannerRef} />
       <AppPromo paused={onboarding} />
       {/* Offline use on a device the introduction did not run on (#295):
           for people who went through the introduction (it asks there), once
@@ -7122,6 +7223,11 @@ export default function WorkspaceApp({
           role="listbox"
           aria-label={t("Ergebnisse und Befehle", "Results and commands")}
         >
+          {createShown && (
+            <div className="palette-group palette-create-group" role="group" aria-label={t("Erstellen", "Create")}>
+              {paletteOption(paletteItems[0], 0, <PaletteCreateRow text={query.trim()} />)}
+            </div>
+          )}
           {recentGroups.map((group, g) => {
             const offset = recentGroups.slice(0, g).reduce((n, x) => n + x.items.length, 0);
             return (
@@ -7137,8 +7243,8 @@ export default function WorkspaceApp({
                 {group.items.map((p, i) => {
                   const path = resultPath(p);
                   return paletteOption(
-                    paletteItems[offset + i],
-                    offset + i,
+                    paletteItems[lead + offset + i],
+                    lead + offset + i,
                     <>
                       <PageIcon name={shownPageIcon(p.icon, p.kind === "row" ? "row" : p.kind)} />
                       <span>
@@ -7183,8 +7289,8 @@ export default function WorkspaceApp({
               {paletteResults.map((p, i) => {
                 const path = resultPath(p);
                 return paletteOption(
-                  paletteItems[recentPages.length + i],
-                  recentPages.length + i,
+                  paletteItems[lead + recentPages.length + i],
+                  lead + recentPages.length + i,
                   <>
                     <PageIcon name={shownPageIcon(p.icon, p.kind === "comment" || p.kind === "file" ? "document" : p.kind)} />
                     <span {...(pdfHit(p) ? { "data-pdf-src": pdfHit(p), "data-pdf": p.title } : {})}>
@@ -7237,8 +7343,8 @@ export default function WorkspaceApp({
               </small>
               {shownActions.map((action, i) =>
                 paletteOption(
-                  paletteItems[recentPages.length + paletteResults.length + i],
-                  recentPages.length + paletteResults.length + i,
+                  paletteItems[lead + recentPages.length + paletteResults.length + i],
+                  lead + recentPages.length + paletteResults.length + i,
                   <>
                     <action.icon size={17} />
                     <span>{action.label}</span>
@@ -8390,18 +8496,27 @@ export default function WorkspaceApp({
       {/* "Hide keyboard" for text fields outside the editors, dialogs included. */}
       <HideKeyboardButton />
       <MobileTabBar
-        active={mobile ? null : screen === "home" ? "home" : screen === "inbox" ? "inbox" : null}
+        active={mobile ? null : screen === "plan" && planView === "today" ? "home" : screen === "inbox" ? "inbox" : null}
         unread={unreadNotifications}
         newTasks={screen === "tasks" ? 0 : boot.newTasks || 0}
         menuOpen={mobile}
         hidden={keyboardOpen || (focusMode && screen === "page")}
-        onHome={() => go("home")}
+        onHome={() => {
+          setMobile(false);
+          location.hash = "plan/today";
+        }}
         onSearch={() => {
           setMobile(false);
           openSearch();
         }}
         onNew={
-          canCreate
+          // Daybar: + is Quick Add on the planner; a page elsewhere.
+          screen === "plan"
+            ? () => {
+                setMobile(false);
+                plannerRef.current?.quickAdd({});
+              }
+            : canCreate
             ? () => {
                 setMobile(false);
                 // In the space of the open page when the reader may edit
@@ -8434,6 +8549,7 @@ export default function WorkspaceApp({
     )}
     </DatabaseLabelsContext.Provider>
     </TagOptionsContext.Provider>
+    </PlannerProvider>
     </AiProvider>
   );
 }
