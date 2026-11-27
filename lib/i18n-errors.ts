@@ -599,6 +599,7 @@ const exact: Record<string, string> = {
   "Ungültiger Link.": "Invalid link.",
   "Ungültige Erinnerung.": "Invalid reminder.",
   "Unbekanntes Symbol.": "Unknown icon.",
+  "Die Aufnahme gehört nicht zu dieser Notiz.": "The recording does not belong to this note.",
   "Keine Eigenschaft für Zeiterfassung.": "No time tracking property.",
   "Zeiteintrag nicht gefunden.": "Time entry not found.",
   "Nur eigene Zeiteinträge löschen.": "Only delete your own time entries.",

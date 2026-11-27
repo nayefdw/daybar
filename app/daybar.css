@@ -3398,3 +3398,217 @@ label.db-field-label,
   pointer-events: none;
   transition: opacity 0.15s;
 }
+
+/* ---------- Voice notes (components/daybar/voice-note.tsx), after rareui's Voice note ---------- */
+.db-voice {
+  --voice-h: 48px;
+  --voice-accent: var(--blue);
+  --progress: 0;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+  height: var(--voice-h);
+  padding: 0 14px 0 6px;
+  border-radius: 999px;
+  background: var(--toast-pill);
+  user-select: none;
+}
+.db-voice-row {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.db-voice.is-recording {
+  padding-left: 16px;
+  margin-bottom: 10px;
+}
+.db-voice.is-failed {
+  gap: 8px;
+  color: var(--secondary);
+  font-size: 13px;
+}
+.db-voice-rec {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--toast-error);
+  animation: db-rec 1.2s ease-in-out infinite;
+}
+@keyframes db-rec {
+  50% {
+    opacity: 0.35;
+  }
+}
+.db-voice-play {
+  z-index: 1;
+  width: calc(var(--voice-h) * 0.76);
+  height: calc(var(--voice-h) * 0.76);
+  flex-shrink: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.db-voice-play:active {
+  transform: scale(0.9);
+}
+.db-voice-play svg {
+  width: 72%;
+  height: 72%;
+}
+.db-voice-play path {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  transition: d 0.34s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.db-voice-track {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: 100%;
+  touch-action: none;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+}
+.db-voice-track:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--blue) 60%, transparent);
+  outline-offset: 2px;
+}
+.db-voice-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.db-voice-bars span {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 28%, transparent);
+  transition: height 0.09s linear;
+}
+.db-voice-bars.is-played {
+  clip-path: inset(0 calc((1 - var(--progress)) * 100%) 0 0);
+}
+.db-voice-bars.is-played span {
+  background: var(--text);
+}
+.db-voice-bars.is-live {
+  position: relative;
+  flex: 1;
+  height: 100%;
+}
+.db-voice-bars.is-live span {
+  background: color-mix(in srgb, var(--toast-error) 75%, var(--text));
+}
+.db-voice-time {
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--toast-quiet);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.db-voice-speed {
+  padding: 1px 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  color: var(--secondary);
+  font-size: 0.85em;
+  line-height: 1.2;
+}
+.db-voice-small {
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--toast-quiet);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s;
+}
+.db-voice-small:active {
+  transform: scale(0.88);
+}
+.db-voice-small.is-keep {
+  color: var(--blue);
+}
+/* The glow: light orbiting the outline while it plays, kept to the edges. */
+.db-voice-glow {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  mix-blend-mode: multiply;
+}
+[data-theme="dark"] .db-voice-glow {
+  mix-blend-mode: screen;
+}
+.db-voice-field {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  filter: blur(calc(var(--voice-h) * 0.32));
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 46%, rgba(0, 0, 0, 0.3) 54%, #000 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.3) 46%, rgba(0, 0, 0, 0.3) 54%, #000 100%);
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.db-voice.is-playing .db-voice-field {
+  opacity: 0.62;
+}
+.db-voice-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 170% at 8% 115%, var(--voice-accent) 0%, transparent 62%),
+    radial-gradient(55% 150% at 40% 130%, var(--voice-accent) 0%, transparent 58%);
+}
+.db-voice-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: var(--voice-accent);
+  translate: -50% -50%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-voice-rec {
+    animation: none;
+  }
+  .db-voice-play path,
+  .db-voice-field {
+    transition: none;
+  }
+}

@@ -28,6 +28,7 @@ import {
   type PlannerSettings,
   type PlannerState,
   type Tag,
+  type VoiceAudio,
 } from "./model";
 import { DAILY, repeatRuleSchema, type RepeatRule } from "./repeat";
 import { isIconName } from "./icons";
@@ -67,6 +68,7 @@ type Row = {
   repeat: string | null;
   folder_id: string | null;
   icon?: string | null;
+  audio?: string | null;
   favorite: number;
   favorite_position: number | null;
   done_at: number | null;
@@ -81,6 +83,15 @@ type Row = {
   page_title?: string | null;
 };
 
+function parseAudio(text: string | null | undefined): VoiceAudio | null {
+  if (!text) return null;
+  try {
+    const parsed = audioSchema.safeParse(JSON.parse(text));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
 function parseRule(text: string | null): RepeatRule | null {
   if (!text) return null;
   try {
@@ -115,6 +126,7 @@ export function itemOf(row: Row, tags: string[] = []): PlannerItem {
     repeat: row.kind === "habit" ? parseRule(row.repeat) ?? DAILY : null,
     folderId: row.folder_id,
     icon: isIconName(row.icon) ? row.icon : null,
+    audio: row.kind === "note" ? parseAudio(row.audio) : null,
     tags,
     favorite: !!row.favorite,
     favoritePosition: row.favorite_position,
@@ -242,6 +254,10 @@ export async function readItem(user: Identity, workspaceId: string, itemId: stri
 const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, "Ungültige ID.").transform((v) => v.toLowerCase());
 // An icon of lib/daybar/icons.ts by its name.
 const iconName = z.string().refine(isIconName, "Unbekanntes Symbol.");
+// A note's voice recording (at most four hours, 64 peaks for the player).
+const audioSchema = z
+  .object({ file: z.string().regex(/^[0-9a-f-]{36}$/i, "Ungültige ID."), seconds: z.number().min(0).max(4 * 3600), peaks: z.array(z.number().min(0).max(1)).max(64) })
+  .strict();
 const dayText = z.string().refine(isDay, "Ungültiges Datum.");
 const timeText = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Ungültige Uhrzeit.");
 const httpUrl = z
@@ -283,6 +299,7 @@ export const itemFields = z
     repeat: repeatRuleSchema.nullable(),
     folderId: uuid.nullable(),
     icon: iconName.nullable(),
+    audio: audioSchema.nullable(),
     tags: z.array(tagName).max(30),
     favorite: z.boolean(),
     position: z.number().finite(),
@@ -299,6 +316,8 @@ export function normalized(item: PlannerItem, today: string, settings: Pick<Plan
   const out = { ...item };
   if (out.kind !== "task") [out.period, out.waitingUntil, out.inProgress, out.parentId] = [null, null, false, null];
   if (out.kind !== "event") [out.endDay, out.endTime, out.allDay] = [null, null, false];
+  // Only notes keep a recording.
+  if (out.kind !== "note") out.audio = null;
   if (out.kind !== "habit") out.repeat = null;
   if (out.kind === "note") [out.time, out.duration, out.priority, out.remindAt] = [null, null, 0, null];
   if (out.kind === "task") {
@@ -416,6 +435,7 @@ const COLUMNS: [keyof PlannerItem, string, (v: unknown) => unknown][] = [
   ["repeat", "repeat", (v) => (v ? JSON.stringify(v) : null)],
   ["folderId", "folder_id", (v) => v],
   ["icon", "icon", (v) => v],
+  ["audio", "audio", (v) => (v ? JSON.stringify(v) : null)],
   ["favorite", "favorite", (v) => (v ? 1 : 0)],
   ["favoritePosition", "favorite_position", (v) => v],
   ["doneAt", "done_at", (v) => v],
@@ -478,6 +498,8 @@ export async function createItem(ctx: Ctx, input: ItemInput & { id?: string }, e
   if (input.parentId && kind !== "task") throw new HttpError(400, "Nur Aufgaben haben Unteraufgaben.");
   await checkParent(ctx, base.id, input.parentId);
   const item = normalized(await applyInput(ctx, base, { ...input, kind }), ctx.today, ctx.settings);
+  // A recording comes after its upload to the note's page (item.update).
+  item.audio = null;
   // A subtask follows its siblings.
   if (item.parentId && input.position === undefined) {
     const last = await one<{ p: number | null }>("SELECT MAX(position) p FROM planner_items WHERE parent_id=?", item.parentId);
@@ -499,12 +521,20 @@ export async function updateItem(ctx: Ctx, itemId: string, input: ItemInput, opt
   if (input.parentId !== undefined) await checkParent(ctx, current.id, input.parentId);
   const item = normalized(await applyInput(ctx, current, input), ctx.today, ctx.settings);
   item.updatedAt = Date.now();
+  if (item.audio && item.audio.file !== current.audio?.file) await checkAudio(item);
   await writeItem(ctx, item, true);
   if (input.tags) await setTags(item.id, item.tags);
   // A note's title is its page's: renamed there too.
   if (current.kind === "note" && current.pageId && input.title !== undefined && input.title.trim() && input.title !== current.title)
     await (await api).command(ctx.user, { action: "page.update", pageId: current.pageId, patch: { title: input.title.trim() } }, true);
   return item;
+}
+
+// A recording must be a file of the note's own page (uploaded there with
+// the page's rights, /api/upload) – never another page's file.
+async function checkAudio(item: PlannerItem) {
+  if (item.kind !== "note" || !item.pageId || !(await one("SELECT 1 FROM files WHERE id=? AND page_id=?", item.audio!.file, item.pageId)))
+    throw new HttpError(400, "Die Aufnahme gehört nicht zu dieser Notiz.");
 }
 
 // Done or not: a task (or subtask) for the day it was ticked.

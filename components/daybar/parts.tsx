@@ -3,7 +3,7 @@
 // colour, a ring for subtasks, half filled while in progress), an item's row
 // with its badges, a section heading and the empty state.
 import { useId, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
-import { Bell, Calendar, Check, Hourglass, Link, MapPin, Repeat, Star, StickyNote } from "lucide-react";
+import { Bell, Calendar, Hourglass, Link, MapPin, Mic, Repeat, Star, StickyNote } from "lucide-react";
 import { useT } from "../i18n";
 import { isFollowUp, isWaiting, subtaskProgress, taskDay, type PlannerItem } from "@/lib/daybar/model";
 import { countdown, dayLabel, durationLabel, spanLabel, timeLabel } from "./format";
@@ -100,6 +100,13 @@ export function ItemMeta({ item, showDay = false, hideTime = false }: { item: Pl
   else if (item.kind === "task" && isFollowUp(item, today) && !item.doneAt) parts.push(<span key="fu" className="db-badge db-badge-followup">{t(`Nachfassen #${item.followUps}`, `Follow-up #${item.followUps}`)}</span>);
   if (item.remindAt) parts.push(<Bell key="remind" size={12} aria-label={t("Erinnerung", "Reminder")} />);
   if (item.location) parts.push(<span key="loc" className="db-meta-icon"><MapPin size={12} aria-hidden />{item.location}</span>);
+  if (item.audio)
+    parts.push(
+      <span key="voice" className="db-meta-icon" title={t("Sprachnotiz", "Voice note")}>
+        <Mic size={12} aria-hidden />
+        {`${Math.floor(item.audio.seconds / 60)}:${String(Math.round(item.audio.seconds % 60)).padStart(2, "0")}`}
+      </span>,
+    );
   if (item.link) parts.push(<Link key="link" size={12} aria-label={t("Link", "Link")} />);
   if (folder)
     parts.push(

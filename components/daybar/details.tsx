@@ -6,9 +6,11 @@
 // subtasks, folder, tags, favourite. Events: start, end, all-day. Habits:
 // the repeat rule and the record. Notes open their page.
 import { useEffect, useId, useState, type ReactNode } from "react";
-import { Copy, ExternalLink, Plus, Shapes, Star, Trash2, X } from "lucide-react";
+import { Copy, ExternalLink, Mic, Plus, Shapes, Star, Trash2, X } from "lucide-react";
 import { IconPicker } from "./icon-picker";
 import { DeleteButton } from "./delete-button";
+import { attachRecording, canRecord, VoiceNotePlayer, VoiceRecorder } from "./voice-note";
+import { showToast } from "../toast";
 import { DurationPicker, fromMinutes, fromTime, toMinutes, toTime } from "./duration-picker";
 import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
@@ -30,6 +32,39 @@ function Field({ label, children, htmlFor }: { label: string; children: ReactNod
       </label>
       <div className="db-field-body">{children}</div>
     </div>
+  );
+}
+
+// A note's voice recording: the player, or recording one onto the note.
+function NoteRecording({ item }: { item: PlannerItem }) {
+  const t = useT();
+  const { store } = usePlannerUi();
+  const [recording, setRecording] = useState(false);
+  if (item.audio)
+    return (
+      <div className="db-voice-row">
+        <VoiceNotePlayer audio={item.audio} label={t(`Sprachnotiz „${item.title}“`, `Voice note “${item.title}”`)} />
+        <button type="button" className="db-quiet-button" onClick={() => void store.update(item.id, { audio: null })}>
+          {t("Aufnahme entfernen", "Remove recording")}
+        </button>
+      </div>
+    );
+  if (!item.pageId || !canRecord()) return null;
+  if (recording)
+    return (
+      <VoiceRecorder
+        onCancel={() => setRecording(false)}
+        onDone={(blob, seconds, peaks) => {
+          setRecording(false);
+          void attachRecording(store, item, blob, seconds, peaks).catch(() => showToast({ text: t("Die Aufnahme ließ sich nicht speichern.", "The recording could not be saved."), tone: "error" }));
+        }}
+      />
+    );
+  return (
+    <button type="button" className="db-quiet-button" onClick={() => setRecording(true)}>
+      <Mic size={15} aria-hidden />
+      {t("Sprachnotiz aufnehmen", "Record a voice note")}
+    </button>
   );
 }
 
@@ -108,6 +143,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
 
       {item.kind === "note" && (
         <>
+          <NoteRecording item={item} />
           {item.pageId ? (
             <button type="button" className="button primary db-open-note" onClick={() => openPage(item.pageId!)}>
               <ExternalLink size={16} aria-hidden />

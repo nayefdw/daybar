@@ -38,7 +38,8 @@ All are personal: `user_id` is the person whose planner it is, `workspace_id` th
   - Imports: `source` (`thisday`, `legacy`) with `external_id` (unique per person and source); `source_done` keeps ThisDay's own done days as of the last import.
   - The trash: `deleted_at` (ms). Subtasks go and come back with their task; a note's page goes to flowplan's trash with it.
 - **`planner_habit_log`**: a habit's check-ins, one per day; `on_time` is 0 for a day logged afterwards (streaks count on-time check-ins only).
-- **`planner_folders`** (with an optional `icon` like items), **`planner_tags`** (unique per person by `lower(name)`), **`planner_item_tags`**. The `icon` columns came after schema 141 as nullable columns an older version leaves alone, so the schema number stayed.
+- A note's **voice recording** lives in `planner_items.audio` (JSON `{ file, seconds, peaks }`): the file is uploaded to the note's own page (`/api/upload`, with that page's rights) and the server accepts only a file of that page; only notes keep one, and an item is created without one (the recording follows its upload).
+- **`planner_folders`** (with an optional `icon` like items), **`planner_tags`** (unique per person by `lower(name)`), **`planner_item_tags`**. The `icon` and `audio` columns came after schema 141 as nullable columns an older version leaves alone, so the schema number stayed.
 - **`planner_settings`**: per person and workspace, JSON: week start, default event length, working hours, the calendar's last view, the notes page, the day-note journal, and the ThisDay sync state (last export, sent outbox keys, the folder of each ThisDay category).
 
 PostgreSQL gets the same tables from `lib/db-driver/postgres-schema.json` (regenerated with `node --import tsx scripts/db-pg-schema.mjs`). Account deletion removes the planner (`lib/account-deletion.ts`), an account merge moves it (`lib/account-merge.ts`).

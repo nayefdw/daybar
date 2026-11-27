@@ -37,6 +37,7 @@ const FIELDS = [
   "repeat",
   "folderId",
   "icon",
+  "audio",
   "tags",
   "favorite",
   "position",

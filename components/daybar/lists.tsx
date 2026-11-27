@@ -4,7 +4,9 @@
 // events and tasks), Favorites, and "View all" of folders and tags with
 // creating, renaming and deleting them.
 import { useState } from "react";
-import { Folder as FolderIcon, Pencil, Plus, Star, Tag as TagIcon, Trash2 } from "lucide-react";
+import { Folder as FolderIcon, Mic, Pencil, Plus, Star, Tag as TagIcon, Trash2 } from "lucide-react";
+import { attachRecording, canRecord, VoiceRecorder } from "./voice-note";
+import { showToast } from "../toast";
 import { useT } from "../i18n";
 import { addDays, type Folder, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
@@ -20,8 +22,22 @@ const COLORS = ["gray", "blue", "green", "orange", "red", "purple", "teal", "pin
 
 export function NotesScreen() {
   const t = useT();
-  const { state, quickAdd, canWritePages } = usePlannerUi();
+  const { state, store, today, select, quickAdd, canWritePages } = usePlannerUi();
+  const [recording, setRecording] = useState(false);
   if (!state) return <PlannerStatus />;
+  // A voice note: a new note for today with the recording.
+  const keep = async (blob: Blob, seconds: number, peaks: number[]) => {
+    setRecording(false);
+    const at = new Date();
+    const note = await store.create({ kind: "note", day: today, title: t(`Sprachnotiz · ${at.toLocaleTimeString("de", { hour: "2-digit", minute: "2-digit" })}`, `Voice note · ${at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`) });
+    if (!note) return;
+    try {
+      await attachRecording(store, note, blob, seconds, peaks);
+      select(note.id);
+    } catch {
+      showToast({ text: t("Die Aufnahme ließ sich nicht speichern.", "The recording could not be saved."), tone: "error" });
+    }
+  };
   const notes = state.items.filter((i) => i.kind === "note" && !i.deletedAt).sort((a, b) => b.updatedAt - a.updatedAt);
   return (
     <div className="db-screen db-notes">
@@ -29,6 +45,12 @@ export function NotesScreen() {
         <h1>
           {t("Notizen", "Notes")} <span className="db-count">{notes.length}</span>
         </h1>
+        {canWritePages && canRecord() && (
+          <button type="button" className="button" onClick={() => setRecording(true)} disabled={recording}>
+            <Mic size={15} aria-hidden />
+            {t("Aufnehmen", "Record")}
+          </button>
+        )}
         {canWritePages && (
           <button type="button" className="button primary" onClick={() => quickAdd({ kind: "note" })}>
             <Plus size={15} aria-hidden />
@@ -36,6 +58,7 @@ export function NotesScreen() {
           </button>
         )}
       </header>
+      {recording && <VoiceRecorder onDone={(blob, seconds, peaks) => void keep(blob, seconds, peaks)} onCancel={() => setRecording(false)} />}
       {notes.length ? (
         <div className="db-list">
           {notes.map((n) => (

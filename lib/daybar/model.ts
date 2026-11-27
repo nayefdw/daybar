@@ -57,6 +57,9 @@ export type PlannerItem = {
   folderId: string | null;
   // The icon in front of the title (lib/daybar/icons.ts), none by default.
   icon: string | null;
+  // A note's voice recording: a file on the note's page, its length and
+  // the waveform the player draws (40 peaks, 0–1).
+  audio: VoiceAudio | null;
   // Tag ids.
   tags: string[];
   favorite: boolean;
@@ -73,6 +76,7 @@ export type PlannerItem = {
 
 // A habit's check-in; onTime is false for a day logged afterwards.
 export type HabitLog = { itemId: string; day: string; onTime: boolean };
+export type VoiceAudio = { file: string; seconds: number; peaks: number[] };
 // `icon`: shown instead of the folder symbol (lib/daybar/icons.ts).
 export type Folder = { id: string; name: string; color: string; icon: string | null; position: number };
 export type Tag = { id: string; name: string; color: string; position: number };
@@ -141,6 +145,7 @@ export function blankItem(kind: ItemKind, at = Date.now()): PlannerItem {
     repeat: null,
     folderId: null,
     icon: null,
+    audio: null,
     tags: [],
     favorite: false,
     favoritePosition: null,

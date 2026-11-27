@@ -97,6 +97,28 @@ test("icons in front of items and folders: one of the list, or none", async () =
   if (tag) await assert.rejects(act({ action: "tag.update", id: tag.id, patch: { icon: "star" } }));
 });
 
+test("a note's voice recording: a file of the note's own page only", async () => {
+  const note = await create({ kind: "note", title: "Voice note" });
+  assert.ok(note.pageId);
+  const file = id(),
+    stray = id();
+  await run("INSERT INTO files(id,page_id,name,mime,size,created_by) VALUES(?,?,?,?,?,?)", file, note.pageId, "voice.webm", "audio/webm", 1200, anna.id);
+  const other = await create({ kind: "note", title: "Another note" });
+  await run("INSERT INTO files(id,page_id,name,mime,size,created_by) VALUES(?,?,?,?,?,?)", stray, other.pageId, "other.webm", "audio/webm", 900, anna.id);
+  const audio = { file, seconds: 12.5, peaks: [0.2, 0.8, 0.5] };
+  const saved = await act({ action: "item.update", id: note.id, patch: { audio } });
+  assert.deepEqual(saved.audio, audio);
+  assert.deepEqual((await state()).items.find((i: { id: string }) => i.id === note.id).audio, audio);
+  // Another page's file, a made-up one, a broken shape: refused.
+  await assert.rejects(act({ action: "item.update", id: note.id, patch: { audio: { ...audio, file: stray } } }), /gehört nicht/);
+  await assert.rejects(act({ action: "item.update", id: note.id, patch: { audio: { ...audio, file: id() } } }), /gehört nicht/);
+  await assert.rejects(act({ action: "item.update", id: note.id, patch: { audio: { ...audio, peaks: [2] } } }));
+  // Only notes keep one.
+  const task = await create({ kind: "task", title: "Not a note", audio });
+  assert.equal(task.audio, null);
+  assert.equal((await act({ action: "item.update", id: note.id, patch: { audio: null } })).audio, null);
+});
+
 test("only the person's own planner: others neither read nor change it", async () => {
   const mine = await create({ kind: "task", title: "Private plan" });
   assert.equal((await state(ben)).items.some((i: { id: string }) => i.id === mine.id), false);

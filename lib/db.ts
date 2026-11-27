@@ -1724,8 +1724,8 @@ function migrate(d: DatabaseSync) {
   // workspace, their folders, tags and habit check-ins, and the planner's
   // settings (ThisDay sync state among them).
   migrateDaybarPlanner(d);
-  // The icons of planner items and folders: new nullable columns an older
-  // version leaves alone, so the schema number stays.
+  // The icons of planner items and folders, a note's voice recording: new
+  // nullable columns an older version leaves alone, so the number stays.
   migrateDaybarIcons(d);
   // A database from a newer version keeps its number.
   if (Number((d.prepare("PRAGMA user_version").get() as { user_version: number }).user_version) < SCHEMA_VERSION)
@@ -1775,10 +1775,12 @@ function migrateDaybarPlanner(d: DatabaseSync) {
 }
 // planner_items.icon and planner_folders.icon: the Lucide icon a person put
 // in front of an item or a folder (lib/daybar/icons.ts), NULL for none.
+// planner_items.audio: a note's voice recording as JSON { file, seconds,
+// peaks } – the file is one of the note's page (lib/daybar/store.ts).
 function migrateDaybarIcons(d: DatabaseSync) {
-  for (const table of ["planner_items", "planner_folders"])
-    if (!(d.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).some((c) => c.name === "icon"))
-      d.exec(`ALTER TABLE ${table} ADD COLUMN icon TEXT`);
+  for (const [table, column] of [["planner_items", "icon"], ["planner_folders", "icon"], ["planner_items", "audio"]])
+    if (!(d.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).some((c) => c.name === column))
+      d.exec(`ALTER TABLE ${table} ADD COLUMN ${column} TEXT`);
 }
 // Schema 140 – workspaces.navigation (#564, lib/workspace-navigation.ts):
 // JSON { library, hidden }, NULL = every space as it is set, every place of
