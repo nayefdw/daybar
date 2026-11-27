@@ -117,7 +117,7 @@ export default function UpcomingScreen() {
                 </DayGroup>
               ))
           ) : (
-            <Empty title={t("Die nächsten 30 Tage sind frei.", "The next 30 days are free.")} />
+            <Empty title={t("Die nächsten 30 Tage sind frei", "The next 30 days are free")} />
           )}
           <CaptureLine placeholder={t("Hinzufügen … (mit Tag: „Freitag 10:00“)", "Add… (with a day: “Friday 10:00”)")} />
         </div>

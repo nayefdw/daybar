@@ -35,7 +35,7 @@ export function NotesScreen() {
       await attachRecording(store, note, blob, seconds, peaks);
       select(note.id);
     } catch {
-      showToast({ text: t("Die Aufnahme ließ sich nicht speichern.", "The recording could not be saved."), tone: "error" });
+      showToast({ text: t("Die Aufnahme ließ sich nicht speichern", "The recording could not be saved"), tone: "error" });
     }
   };
   const notes = state.items.filter((i) => i.kind === "note" && !i.deletedAt).sort((a, b) => b.updatedAt - a.updatedAt);
@@ -66,7 +66,7 @@ export function NotesScreen() {
           ))}
         </div>
       ) : (
-        <Empty title={t("Noch keine Notizen.", "No notes yet.")} hint={t("Eine Notiz ist eine Seite: schreiben, formatieren, verlinken. „N: Einkaufsliste“ legt eine an.", "A note is a page: write, format, link. “N: Shopping list” creates one.")} />
+        <Empty title={t("Noch keine Notizen", "No notes yet")} hint={t("Eine Notiz ist eine Seite: schreiben, formatieren, verlinken. „N: Einkaufsliste“ legt eine an.", "A note is a page: write, format, link. “N: Shopping list” creates one.")} />
       )}
     </div>
   );
@@ -106,7 +106,7 @@ export function EventsScreen() {
           </DayGroup>
         ))
       ) : (
-        <Empty title={show === "past" ? t("Keine vergangenen Termine.", "No past events.") : t("Keine kommenden Termine.", "No upcoming events.")} />
+        <Empty title={show === "past" ? t("Keine vergangenen Termine", "No past events") : t("Keine kommenden Termine", "No upcoming events")} />
       )}
     </div>
   );
@@ -118,7 +118,7 @@ function Collection({ kind, id }: { kind: "folder" | "tag"; id: string }) {
   const { state, today } = usePlannerUi();
   if (!state) return <PlannerStatus />;
   const meta = kind === "folder" ? state.folders.find((f) => f.id === id) : state.tags.find((x) => x.id === id);
-  if (!meta) return <Empty title={kind === "folder" ? t("Diesen Ordner gibt es nicht mehr.", "This folder no longer exists.") : t("Diesen Tag gibt es nicht mehr.", "This tag no longer exists.")} />;
+  if (!meta) return <Empty title={kind === "folder" ? t("Diesen Ordner gibt es nicht mehr", "This folder no longer exists") : t("Diesen Tag gibt es nicht mehr", "This tag no longer exists")} />;
   const inIt = (i: PlannerItem) => !i.deletedAt && !i.parentId && (kind === "folder" ? i.folderId === id : i.tags.includes(id));
   const notes = state.items.filter((i) => i.kind === "note" && inIt(i));
   const events = state.items.filter((i) => i.kind === "event" && inIt(i) && (i.endDay || i.day || "") >= addDays(today, -30));
@@ -186,7 +186,7 @@ export function FavoritesScreen() {
           ))}
         </div>
       ) : (
-        <Empty title={t("Noch keine Favoriten.", "No favourites yet.")} hint={t("Markiere einen Eintrag im rechten Bereich mit dem Stern.", "Mark an item with the star in the right panel.")} />
+        <Empty title={t("Noch keine Favoriten", "No favourites yet")} hint={t("Markiere einen Eintrag im rechten Bereich mit dem Stern", "Mark an item with the star in the right panel")} />
       )}
     </div>
   );
@@ -294,7 +294,7 @@ export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
           ))}
         </ul>
       ) : (
-        <Empty title={kind === "folders" ? t("Noch keine Ordner.", "No folders yet.") : t("Noch keine Tags.", "No tags yet.")} />
+        <Empty title={kind === "folders" ? t("Noch keine Ordner", "No folders yet") : t("Noch keine Tags", "No tags yet")} />
       )}
     </div>
   );

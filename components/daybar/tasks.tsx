@@ -210,7 +210,7 @@ export default function TasksScreen({ folderId, tagId, title, lead }: { folderId
       )}
       <CaptureLine defaults={{ folderId: folderId ?? null, tags: tagId ? [state.tags.find((x) => x.id === tagId)?.name || ""].filter(Boolean) : [] }} kind="task" placeholder={t("Neue Aufgabe … (mit Tag, Zeit, #tag, !, ~30m)", "New task… (with a day, time, #tag, !, ~30m)")} />
       {!groups.some((g) => g.items.length) ? (
-        <Empty title={t("Keine Aufgaben.", "No tasks.")} hint={pills.length ? t("Kein Treffer für diese Filter.", "Nothing matches these filters.") : undefined} />
+        <Empty title={t("Keine Aufgaben", "No tasks")} hint={pills.length ? t("Kein Treffer für diese Filter", "Nothing matches these filters") : undefined} />
       ) : layout === "table" ? (
         <div className="db-table-wrap">
           <table className="db-table">

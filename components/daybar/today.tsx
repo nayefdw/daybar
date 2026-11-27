@@ -207,11 +207,11 @@ export default function TodayScreen() {
             })}
         </ul>
         {!on.events.length && !on.tasks.length && !on.habits.length && !on.notes.length && (
-          <p className="db-hint">{t("Noch nichts an diesem Tag.", "Nothing on this day yet.")}</p>
+          <p className="db-hint">{t("Noch nichts an diesem Tag", "Nothing on this day yet")}</p>
         )}
         <CaptureLine defaults={{ day }} placeholder={t("Aufgabe, Termin um 9:00, Notiz …", "A task, an event at 9:00, a note…")} />
         <div className="db-daynote-text">
-          {note?.text ? <p>{note.text}</p> : day > today && <p className="db-hint">{t("Tagesnotizen gibt es ab dem Tag selbst.", "Day notes start on the day itself.")}</p>}
+          {note?.text ? <p>{note.text}</p> : day > today && <p className="db-hint">{t("Tagesnotizen gibt es ab dem Tag selbst", "Day notes start on the day itself")}</p>}
           {day <= today && (
             <button type="button" className="db-quiet-button" disabled={opening} onClick={() => void openDayNote()}>
               <NotebookPen size={16} aria-hidden />
@@ -229,11 +229,11 @@ export default function TodayScreen() {
             ))}
           </div>
         ) : (
-          <p className="db-hint">{t("Aufgaben für die ganze Woche stehen hier.", "Tasks for the whole week show here.")}</p>
+          <p className="db-hint">{t("Aufgaben für die ganze Woche stehen hier", "Tasks for the whole week show here")}</p>
         )}
         <CaptureLine defaults={{ period: "week", day: weekStart(day, weekStartsOn) }} placeholder={t("Für diese Woche …", "For this week…")} kind="task" />
       </Section>
-      {!state.items.length && <Empty title={t("Willkommen bei Daybar.", "Welcome to Daybar.")} hint={t("Drücke ⌘K oder ⌘N und tippe einen Satz: „Anna anrufen morgen 10:00“.", "Press ⌘K or ⌘N and type a sentence: “Call Anna tomorrow 10:00”.")} />}
+      {!state.items.length && <Empty title={t("Willkommen bei Daybar", "Welcome to Daybar")} hint={t("Drücke ⌘K oder ⌘N und tippe einen Satz: „Anna anrufen morgen 10:00“", "Press ⌘K or ⌘N and type a sentence: “Call Anna tomorrow 10:00”")} />}
     </div>
   );
 }

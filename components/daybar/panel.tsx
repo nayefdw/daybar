@@ -83,7 +83,7 @@ export function PlannerPanel() {
         ) : (
           <>
             {scope === "inbox" && <CaptureLine placeholder={t("In den Eingang …", "Add to Inbox…")} />}
-            {scope === "calendar" && <p className="db-hint">{t("Zieh eine Aufgabe auf einen Tag oder eine Uhrzeit im Kalender.", "Drag a task onto a day or a time in the calendar.")}</p>}
+            {scope === "calendar" && <p className="db-hint">{t("Zieh eine Aufgabe auf einen Tag oder eine Uhrzeit im Kalender", "Drag a task onto a day or a time in the calendar")}</p>}
             {list.length ? (
               <div className="db-list">
                 {list.map((i) => (
@@ -100,7 +100,7 @@ export function PlannerPanel() {
                 ))}
               </div>
             ) : (
-              <Empty title={t("Hier ist nichts.", "Nothing here.")} hint={scope === "inbox" ? t("Was ohne Datum und Ordner hinzukommt, landet hier.", "What you add without a date or folder lands here.") : undefined} />
+              <Empty title={t("Hier ist nichts", "Nothing here")} hint={scope === "inbox" ? t("Was ohne Datum und Ordner hinzukommt, landet hier", "What you add without a date or folder lands here") : undefined} />
             )}
           </>
         )}

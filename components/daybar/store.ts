@@ -90,7 +90,7 @@ export class PlannerStore {
   }
   // A refused change: the planner as the server has it, and why.
   private async failed(error: unknown) {
-    showToast({ text: (error as Error).message || tr("Die Änderung wurde nicht gespeichert.", "The change was not saved."), tone: "error" });
+    showToast({ text: (error as Error).message || tr("Die Änderung wurde nicht gespeichert", "The change was not saved"), tone: "error" });
     await this.load(true);
   }
   private replaceItems(items: PlannerItem[]) {
@@ -169,7 +169,7 @@ export class PlannerStore {
     this.setState((s) => ({ ...s, items: s.items.filter((i) => !gone.has(i.id)) }));
     try {
       await this.send({ action: "item.delete", id });
-      showUndo(label ? tr(`„${label}“ gelöscht.`, `“${label}” deleted.`) : tr("Gelöscht.", "Deleted."), () => this.restore(id));
+      showUndo(label ? tr(`„${label}“ gelöscht`, `“${label}” deleted`) : tr("Gelöscht", "Deleted"), () => this.restore(id));
     } catch (e) {
       await this.failed(e);
     }

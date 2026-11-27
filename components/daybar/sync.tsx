@@ -43,11 +43,11 @@ export default function SyncScreen() {
     setBusy(true);
     try {
       const r = await store.importThisDay(data, force);
-      if (r.status === "old") showToast({ text: t("Dieser ThisDay-Export ist älter als der zuletzt importierte – nichts geändert.", "That ThisDay export is older than the one Daybar already has, so nothing changed."), tone: "error" });
+      if (r.status === "old") showToast({ text: t("Dieser ThisDay-Export ist älter als der zuletzt importierte – nichts geändert", "That ThisDay export is older than the one Daybar already has, so nothing changed"), tone: "error" });
       else if (r.status === "held") setHeld({ data, removed: r.removed ?? 0 });
       else {
         setHeld(null);
-        showToast({ text: t(`Mit ThisDay abgeglichen: ${r.added} neu, ${r.updated} geändert, ${r.removed} entfernt.`, `Synced with ThisDay: ${r.added} new, ${r.updated} updated, ${r.removed} removed.`) });
+        showToast({ text: t(`Mit ThisDay abgeglichen: ${r.added} neu, ${r.updated} geändert, ${r.removed} entfernt`, `Synced with ThisDay: ${r.added} new, ${r.updated} updated, ${r.removed} removed`) });
       }
       await refresh();
     } catch (e) {
@@ -62,7 +62,7 @@ export default function SyncScreen() {
     try {
       data = await readJson(file);
     } catch {
-      return showToast({ text: t("Diese Datei ist kein lesbarer ThisDay-Export.", "This file is not a ThisDay export Daybar can read."), tone: "error" });
+      return showToast({ text: t("Diese Datei ist kein lesbarer ThisDay-Export", "This file is not a ThisDay export Daybar can read"), tone: "error" });
     }
     await importThisDay(data);
   };
@@ -71,10 +71,10 @@ export default function SyncScreen() {
     setBusy(true);
     try {
       const r = await store.importLegacy(await readJson(file));
-      showToast({ text: t(`Aus dem alten Daybar übernommen: ${r.added} neu, ${r.updated} aktualisiert.`, `Moved over from the old Daybar: ${r.added} new, ${r.updated} updated.`) });
+      showToast({ text: t(`Aus dem alten Daybar übernommen: ${r.added} neu, ${r.updated} aktualisiert`, `Moved over from the old Daybar: ${r.added} new, ${r.updated} updated`) });
       await refresh();
     } catch (e) {
-      showToast({ text: e instanceof SyntaxError ? t("Diese Datei ist keine Daybar-Sicherung.", "This file is not a Daybar backup.") : (e as Error).message, tone: "error" });
+      showToast({ text: e instanceof SyntaxError ? t("Diese Datei ist keine Daybar-Sicherung", "This file is not a Daybar backup") : (e as Error).message, tone: "error" });
     } finally {
       setBusy(false);
     }
@@ -133,7 +133,7 @@ export default function SyncScreen() {
             type="button"
             className="icon-button"
             aria-label={t("Adresse kopieren", "Copy address")}
-            onClick={() => void navigator.clipboard?.writeText(outboxUrl).then(() => showToast({ text: t("Adresse kopiert.", "Address copied.") }))}
+            onClick={() => void navigator.clipboard?.writeText(outboxUrl).then(() => showToast({ text: t("Adresse kopiert", "Address copied") }))}
           >
             <Copy size={15} />
           </button>
@@ -148,7 +148,7 @@ export default function SyncScreen() {
             className="button"
             disabled={!status?.sent}
             onClick={() => void store.resendThisDay().then(refresh)}
-            title={t("Falls der Kurzbefehl etwas verloren hat: alles noch einmal anbieten.", "If the Shortcut lost something: offer everything again.")}
+            title={t("Falls der Kurzbefehl etwas verloren hat: alles noch einmal anbieten", "If the Shortcut lost something: offer everything again")}
           >
             {t("Erneut senden", "Send again")}
           </button>

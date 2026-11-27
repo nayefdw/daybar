@@ -258,7 +258,7 @@ export default function CalendarScreen() {
         {header}
         <div className="db-period-strip" aria-label={t("Dieser Monat", "This month")}>
           <strong>{t("Dieser Monat", "This month")}</strong>
-          {monthTasks.length ? monthTasks.map((i) => <ItemRow key={i.id} item={i} className="db-chip-row-item" />) : <span className="db-hint">{t("Keine Aufgaben für den ganzen Monat.", "No tasks for the whole month.")}</span>}
+          {monthTasks.length ? monthTasks.map((i) => <ItemRow key={i.id} item={i} className="db-chip-row-item" />) : <span className="db-hint">{t("Keine Aufgaben für den ganzen Monat", "No tasks for the whole month")}</span>}
         </div>
         <div className="db-month">
           {days.slice(0, 7).map((d) => (
@@ -323,7 +323,7 @@ export default function CalendarScreen() {
       {view === "week" && (
         <div className="db-period-strip" aria-label={t("Diese Woche", "This week")}>
           <strong>{t("Diese Woche", "This week")}</strong>
-          {weekTasks.length ? weekTasks.map((i) => <ItemRow key={i.id} item={i} className="db-chip-row-item" />) : <span className="db-hint">{t("Keine Aufgaben für die ganze Woche.", "No tasks for the whole week.")}</span>}
+          {weekTasks.length ? weekTasks.map((i) => <ItemRow key={i.id} item={i} className="db-chip-row-item" />) : <span className="db-hint">{t("Keine Aufgaben für die ganze Woche", "No tasks for the whole week")}</span>}
         </div>
       )}
       <div className="db-grid-head" style={{ gridTemplateColumns: cols }}>
@@ -458,7 +458,7 @@ export default function CalendarScreen() {
           </div>
         </div>
       </div>
-      {!state.items.some((i) => i.kind === "event") && <Empty title={t("Noch keine Termine.", "No events yet.")} hint={t("Klicke in den Kalender oder zieh über eine Spalte.", "Click into the calendar or drag down a column.")} />}
+      {!state.items.some((i) => i.kind === "event") && <Empty title={t("Noch keine Termine", "No events yet")} hint={t("Klicke in den Kalender oder zieh über eine Spalte", "Click into the calendar or drag down a column")} />}
     </div>
   );
 }

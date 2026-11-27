@@ -62,7 +62,7 @@ export default function HabitsScreen() {
       </header>
       <CaptureLine kind="habit" placeholder={t("Neue Gewohnheit … („Lesen jeden Abend 21:00“, „Laufen Mo, Mi, Fr“)", "New habit… (“Read every day 21:00”, “Run every mon, wed and fri”)")} />
       {!rows.length ? (
-        <Empty title={t("Noch keine Gewohnheiten.", "No habits yet.")} hint={t("Eine Gewohnheit wiederholt sich: jeden Tag, an Wochentagen, monatlich …", "A habit repeats: every day, on weekdays, monthly…")} />
+        <Empty title={t("Noch keine Gewohnheiten", "No habits yet")} hint={t("Eine Gewohnheit wiederholt sich: jeden Tag, an Wochentagen, monatlich …", "A habit repeats: every day, on weekdays, monthly…")} />
       ) : (
         groups
           .filter((g) => g.rows.length)

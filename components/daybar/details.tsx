@@ -56,7 +56,7 @@ function NoteRecording({ item }: { item: PlannerItem }) {
         onCancel={() => setRecording(false)}
         onDone={(blob, seconds, peaks) => {
           setRecording(false);
-          void attachRecording(store, item, blob, seconds, peaks).catch(() => showToast({ text: t("Die Aufnahme ließ sich nicht speichern.", "The recording could not be saved."), tone: "error" }));
+          void attachRecording(store, item, blob, seconds, peaks).catch(() => showToast({ text: t("Die Aufnahme ließ sich nicht speichern", "The recording could not be saved"), tone: "error" }));
         }}
       />
     );
@@ -398,7 +398,7 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
           }}
         />
       </div>
-      {item.source === "thisday" && <p className="db-hint">{t("Aus ThisDay: ThisDay bleibt maßgeblich; Änderungen hier überschreibt der nächste Import.", "From ThisDay: ThisDay stays the truth; the next import overwrites changes made here.")}</p>}
+      {item.source === "thisday" && <p className="db-hint">{t("Aus ThisDay: ThisDay bleibt maßgeblich; Änderungen hier überschreibt der nächste Import", "From ThisDay: ThisDay stays the truth; the next import overwrites changes made here")}</p>}
     </div>
   );
 }

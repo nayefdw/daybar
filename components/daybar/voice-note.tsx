@@ -113,7 +113,7 @@ export function VoiceRecorder({ onDone, onCancel }: { onDone: (blob: Blob, secon
         };
         frame = requestAnimationFrame(tick);
       } catch (e) {
-        setFailed(e instanceof DOMException && e.name === "NotAllowedError" ? t("Das Mikrofon ist nicht erlaubt.", "The microphone is not allowed.") : t("Aufnahme nicht möglich.", "Recording is not possible."));
+        setFailed(e instanceof DOMException && e.name === "NotAllowedError" ? t("Das Mikrofon ist nicht erlaubt", "The microphone is not allowed") : t("Aufnahme nicht möglich", "Recording is not possible"));
       }
     })();
     return () => {

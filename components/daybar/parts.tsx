@@ -294,7 +294,7 @@ export function PlannerStatus() {
   if (status === "error")
     return (
       <div className="db-loading" role="alert">
-        <span>{error || t("Der Planer konnte nicht geladen werden.", "The planner could not be loaded.")}</span>
+        <span>{error || t("Der Planer konnte nicht geladen werden", "The planner could not be loaded")}</span>
         <button type="button" className="button" onClick={() => void store.load(true)}>
           {t("Erneut versuchen", "Try again")}
         </button>
