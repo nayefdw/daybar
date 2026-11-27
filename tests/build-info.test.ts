@@ -12,12 +12,12 @@ const build: BuildInfo = {
 };
 
 test("the version line names version, channel, commit, build time and Node.js", () => {
-  assert.equal(versionLine(build, "beta"), "Flowplan 0.9.3 (beta, build abc1234, built 2026-11-10T09:00:00.000Z, Node.js v26.1.0)");
-  assert.equal(versionLine(build, " Release "), "Flowplan 0.9.3 (release, build abc1234, built 2026-11-10T09:00:00.000Z, Node.js v26.1.0)");
+  assert.equal(versionLine(build, "beta"), "Daybar 0.9.3 (beta, build abc1234, built 2026-11-10T09:00:00.000Z, Node.js v26.1.0)");
+  assert.equal(versionLine(build, " Release "), "Daybar 0.9.3 (release, build abc1234, built 2026-11-10T09:00:00.000Z, Node.js v26.1.0)");
 });
 
 test("the version line leaves out what the build does not know", () => {
-  assert.equal(versionLine({ ...build, commit: "", builtAt: "" }, ""), "Flowplan 0.9.3 (Node.js v26.1.0)");
-  assert.equal(versionLine({ ...build, commit: "", builtAt: "", node: "" }, "nightly"), "Flowplan 0.9.3");
-  assert.equal(versionLine({ ...build, version: "", commit: "", builtAt: "", node: "" }, ""), "Flowplan (version unknown)");
+  assert.equal(versionLine({ ...build, commit: "", builtAt: "" }, ""), "Daybar 0.9.3 (Node.js v26.1.0)");
+  assert.equal(versionLine({ ...build, commit: "", builtAt: "", node: "" }, "nightly"), "Daybar 0.9.3");
+  assert.equal(versionLine({ ...build, version: "", commit: "", builtAt: "", node: "" }, ""), "Daybar (version unknown)");
 });

@@ -113,7 +113,13 @@ const PAGES = [
   // list, the group chip with one-tap choices, the kind of a new database
   // as a select) and the limits notice in the shell. Measured: database
   // 920.3, settings section 884.3 KB; both budgets are about 3 % above.
-  { path: (ids) => `/#page=${ids.databaseId}`, name: "database", signedIn: true, jsKb: 990 },
+  // 2026-11-27, Daybar: the planner is part of the shell on every page – its
+  // part of the sidebar, the top bar, the Quick Add bridge and the planner's
+  // store (the screens, the right panel and the Quick Add dialog load when
+  // opened). Measured: database 983.9, home 837.3, workflow 1077.5, settings
+  // 872.6, settings section 959.5, settings: instance 872.6, monitoring
+  // 900.9, push status 880.5 KB; the raised budgets are about 2 % above.
+  { path: (ids) => `/#page=${ids.databaseId}`, name: "database", signedIn: true, jsKb: 1005 },
   // A workflow page with its canvas (@xyflow/react, components/workflow):
   // at most a database page + 120 KB (docs/specs/workflows.md §10.1);
   // 1830 since 0.9.6: measured 1818.7 KB with tabs and frames (#279) and
@@ -123,21 +129,21 @@ const PAGES = [
   // 2026-11-18 (flashcards phase 5: 1175.2 KB after the offline sending
   // moved out of the shell; that is 3 % above the 1153.2 KB of 2026-11-17,
   // the margin the other pages have).
-  { path: (ids) => `/#page=${ids.workflowId}`, name: "workflow", signedIn: true, jsKb: 1070, ready: ".react-flow__node, .wf-list-node" },
+  { path: (ids) => `/#page=${ids.workflowId}`, name: "workflow", signedIn: true, jsKb: 1100, ready: ".react-flow__node, .wf-list-node" },
   // The landing pages of the settings and the administration (tiles), and a
   // settings section on a phone (components/settings/shell.tsx).
   // The start page with its widgets; customizing loads on demand
   // (components/home/home-editor.tsx).
-  { path: "/#home", name: "home", signedIn: true, jsKb: 840, ready: ".home-grid" },
-  { path: "/#settings", name: "settings", signedIn: true, jsKb: 870, ready: ".sv-start .sv-start-ring, .sv-start .sv-start-setup a" },
-  { path: "/#settings/account", name: "settings section", signedIn: true, jsKb: 957, ready: ".settings-detail .setting-group" },
+  { path: "/#home", name: "home", signedIn: true, jsKb: 855, ready: ".home-grid" },
+  { path: "/#settings", name: "settings", signedIn: true, jsKb: 890, ready: ".sv-start .sv-start-ring, .sv-start .sv-start-setup a" },
+  { path: "/#settings/account", name: "settings section", signedIn: true, jsKb: 980, ready: ".settings-detail .setting-group" },
   // The start page of an admin: the instance at a glance (#532, the former
   // administration landing page).
-  { path: "/#settings/instance", name: "settings: instance", signedIn: true, jsKb: 870, ready: ".sv-glance-grid:not(.placeholder)" },
+  { path: "/#settings/instance", name: "settings: instance", signedIn: true, jsKb: 890, ready: ".sv-glance-grid:not(.placeholder)" },
   // The live dashboard with every chart (components/settings/admin/monitoring.tsx).
-  { path: "/#settings/instance/monitoring", name: "monitoring", signedIn: true, jsKb: 897, ready: ".mon-health" },
+  { path: "/#settings/instance/monitoring", name: "monitoring", signedIn: true, jsKb: 920, ready: ".mon-health" },
   // The push relay's state (components/settings/admin/push.tsx).
-  { path: "/#settings/instance/push", name: "push status", signedIn: true, jsKb: 876, ready: "#relay" },
+  { path: "/#settings/instance/push", name: "push status", signedIn: true, jsKb: 900, ready: "#relay" },
 ];
 const BUDGET = { jsKb: 255, lcpMs: 2500 };
 const LOCALE = "de-DE";
