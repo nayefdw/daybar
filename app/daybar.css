@@ -3,8 +3,8 @@
    content colours – Task blue, Event red, Note yellow, Habit orange – with
    their own light and dark values. */
 :root {
-  --kind-task: #2f63c8;
-  --kind-task-bg: #e1eafb;
+  --kind-task: var(--blue);
+  --kind-task-bg: var(--blue-light);
   --kind-event: #c8414a;
   --kind-event-bg: #f9e0e1;
   --kind-note: #9a7406;
@@ -13,7 +13,7 @@
   --kind-habit-bg: #fbe5d3;
   --pri-high: #c8414a;
   --pri-medium: #c8631a;
-  --pri-low: #2f63c8;
+  --pri-low: var(--blue);
   --db-grid-line: #e9e5dc;
   --db-off-hours: #f3f1eb;
   --db-weekend: #f7f5f0;
@@ -27,8 +27,6 @@
   color: var(--opt-bg);
 }
 [data-theme="dark"] {
-  --kind-task: #8db1ff;
-  --kind-task-bg: rgba(81, 130, 255, 0.24);
   --kind-event: #ff8f94;
   --kind-event-bg: rgba(240, 96, 104, 0.24);
   --kind-note: #f0cd5a;
@@ -37,7 +35,6 @@
   --kind-habit-bg: rgba(240, 130, 50, 0.24);
   --pri-high: #ff8f94;
   --pri-medium: #ffaa6b;
-  --pri-low: #8db1ff;
   --db-grid-line: #2b2932;
   --db-off-hours: #1a1920;
   --db-weekend: #19181e;
@@ -106,8 +103,8 @@ label.db-field-label,
   margin: 0;
   margin-right: auto;
   font-size: 26px;
-  font-weight: 650;
-  letter-spacing: -0.028em;
+  font-weight: 600;
+  letter-spacing: -0.022em;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -319,7 +316,6 @@ label.db-field-label,
 }
 .db-row.is-done .db-row-title {
   color: var(--muted);
-  text-decoration: line-through;
 }
 .db-row-action {
   display: inline-flex;
@@ -660,12 +656,11 @@ label.db-field-label,
 }
 .db-strip-cell.is-today .db-strip-n {
   color: var(--blue);
-  font-weight: 700;
+  font-weight: 600;
 }
 .db-strip-wd {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 .db-strip-n {
   font-size: 17px;
@@ -880,8 +875,7 @@ label.db-field-label,
 }
 .db-grid-day span {
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 .db-grid-day strong {
   font-size: 18px;
@@ -1100,8 +1094,7 @@ label.db-field-label,
 .db-month-wd {
   padding: 6px;
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   color: var(--muted);
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -2328,5 +2321,775 @@ label.db-field-label,
 @media (prefers-reduced-motion: reduce) {
   .db-menu {
     animation: none;
+  }
+}
+
+/* ---------- Folding groups (components/daybar/fold.tsx) ---------- */
+.db-fold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  margin: -2px -6px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease-out, ease);
+}
+.db-fold:hover {
+  background: var(--hover);
+}
+.db-fold-chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.db-fold[aria-expanded="true"] .db-fold-chevron {
+  transform: rotate(90deg);
+}
+.db-fold:not(:hover) .db-fold-chevron {
+  opacity: 0.7;
+}
+.db-section-body {
+  display: contents;
+}
+.db-table-group .db-fold {
+  margin: 0 -6px;
+  font-weight: inherit;
+}
+.db-day-group > h2 .db-fold span {
+  color: var(--muted);
+  font-weight: 400;
+}
+.db-unfold,
+.db-section-body.db-unfold > * {
+  animation: db-unfold 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes db-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-unfold,
+  .db-section-body.db-unfold > *,
+  .db-fold-chevron {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---------- Daybar's look: buttons, glass, phones ---------- */
+/* Buttons in the planner: a soft fill and a hairline, the press sinks a
+   little (Apple's controls); the main one in the accent. */
+:is(.db-screen, .db-details, .planner-topbar, .qa-dialog) .button {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--text) 9%, transparent);
+  background: color-mix(in srgb, var(--surface) 80%, var(--bg));
+  font-weight: 500;
+  transition: background-color 0.15s var(--ease-out, ease), border-color 0.15s var(--ease-out, ease), transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is(.db-screen, .db-details, .planner-topbar, .qa-dialog) .button:hover:not(:disabled) {
+  background: var(--hover);
+}
+:is(.db-screen, .db-details, .planner-topbar, .qa-dialog) .button.primary {
+  border-color: transparent;
+  background: var(--blue);
+  color: var(--on-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px color-mix(in srgb, var(--blue) 35%, transparent);
+}
+:is(.db-screen, .db-details, .planner-topbar, .qa-dialog) .button.primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+:is(.db-screen, .db-details, .planner-topbar, .qa-dialog, .db-menu) :is(.button, .icon-button, .db-row-action, .db-strip-cell, .db-menu-chip, .db-quiet-button):active:not(:disabled) {
+  transform: scale(0.97);
+}
+.db-quiet-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 4px 8px 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease-out, ease), color 0.15s var(--ease-out, ease), transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.db-quiet-button:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--text);
+}
+/* Glass for what floats: menus, the Quick Add dialog, the phone's tab bar. */
+.dropdown,
+.qa-dialog {
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-color: color-mix(in srgb, var(--text) 10%, transparent);
+}
+@media (max-width: 767.98px) {
+  .mobile-tab-bar {
+    background: color-mix(in srgb, var(--sidebar) 78%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+  /* The tab bar has Search and + on phones: the top bar leaves them out. */
+  .planner-topbar :is(.planner-search, .planner-new) {
+    display: none;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dropdown,
+  .qa-dialog,
+  .db-menu,
+  .db-icon-panel {
+    background: var(--bg);
+  }
+}
+
+/* ---------- Toasts (components/toast.tsx), after rareui's Toast Feedback ---------- */
+:root {
+  --toast-bg: #ffffff;
+  --toast-pill: #f4f4f9;
+  --toast-pill-hover: #ededf3;
+  --toast-success: #34c759;
+  --toast-error: #ff3b30;
+  --toast-quiet: #868593;
+}
+[data-theme="dark"] {
+  --toast-bg: #1c1c1e;
+  --toast-pill: #2c2c2e;
+  --toast-pill-hover: #3a3a3c;
+  --toast-success: #30d158;
+  --toast-error: #ff453a;
+  --toast-quiet: #9b9aa7;
+}
+.toast,
+.toast.toast-error {
+  gap: 12px;
+  padding: 10px;
+  min-width: min(320px, calc(100% - 32px));
+  /* The card's radius is the tile's plus the padding: concentric corners. */
+  border-radius: 21px;
+  corner-shape: squircle;
+  background: var(--toast-bg);
+  color: var(--text);
+  font-size: 14px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent),
+    0 1px 1px rgba(0, 0, 0, 0.05),
+    0 2px 5px rgba(0, 0, 0, 0.06),
+    0 14px 36px rgba(0, 0, 0, 0.1);
+  animation: db-toast-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.toast.is-leaving {
+  animation: db-toast-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+@keyframes db-toast-in {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+    scale: 0.96;
+  }
+}
+@keyframes db-toast-out {
+  to {
+    opacity: 0;
+    translate: 0 10px;
+    scale: 0.97;
+  }
+}
+.toast-tile {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  corner-shape: squircle;
+  color: #fff;
+  animation: db-toast-tile 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+.toast-tile.is-success {
+  background: var(--toast-success);
+}
+.toast-tile.is-error {
+  background: var(--toast-error);
+}
+.toast-tile svg {
+  width: 18px;
+  height: 18px;
+  animation: db-toast-glyph 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) 0.32s both;
+}
+.toast-tile path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: db-draw 0.3s ease-out 0.42s forwards;
+}
+@keyframes db-toast-tile {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+@keyframes db-toast-glyph {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+@keyframes db-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.toast .toast-message,
+.toast .toast-text strong {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.toast.toast-undo .toast-message {
+  padding-left: 6px;
+}
+.toast .toast-text span {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--toast-quiet);
+}
+.toast .toast-action {
+  height: 36px;
+  margin-left: auto;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 11px;
+  corner-shape: squircle;
+  background: var(--toast-pill);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.15s var(--ease-out, ease), transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast .toast-action:hover {
+  background: var(--toast-pill-hover);
+}
+.toast .toast-action:active {
+  transform: scale(0.95);
+}
+.toast .toast-kbd {
+  color: var(--toast-quiet);
+  background: transparent;
+  border: 0;
+  font-weight: 500;
+}
+.toast-close {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--toast-bg);
+  color: var(--toast-quiet);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 9%, transparent);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s, color 0.15s;
+}
+.toast-close svg {
+  width: 10px;
+  height: 10px;
+}
+.toast:hover .toast-close,
+.toast-close:focus-visible {
+  opacity: 1;
+}
+.toast-close:hover {
+  color: var(--text);
+}
+@media (hover: none) {
+  .toast-close {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.is-leaving,
+  .toast-tile,
+  .toast-tile svg {
+    animation: none;
+  }
+  .toast-tile path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Ticking a task off (components/daybar/parts.tsx TaskCheck), after rareui's task list ---------- */
+.db-check {
+  transition: background-color 0.24s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.12s var(--ease-spring, ease);
+}
+.db-tick path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.06s;
+}
+.db-check[aria-checked="true"] .db-tick path {
+  stroke-dashoffset: 0;
+}
+.db-check.is-ticking[aria-checked="true"] {
+  animation: db-check-pop 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes db-check-pop {
+  40% {
+    scale: 1.08;
+  }
+}
+/* The strike rides on the text, so a title that wraps gets a line per row. */
+.db-row-label {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 55%;
+  background-size: 0% 1.5px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.38s cubic-bezier(0.65, 0, 0.35, 1), color 0.3s;
+}
+.db-row.is-done .db-row-label,
+.db-row:has(> .db-check[aria-checked="true"]) .db-row-label {
+  background-size: 100% 1.5px;
+  color: var(--muted);
+}
+.db-row:has(> .db-check.is-ticking[aria-checked="true"]) .db-row-label {
+  transition-delay: 0.26s;
+}
+.db-row:has(> .db-check.is-ticking[aria-checked="true"]) {
+  animation: db-nudge 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.64s;
+}
+@keyframes db-nudge {
+  35% {
+    translate: 8px 0;
+  }
+  70% {
+    translate: -2px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-check,
+  .db-tick path,
+  .db-row-label {
+    transition: none;
+  }
+  .db-check.is-ticking[aria-checked="true"],
+  .db-row:has(> .db-check.is-ticking[aria-checked="true"]) {
+    animation: none;
+  }
+}
+
+/* ---------- Delete button (components/daybar/delete-button.tsx), after rareui's Delete button ---------- */
+:root {
+  --db-recess: #e7e7ef;
+  --db-delete: #ff3b30;
+}
+[data-theme="dark"] {
+  --db-recess: #1b1b1b;
+  --db-delete: #ff453a;
+}
+.db-delete {
+  --tile: 40px;
+  --panel: 80px;
+  --circle: 28px;
+  position: relative;
+  width: var(--tile);
+  height: var(--tile);
+  flex-shrink: 0;
+  border-radius: 13px;
+  corner-shape: squircle;
+  background: var(--toast-pill);
+  color: var(--toast-quiet);
+  transition: width 0.62s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.db-delete.is-sm {
+  --tile: 30px;
+  --panel: 64px;
+  --circle: 22px;
+  border-radius: 10px;
+}
+.db-delete[data-open] {
+  width: calc(var(--tile) + var(--panel));
+}
+.db-delete-trigger {
+  position: relative;
+  z-index: 1;
+  width: var(--tile);
+  height: var(--tile);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), color 0.15s;
+}
+.db-delete-trigger:hover {
+  color: var(--db-delete);
+}
+.db-delete-trigger:active {
+  transform: scale(0.94);
+}
+.db-delete-trigger svg {
+  width: 50%;
+  height: 50%;
+  overflow: visible;
+}
+.db-bin-body {
+  /* The walls drop when the lid opens (Chrome, Firefox; Safari keeps them). */
+  transition: d 0.56s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.db-delete[data-open] .db-bin-body {
+  d: path("M19 13.5v6.5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V13.5");
+}
+.db-bin-lid {
+  transform-box: view-box;
+  transform-origin: 3px 6px;
+  transition: transform 0.6s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+.db-delete[data-open] .db-bin-lid {
+  transform: rotate(-35deg);
+}
+.db-delete[data-status="kept"] .db-delete-bin {
+  animation: db-bin-settle 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes db-bin-settle {
+  40% {
+    scale: 0.86;
+  }
+}
+.db-delete-done {
+  stroke: var(--db-delete);
+  stroke-width: 2.5;
+  animation: db-delete-swap 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.db-delete-done path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: db-draw 0.45s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+@keyframes db-delete-swap {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+.db-delete-panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--circle) * 0.28);
+  border-radius: inherit;
+  background: var(--db-recess);
+  animation: db-delete-panel 0.44s cubic-bezier(0.32, 0.72, 0, 1) 0.14s both;
+}
+@keyframes db-delete-panel {
+  from {
+    opacity: 0;
+    translate: -6px 0;
+  }
+}
+.db-delete-tail {
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  translate: 0 -50%;
+  background: var(--db-recess);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+.db-delete-circle {
+  width: var(--circle);
+  height: var(--circle);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--toast-pill);
+  color: var(--toast-quiet);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 0.5px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  animation: db-delete-circle 0.44s cubic-bezier(0.32, 0.72, 0, 1) 0.14s both;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s;
+}
+.db-delete-circle + .db-delete-circle {
+  animation-delay: 0.21s;
+}
+[data-theme="dark"] .db-delete-circle {
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.35), 0 1.5px 4px rgba(0, 0, 0, 0.25), inset 0 0.5px 0 rgba(255, 255, 255, 0.07);
+}
+.db-delete-circle:hover {
+  transform: scale(1.03);
+  background: var(--toast-pill-hover);
+}
+.db-delete-circle:active {
+  transform: scale(0.84);
+}
+.db-delete-circle.is-confirm {
+  color: var(--db-delete);
+}
+.db-delete-circle svg {
+  width: 50%;
+  height: 50%;
+}
+@keyframes db-delete-circle {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .db-delete,
+  .db-bin-body,
+  .db-bin-lid {
+    transition: none;
+  }
+  .db-delete-panel,
+  .db-delete-circle,
+  .db-delete-done,
+  .db-delete[data-status="kept"] .db-delete-bin {
+    animation: none;
+  }
+  .db-delete-done path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Theme selector (components/theme-selector.tsx), after rareui's ---------- */
+.theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  min-width: 0;
+}
+.ts-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.ts-card {
+  position: relative;
+  width: 148px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+.ts-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  border-radius: 16px;
+  corner-shape: squircle;
+  background: var(--toast-pill);
+  transition: background-color 0.15s;
+}
+.ts-card:hover .ts-frame {
+  background: var(--toast-pill-hover);
+}
+.ts-ring {
+  pointer-events: none;
+  position: absolute;
+  inset: -3.5px;
+  border-radius: 19.5px;
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.ts-card:hover .ts-ring {
+  border-color: color-mix(in srgb, var(--text) 12%, transparent);
+}
+.ts-card[aria-checked="true"] .ts-ring {
+  border-color: color-mix(in srgb, var(--text) 40%, transparent);
+}
+.ts-card:focus-visible .ts-ring {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--blue) 30%, transparent);
+}
+.ts-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.ts-label.is-on {
+  color: var(--text);
+}
+/* The picture bleeds past the right and bottom: only its corner shows. */
+.ts-preview {
+  position: absolute;
+  inset: 13cqw -10cqw -10cqw 13cqw;
+  display: flex;
+  border-top-left-radius: 5cqw;
+  background: var(--ts-sidebar);
+  box-shadow: 0 0 0 1px var(--ts-border), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.ts-preview.is-half {
+  clip-path: polygon(62% 0, 100% 0, 100% 100%, 22% 100%);
+}
+.ts-preview i,
+.ts-preview .ts-nav i {
+  display: block;
+  height: 2.2cqw;
+  border-radius: 999px;
+}
+.ts-side {
+  width: 25cqw;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 4cqw 3cqw 14cqw;
+}
+.ts-dots {
+  display: flex;
+  gap: 1.3cqw;
+  padding: 0 1.2cqw;
+}
+.ts-dots span {
+  width: 2cqw;
+  height: 2cqw;
+  border-radius: 50%;
+  background: var(--ts-muted);
+}
+.ts-nav {
+  margin-top: 4cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+}
+.ts-nav span {
+  height: 4.6cqw;
+  display: flex;
+  align-items: center;
+  padding: 0 1.2cqw;
+  border-radius: 1.6cqw;
+}
+.ts-nav span i {
+  width: 8cqw;
+  background: var(--ts-muted);
+}
+.ts-nav span:nth-child(2) i {
+  width: 13cqw;
+}
+.ts-nav span.is-on {
+  background: color-mix(in srgb, var(--ts-accent) 22%, transparent);
+}
+.ts-nav span.is-on i {
+  width: 10cqw;
+  background: var(--ts-accent);
+}
+.ts-me {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  padding: 0 1.2cqw;
+}
+.ts-me span {
+  width: 4.4cqw;
+  height: 4.4cqw;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--ts-strong);
+}
+.ts-me i {
+  width: 7cqw;
+  background: var(--ts-muted);
+}
+.ts-main {
+  flex: 1;
+  min-width: 0;
+  margin-top: 3cqw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 5cqw 0 0 5cqw;
+  border-top-left-radius: 4cqw;
+  background: var(--ts-panel);
+  box-shadow: 0 0 0 1px var(--ts-border);
+}
+.ts-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2cqw;
+}
+.ts-lines i:first-child {
+  width: 11cqw;
+  background: var(--ts-strong);
+}
+.ts-lines i:last-child {
+  width: 19cqw;
+  background: var(--ts-muted);
+}
+.ts-tiles {
+  margin-top: 5cqw;
+  display: flex;
+  gap: 2.5cqw;
+}
+.ts-tiles span,
+.ts-wide {
+  flex-shrink: 0;
+  border-radius: 2.4cqw;
+  background: var(--ts-tile);
+  box-shadow: 0 0 0 1px var(--ts-border);
+}
+.ts-tiles span {
+  width: 19cqw;
+  height: 12cqw;
+}
+.ts-wide {
+  margin-top: 2.5cqw;
+  width: 70cqw;
+  height: 20cqw;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ts-frame,
+  .ts-ring,
+  .ts-label {
+    transition: none;
   }
 }

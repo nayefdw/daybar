@@ -8,7 +8,7 @@ import { useT } from "../i18n";
 import { movedToDay, upcomingDays, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
 import { CaptureLine } from "./quick-add";
-import { Empty, ItemRow, PlannerStatus } from "./parts";
+import { DayGroup, Empty, ItemRow, PlannerStatus } from "./parts";
 import { dayLabel, dayMonth, weekdayShort } from "./format";
 import { DRAG_TYPE, dropToDay } from "./today";
 
@@ -103,21 +103,18 @@ export default function UpcomingScreen() {
             days
               .filter((d) => d.items.length || d.day === today)
               .map(({ day, items }) => (
-                <section
+                <DayGroup
                   key={day}
-                  className="db-day-group"
+                  fold={`upcoming:${day}`}
+                  title={dayLabel(day, today, t)}
+                  detail={`${weekdayShort(day)} ${dayMonth(day)}`}
                   onDragOver={(e) => e.dataTransfer.types.includes(DRAG_TYPE) && e.preventDefault()}
                   onDrop={(e) => dropToDay(e, day, state.items, move)}
                 >
-                  <h2>
-                    {dayLabel(day, today, t)} <span>{`${weekdayShort(day)} ${dayMonth(day)}`}</span>
-                  </h2>
-                  <div className="db-list">
-                    {items.map((item) => (
-                      <ItemRow key={item.id} item={item} draggable={item.kind !== "note"} onDragStart={drag(item)} />
-                    ))}
-                  </div>
-                </section>
+                  {items.map((item) => (
+                    <ItemRow key={item.id} item={item} draggable={item.kind !== "note"} onDragStart={drag(item)} />
+                  ))}
+                </DayGroup>
               ))
           ) : (
             <Empty title={t("Die nächsten 30 Tage sind frei.", "The next 30 days are free.")} />

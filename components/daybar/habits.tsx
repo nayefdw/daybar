@@ -13,7 +13,7 @@ import { bestStreak, habitDue, habitFinished, monthRate, ruleLabel, streak, week
 import type { PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
 import { CaptureLine } from "./quick-add";
-import { Empty, PlannerStatus } from "./parts";
+import { Empty, Group, PlannerStatus } from "./parts";
 import { dayLabel, timeLabel, weekdayName, weekdayNarrow } from "./format";
 import { checkinsOf } from "./store";
 
@@ -67,17 +67,13 @@ export default function HabitsScreen() {
         groups
           .filter((g) => g.rows.length)
           .map((g) => (
-            <section key={g.key} className="db-group" aria-label={g.title}>
-              <header className="db-group-head">
-                <strong>{g.title}</strong>
-                <span className="db-count">{g.rows.length}</span>
-              </header>
+            <Group key={g.key} fold={`habits:${g.key}`} label={g.title} title={g.title} count={g.rows.length}>
               <ul className="db-habit-list">
                 {g.rows.map(({ habit, checkins, due, done }) => (
                   <HabitRow key={habit.id} habit={habit} checkins={checkins} due={due} done={done} onOpen={() => select(habit.id)} onMenu={(e) => openMenu(e, habit)} onToggle={(day, on) => void store.checkHabit(habit.id, day, on)} today={today} weekStartsOn={weekStartsOn} />
                 ))}
               </ul>
-            </section>
+            </Group>
           ))
       )}
     </div>

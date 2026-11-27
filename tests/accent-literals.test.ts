@@ -71,6 +71,7 @@ const CODE_ALLOWED: Record<string, string> = {
   "lib/workspace-theme.ts": "the palette and the mark",
   "components/brand-mark.tsx": "the mark's default colours (CSS variables override them)",
   "components/settings/user/workspace-look.tsx": "Flowplan's own accent as a choice and in the preview",
+  "components/theme-selector.tsx": "the pictures of the light and the dark look: each shows its own accent, whatever the current theme",
   "components/publication-domain.tsx": "a custom domain's own accent setting",
   "components/admin-storage.tsx": "chart palette",
   "components/text-menu.tsx": "default colours of new function plots (content)",

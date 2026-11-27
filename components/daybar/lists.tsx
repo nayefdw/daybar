@@ -9,9 +9,10 @@ import { useT } from "../i18n";
 import { addDays, type Folder, type PlannerItem } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
 import { IconPicker } from "./icon-picker";
+import { DeleteButton } from "./delete-button";
 import { ChosenIcon } from "./item-icon";
 import { CaptureLine } from "./quick-add";
-import { Empty, ItemRow, PlannerStatus, Section } from "./parts";
+import { DayGroup, Empty, ItemRow, PlannerStatus, Section } from "./parts";
 import { dayLabel, dayMonth, weekdayShort } from "./format";
 import TasksScreen from "./tasks";
 
@@ -75,16 +76,11 @@ export function EventsScreen() {
       <CaptureLine kind="event" placeholder={t("Neuer Termin … („Zahnarzt Freitag 14:00“)", "New event… (“Dentist friday 14:00”)")} />
       {byDay.size ? (
         [...byDay.entries()].map(([day, list]) => (
-          <section key={day} className="db-day-group">
-            <h2>
-              {dayLabel(day, today, t)} <span>{`${weekdayShort(day)} ${dayMonth(day)}`}</span>
-            </h2>
-            <div className="db-list">
-              {list.map((e) => (
-                <ItemRow key={e.id} item={e} />
-              ))}
-            </div>
-          </section>
+          <DayGroup key={day} fold={`events:${day}`} title={dayLabel(day, today, t)} detail={`${weekdayShort(day)} ${dayMonth(day)}`}>
+            {list.map((e) => (
+              <ItemRow key={e.id} item={e} />
+            ))}
+          </DayGroup>
         ))
       ) : (
         <Empty title={show === "past" ? t("Keine vergangenen Termine.", "No past events.") : t("Keine kommenden Termine.", "No upcoming events.")} />
@@ -115,7 +111,7 @@ function Collection({ kind, id }: { kind: "folder" | "tag"; id: string }) {
       />
       <div className="db-screen db-collection-rest">
         {notes.length > 0 && (
-          <Section title={t("Notizen", "Notes")} count={notes.length}>
+          <Section fold="collection:notes" title={t("Notizen", "Notes")} count={notes.length}>
             <div className="db-list">
               {notes.map((n) => (
                 <ItemRow key={n.id} item={n} showDay />
@@ -124,7 +120,7 @@ function Collection({ kind, id }: { kind: "folder" | "tag"; id: string }) {
           </Section>
         )}
         {events.length > 0 && (
-          <Section title={t("Termine", "Events")} count={events.length}>
+          <Section fold="collection:events" title={t("Termine", "Events")} count={events.length}>
             <div className="db-list">
               {events.map((e) => (
                 <ItemRow key={e.id} item={e} showDay />
@@ -133,7 +129,7 @@ function Collection({ kind, id }: { kind: "folder" | "tag"; id: string }) {
           </Section>
         )}
         {habits.length > 0 && (
-          <Section title={t("Gewohnheiten", "Habits")} count={habits.length}>
+          <Section fold="collection:habits" title={t("Gewohnheiten", "Habits")} count={habits.length}>
             <div className="db-list">
               {habits.map((h) => (
                 <ItemRow key={h.id} item={h} />
@@ -265,18 +261,12 @@ export function MetaIndexScreen({ kind }: { kind: "folders" | "tags" }) {
               <button type="button" className="icon-button" aria-label={t(`„${m.name}“ umbenennen`, `Rename “${m.name}”`)} onClick={() => [setEditing(m.id), setDraft(m.name)]}>
                 <Pencil size={15} />
               </button>
-              <button
-                type="button"
-                className="icon-button"
-                aria-label={t(`„${m.name}“ löschen`, `Delete “${m.name}”`)}
-                onClick={() => {
-                  if (!window.confirm(kind === "folders" ? t(`Ordner „${m.name}“ löschen? Seine Einträge bleiben, ohne Ordner.`, `Delete the folder “${m.name}”? Its items stay, without a folder.`) : t(`Tag „${m.name}“ löschen? Die Einträge bleiben.`, `Delete the tag “${m.name}”? The items stay.`))) return;
-                  if (kind === "folders") void store.deleteFolder(m.id);
-                  else void store.deleteTag(m.id);
-                }}
-              >
-                <Trash2 size={15} />
-              </button>
+              {/* The items stay, without this folder or tag. */}
+              <DeleteButton
+                size="sm"
+                label={kind === "folders" ? t(`Ordner „${m.name}“ löschen (seine Einträge bleiben)`, `Delete the folder “${m.name}” (its items stay)`) : t(`Tag „${m.name}“ löschen (die Einträge bleiben)`, `Delete the tag “${m.name}” (the items stay)`)}
+                onConfirm={() => void (kind === "folders" ? store.deleteFolder(m.id) : store.deleteTag(m.id))}
+              />
             </li>
           ))}
         </ul>

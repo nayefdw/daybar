@@ -18,7 +18,7 @@
 // profile, all devices, components/settings/user/feature-modules.tsx).
 import { useKeyboardHints } from "@/lib/keyboard-hints";
 import { useInFlowplanApp } from "@/lib/native-app";
-import { CircleHalf, Gift, Keyboard, Moon, Sun } from "@phosphor-icons/react";
+import { Gift, Keyboard } from "@phosphor-icons/react";
 import { LANGUAGES, LOCALES, isLocale } from "@/lib/i18n";
 import { clearLocale, setLocale, useT } from "../../i18n";
 import { Select } from "../../select";
@@ -54,6 +54,7 @@ import type { StartScreen } from "@/lib/start-screen";
 import { setStartScreenLocal, startScreen as startScreenNow, useStartScreen } from "@/lib/start-screen-client";
 import { openWhatsNew, setUpdateNotesLevelLocal, updateNotesLevel, useUpdateNotesLevel } from "@/lib/update-notes-client";
 import { PERSONAL_FONTS, personalFontOf } from "@/lib/personal-font";
+import { ThemeSelector } from "../../theme-selector";
 import { DEFAULT_FONTS, SYSTEM_FONT, bundledFont, bundledFontFaces, customFontId, fontStack } from "@/lib/theme-fonts";
 import type { Bootstrap } from "@/lib/types";
 
@@ -267,24 +268,13 @@ export default function AppearanceSection() {
           </Select>
         </SettingRow>
         <SettingRow
+          wide
           anchor="color-theme"
           label={t("Erscheinungsbild", "Appearance")}
           description={t("Automatisch folgt dem Hell- oder Dunkelmodus des Geräts. Nur auf diesem Gerät.", "Automatic follows the device's light or dark mode. On this device only.")}
         >
-          <div className="segmented" role="radiogroup" aria-label={t("Erscheinungsbild", "Appearance")}>
-            <label data-active={theme === "system"}>
-              <input type="radio" name="profile-theme" checked={theme === "system"} onChange={() => setTheme("system")} />
-              <CircleHalf size={15} aria-hidden /> {t("Automatisch", "Automatic")}
-            </label>
-            <label data-active={theme === "light"}>
-              <input type="radio" name="profile-theme" checked={theme === "light"} onChange={() => setTheme("light")} />
-              <Sun size={15} aria-hidden /> {t("Hell", "Light")}
-            </label>
-            <label data-active={theme === "dark"}>
-              <input type="radio" name="profile-theme" checked={theme === "dark"} onChange={() => setTheme("dark")} />
-              <Moon size={15} aria-hidden /> {t("Dunkel", "Dark")}
-            </label>
-          </div>
+          {/* Cards with a picture of each look (components/theme-selector.tsx). */}
+          <ThemeSelector value={theme} onChange={setTheme} />
         </SettingRow>
         <SettingRow
           anchor="whiteboard-canvas"

@@ -4,7 +4,8 @@
 // list, a board (one column per group; drop on a day to move there) or a
 // table. Sorted by time, priority, title or creation; filtered by text,
 // priority, folder and tag, the filters shown as pills.
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useFlip } from "./flip";
 import { Kanban, List, Table, X } from "lucide-react";
 import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
@@ -12,7 +13,8 @@ import { Select } from "../select";
 import { addDays, monthStart, movedToDay, taskDay, taskGroups, weekStart, type PlannerItem, type TaskGroup } from "@/lib/daybar/model";
 import { usePlannerUi } from "./context";
 import { CaptureLine } from "./quick-add";
-import { Empty, ItemMeta, ItemRow, PlannerStatus, TaskCheck, priorityName } from "./parts";
+import { Empty, Group, ItemMeta, ItemRow, PlannerStatus, TaskCheck, priorityName } from "./parts";
+import { FoldButton, useFolded } from "./fold";
 import { dayLabel, monthLabel, timeLabel, weekLabel } from "./format";
 import { DRAG_TYPE } from "./today";
 
@@ -37,6 +39,9 @@ const keep = (key: string, value: string) => {
 export default function TasksScreen({ folderId, tagId, title, lead }: { folderId?: string; tagId?: string; title?: string; lead?: ReactNode }) {
   const t = useT();
   const { state, today, store } = usePlannerUi();
+  // Ticked tasks glide to the Done group (components/daybar/flip.ts).
+  const groupsRef = useRef<HTMLDivElement>(null);
+  useFlip(groupsRef);
   const [layout, setLayout] = useState<Layout>(() => read("daybar-tasks-layout", ["list", "board", "table"], "list"));
   const [groupBy, setGroupBy] = useState<GroupBy>(() => read("daybar-tasks-group", ["when", "priority", "folder", "tag", "none"], "when"));
   const [sortBy, setSortBy] = useState<SortBy>(() => read("daybar-tasks-sort", ["default", "priority", "title", "created"], "default"));
@@ -222,22 +227,38 @@ export default function TasksScreen({ folderId, tagId, title, lead }: { folderId
               </tr>
             </thead>
             {groups.map((g) => (
-              <tbody key={g.key}>
-                <tr className="db-table-group">
-                  <th colSpan={6} scope="colgroup">
-                    {g.title} <span className="db-count">{g.items.length}</span>
-                  </th>
-                </tr>
-                {g.items.map((i) => (
-                  <TableRow key={i.id} item={i} />
-                ))}
-              </tbody>
+              <TableGroup key={g.key} fold={`tasks:${g.key}`} title={g.title} items={g.items} />
             ))}
           </table>
         </div>
       ) : (
-        <div className={layout === "board" ? "db-board" : "db-groups"}>
-          {groups.map((g) => (
+        <div ref={groupsRef} className={layout === "board" ? "db-board" : "db-groups"}>
+          {groups.map((g) =>
+            layout === "list" ? (
+              <Group
+                key={g.key}
+                fold={`tasks:${g.key}`}
+                label={g.title}
+                title={g.title}
+                titleClass={g.kind === "overdue" ? "db-overdue" : undefined}
+                count={g.items.length}
+                onDragOver={(e) => e.dataTransfer.types.includes(DRAG_TYPE) && (g.day || g.kind === "inbox" || g.kind === "someday" || g.kind === "done") && e.preventDefault()}
+                onDrop={(e) => dropOnGroup(e, g)}
+                actions={
+                  g.kind === "overdue" && g.items.length > 0 ? (
+                    <button type="button" className="db-link-button" onClick={() => void store.updateMany(g.items.map((i) => i.id), { day: today, period: null })}>
+                      {t("Alle auf heute", "All to today")}
+                    </button>
+                  ) : undefined
+                }
+              >
+                <div className="db-list">
+                  {g.items.map((i) => (
+                    <ItemRow key={i.id} item={i} showDay={g.kind !== "day"} draggable onDragStart={(e) => e.dataTransfer.setData(DRAG_TYPE, i.id)} />
+                  ))}
+                </div>
+              </Group>
+            ) : (
             <section
               key={g.key}
               className={layout === "board" ? "db-column" : "db-group"}
@@ -260,10 +281,28 @@ export default function TasksScreen({ folderId, tagId, title, lead }: { folderId
                 ))}
               </div>
             </section>
-          ))}
+            ),
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+// A group's rows in the table, under a heading row that folds them.
+function TableGroup({ fold, title, items }: { fold: string; title: string; items: PlannerItem[] }) {
+  const [folded, toggle] = useFolded(fold);
+  return (
+    <tbody className={folded ? "is-folded" : undefined}>
+      <tr className="db-table-group">
+        <th colSpan={6} scope="colgroup">
+          <FoldButton folded={folded} onToggle={toggle}>
+            {title} <span className="db-count">{items.length}</span>
+          </FoldButton>
+        </th>
+      </tr>
+      {!folded && items.map((i) => <TableRow key={i.id} item={i} />)}
+    </tbody>
   );
 }
 

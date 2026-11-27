@@ -129,6 +129,7 @@ export default function TodayScreen() {
 
       {leftovers.length > 0 && (
         <Section
+          fold="today:leftovers"
           className="db-card db-leftovers"
           title={leftovers.every((i) => taskDay(i) === addDays(today, -1)) ? t("Von gestern noch offen", "From yesterday you still have") : t("Von früheren Tagen noch offen", "Still open from earlier days")}
           count={leftovers.length}
@@ -158,7 +159,7 @@ export default function TodayScreen() {
         </Section>
       )}
 
-      <Section className="db-card db-daynote" title={day === today ? t("Tagesnotiz", "Day note") : t(`Tagesnotiz · ${dayLabel(day, today, t)}`, `Day note · ${dayLabel(day, today, t)}`)}>
+      <Section fold="today:daynote" className="db-card db-daynote" title={day === today ? t("Tagesnotiz", "Day note") : t(`Tagesnotiz · ${dayLabel(day, today, t)}`, `Day note · ${dayLabel(day, today, t)}`)}>
         <ul className="db-lines" aria-label={t("Die Einträge des Tages", "The day's items")}>
           {/* In the order of the day: all-day events, then by time, then
               what has no time. */}
@@ -210,13 +211,9 @@ export default function TodayScreen() {
         )}
         <CaptureLine defaults={{ day }} placeholder={t("Aufgabe, Termin um 9:00, Notiz …", "A task, an event at 9:00, a note…")} />
         <div className="db-daynote-text">
-          {note?.text ? (
-            <p>{note.text}</p>
-          ) : (
-            <p className="db-hint">{day > today ? t("Tagesnotizen gibt es ab dem Tag selbst.", "Day notes start on the day itself.") : t("Noch keine Tagesnotiz.", "No day note yet.")}</p>
-          )}
+          {note?.text ? <p>{note.text}</p> : day > today && <p className="db-hint">{t("Tagesnotizen gibt es ab dem Tag selbst.", "Day notes start on the day itself.")}</p>}
           {day <= today && (
-            <button type="button" className="button" disabled={opening} onClick={() => void openDayNote()}>
+            <button type="button" className="db-quiet-button" disabled={opening} onClick={() => void openDayNote()}>
               <NotebookPen size={16} aria-hidden />
               {note ? t("Tagesnotiz öffnen", "Open day note") : t("Tagesnotiz schreiben", "Write a day note")}
             </button>
@@ -224,7 +221,7 @@ export default function TodayScreen() {
         </div>
       </Section>
 
-      <Section className="db-card db-week" title={t("Diese Woche", "This week")} count={weekTasks.length}>
+      <Section fold="today:week" className="db-card db-week" title={t("Diese Woche", "This week")} count={weekTasks.length}>
         {weekTasks.length ? (
           <div className="db-list">
             {weekTasks.map((i) => (

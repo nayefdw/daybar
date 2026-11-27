@@ -3,7 +3,8 @@
 // a scope chosen in its title menu – Inbox (no date, no folder), All,
 // Upcoming, Overdue, Waiting, Today, Calendar – lists items; an item opened
 // anywhere in the planner shows its details here.
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useFlip } from "./flip";
 import { ArrowLeft } from "lucide-react";
 import { useT } from "../i18n";
 import { Select } from "../select";
@@ -30,6 +31,8 @@ export const scopeName = (scope: PanelScope, t: T) =>
 export function PlannerPanel() {
   const t = useT();
   const { state, today, selectedId, select, setPanelOpen } = usePlannerUi();
+  const listRef = useRef<HTMLDivElement>(null);
+  useFlip(listRef);
   const [scope, setScope] = useState<PanelScope>(() => {
     try {
       const saved = localStorage.getItem("daybar-panel-scope") as PanelScope | null;
@@ -74,7 +77,7 @@ export function PlannerPanel() {
         )
       }
     >
-      <div className="db-panel">
+      <div className="db-panel" ref={listRef}>
         {item ? (
           <ItemDetails key={item.id} item={item} onClose={() => select(null)} />
         ) : (

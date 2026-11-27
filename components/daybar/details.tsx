@@ -8,6 +8,7 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { Copy, ExternalLink, Plus, Shapes, Star, Trash2, X } from "lucide-react";
 import { IconPicker } from "./icon-picker";
+import { DeleteButton } from "./delete-button";
 import { ChosenIcon } from "./item-icon";
 import { useT } from "../i18n";
 import { Select } from "../select";
@@ -359,17 +360,13 @@ export function ItemDetails({ item, onClose }: { item: PlannerItem; onClose: () 
             {t("Duplizieren", "Duplicate")}
           </button>
         )}
-        <button
-          type="button"
-          className="button db-danger"
-          onClick={() => {
+        <DeleteButton
+          label={t(`„${item.title}“ löschen`, `Delete “${item.title}”`)}
+          onConfirm={() => {
             onClose();
             void store.remove(item.id, item.title);
           }}
-        >
-          <Trash2 size={15} aria-hidden />
-          {t("Löschen", "Delete")}
-        </button>
+        />
       </div>
       {item.source === "thisday" && <p className="db-hint">{t("Aus ThisDay: ThisDay bleibt maßgeblich; Änderungen hier überschreibt der nächste Import.", "From ThisDay: ThisDay stays the truth; the next import overwrites changes made here.")}</p>}
     </div>

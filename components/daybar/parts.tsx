@@ -2,13 +2,15 @@
 // The pieces every planner screen shows: the checkbox (in the priority's
 // colour, a ring for subtasks, half filled while in progress), an item's row
 // with its badges, a section heading and the empty state.
-import type { CSSProperties, DragEvent, ReactNode } from "react";
+import { useId, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
 import { Bell, Calendar, Check, Hourglass, Link, MapPin, Repeat, Star, StickyNote } from "lucide-react";
 import { useT } from "../i18n";
 import { isFollowUp, isWaiting, subtaskProgress, taskDay, type PlannerItem } from "@/lib/daybar/model";
 import { countdown, dayLabel, durationLabel, spanLabel, timeLabel } from "./format";
 import { usePlannerUi } from "./context";
 import { ChosenIcon } from "./item-icon";
+import { FoldButton, useFolded } from "./fold";
+import { expectReorder } from "./flip";
 
 export const PRIORITY_CLASS = ["", "pri-low", "pri-medium", "pri-high"] as const;
 type T = (de: string, en: string) => string;
@@ -16,28 +18,47 @@ export const priorityName = (p: number, t: T) => [t("Keine", "None"), t("Niedrig
 export const kindName = (kind: PlannerItem["kind"], t: T) =>
   ({ task: t("Aufgabe", "Task"), event: t("Termin", "Event"), note: t("Notiz", "Note"), habit: t("Gewohnheit", "Habit") })[kind];
 
+// The tick plays before the task counts as done (after rareui's task list):
+// fill and pop, the tick draws, the title is struck through, the row gives
+// a small nudge – then the change is made and the row glides to its place.
+const TICK_MS = 950;
+const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // A task's checkbox: the priority's colour, a progress ring with subtasks.
 export function TaskCheck({ item, onToggle, size = 18 }: { item: PlannerItem; onToggle: () => void; size?: number }) {
   const t = useT();
   const { state } = usePlannerUi();
   const progress = state ? subtaskProgress(state.items, item.id) : { done: 0, total: 0 };
-  const done = !!item.doneAt;
+  // Shown while the tick plays; the store changes after it.
+  const [pending, setPending] = useState<boolean | null>(null);
+  const [ticked, setTicked] = useState(false);
+  const done = pending ?? !!item.doneAt;
   const style = { "--size": `${size}px`, "--progress": progress.total ? `${(progress.done / progress.total) * 360}deg` : "0deg" } as CSSProperties;
   return (
     <button
       type="button"
       role="checkbox"
       aria-checked={done}
-      className={`db-check ${PRIORITY_CLASS[item.priority]}${progress.total && !done ? " has-progress" : ""}${item.inProgress && !done ? " in-progress" : ""}`}
+      className={`db-check ${PRIORITY_CLASS[item.priority]}${progress.total && !done ? " has-progress" : ""}${item.inProgress && !done ? " in-progress" : ""}${ticked ? " is-ticking" : ""}`}
       style={style}
       onClick={(e) => {
         e.stopPropagation();
-        onToggle();
+        if (pending !== null) return;
+        setTicked(true);
+        if (done || reducedMotion()) return onToggle();
+        setPending(true);
+        expectReorder();
+        setTimeout(() => {
+          onToggle();
+          setPending(null);
+        }, TICK_MS);
       }}
       aria-label={done ? t(`„${item.title}“ wieder öffnen`, `Reopen “${item.title}”`) : t(`„${item.title}“ erledigen`, `Complete “${item.title}”`)}
       title={progress.total ? t(`${progress.done} von ${progress.total} Unteraufgaben erledigt`, `${progress.done} of ${progress.total} subtasks done`) : undefined}
     >
-      {done && <Check size={size - 6} strokeWidth={2.75} aria-hidden />}
+      <svg className="db-tick" viewBox="0 0 24 24" width={size - 4} height={size - 4} fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M5.5 12.5l4.2 4.2L18.5 7.8" pathLength={1} />
+      </svg>
     </button>
   );
 }
@@ -126,7 +147,7 @@ export function ItemRow({
       <button type="button" className="db-row-main" onClick={() => select(item.id)}>
         <span className="db-row-title">
           {item.icon && <ChosenIcon name={item.icon} size={15} className="db-title-icon" />}
-          {item.title || "…"}
+          <span className="db-row-label">{item.title || "…"}</span>
         </span>
         <ItemMeta item={item} showDay={showDay} hideTime={hideTime} />
       </button>
@@ -135,15 +156,110 @@ export function ItemRow({
   );
 }
 
-export function Section({ title, count, actions, children, className = "" }: { title: ReactNode; count?: number; actions?: ReactNode; children: ReactNode; className?: string }) {
+// A titled group; with `fold` (a key) its heading folds it.
+export function Section({ title, count, actions, children, className = "", fold }: { title: ReactNode; count?: number; actions?: ReactNode; children: ReactNode; className?: string; fold?: string }) {
+  const [folded, toggle, opened] = useFolded(fold);
+  const id = useId();
   return (
-    <section className={`db-section ${className}`}>
+    <section className={`db-section ${className}${folded ? " is-folded" : ""}`}>
       <header className="db-section-head">
-        <h2>{title}</h2>
-        {count !== undefined && <span className="db-count">{count}</span>}
-        {actions && <span className="db-section-actions">{actions}</span>}
+        {fold ? (
+          <h2>
+            <FoldButton folded={folded} onToggle={toggle} controls={id}>
+              {title}
+              {count !== undefined && <span className="db-count">{count}</span>}
+            </FoldButton>
+          </h2>
+        ) : (
+          <>
+            <h2>{title}</h2>
+            {count !== undefined && <span className="db-count">{count}</span>}
+          </>
+        )}
+        {actions && !folded && <span className="db-section-actions">{actions}</span>}
       </header>
-      {children}
+      {!folded && (
+        <div id={id} className={`db-section-body${opened ? " db-unfold" : ""}`}>
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// A group of a list (tasks, habits): the heading folds it; actions stay
+// beside the heading.
+export function Group({
+  fold,
+  title,
+  count,
+  titleClass,
+  actions,
+  children,
+  label,
+  onDragOver,
+  onDrop,
+}: {
+  fold: string;
+  title: ReactNode;
+  count: number;
+  titleClass?: string;
+  actions?: ReactNode;
+  children: ReactNode;
+  label?: string;
+  onDragOver?: (e: DragEvent<HTMLElement>) => void;
+  onDrop?: (e: DragEvent<HTMLElement>) => void;
+}) {
+  const [folded, toggle, opened] = useFolded(fold);
+  const id = useId();
+  return (
+    <section className={`db-group${folded ? " is-folded" : ""}`} aria-label={label} onDragOver={onDragOver} onDrop={onDrop}>
+      <header className="db-group-head">
+        <FoldButton folded={folded} onToggle={toggle} controls={id}>
+          <strong className={titleClass}>{title}</strong>
+          <span className="db-count">{count}</span>
+        </FoldButton>
+        {!folded && actions}
+      </header>
+      {!folded && (
+        <div id={id} className={`db-group-body${opened ? " db-unfold" : ""}`}>
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// A day's items under the day's name; the heading folds them.
+export function DayGroup({
+  fold,
+  title,
+  detail,
+  children,
+  onDragOver,
+  onDrop,
+}: {
+  fold: string;
+  title: string;
+  detail: string;
+  children: ReactNode;
+  onDragOver?: (e: DragEvent<HTMLElement>) => void;
+  onDrop?: (e: DragEvent<HTMLElement>) => void;
+}) {
+  const [folded, toggle, opened] = useFolded(fold);
+  const id = useId();
+  return (
+    <section className={`db-day-group${folded ? " is-folded" : ""}`} onDragOver={onDragOver} onDrop={onDrop}>
+      <h2>
+        <FoldButton folded={folded} onToggle={toggle} controls={id}>
+          {title} <span>{detail}</span>
+        </FoldButton>
+      </h2>
+      {!folded && (
+        <div id={id} className={`db-list${opened ? " db-unfold" : ""}`}>
+          {children}
+        </div>
+      )}
     </section>
   );
 }

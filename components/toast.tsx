@@ -11,8 +11,11 @@
 //   assertive for errors, so screen readers announce every toast.
 // - On phones the toast sits above the tab bar and the safe area
 //   (app/globals.css, .toast).
+// - Its look follows rareui's "Toast Feedback" (app/daybar.css, Toasts): a
+//   card with continuous corners, a coloured tile whose glyph draws itself
+//   after the card lands, the action as a soft pill and a close button on
+//   the corner while hovered; it rises in and sinks away.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowCounterClockwise, Check, WarningCircle, X } from "@phosphor-icons/react";
 import { useT } from "./i18n";
 import { useKeyboardHints } from "@/lib/keyboard-hints";
 import { eventMatches } from "@/lib/keymap";
@@ -81,18 +84,35 @@ const typingIn = (el: Element | null) =>
 export function Toaster() {
   const t = useT();
   const keyHints = useKeyboardHints();
-  const toast = useSyncExternalStore(subscribe, currentToast, () => null);
+  const live = useSyncExternalStore(subscribe, currentToast, () => null);
+  // The last toast stays a moment after it is dismissed, to sink away.
+  const [leaving, setLeaving] = useState<Shown | null>(null);
+  const last = useRef<Shown | null>(null);
+  useEffect(() => {
+    if (live) {
+      last.current = live;
+      setLeaving(null);
+      return;
+    }
+    if (!last.current) return;
+    setLeaving(last.current);
+    last.current = null;
+    const timer = setTimeout(() => setLeaving(null), 200);
+    return () => clearTimeout(timer);
+  }, [live]);
+  const toast = live ?? leaving;
   const ref = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
   // The timer: restarts for each toast, waits while paused.
   useEffect(() => {
-    if (!toast || paused) return;
-    const timer = setTimeout(() => dismissToast(toast.id), toast.duration ?? (toast.tone === "error" ? 8000 : 5000));
+    if (!live || paused) return;
+    const timer = setTimeout(() => dismissToast(live.id), live.duration ?? (live.tone === "error" ? 8000 : 5000));
     return () => clearTimeout(timer);
-  }, [toast, paused]);
-  useEffect(() => setPaused(false), [toast?.id]);
+  }, [live, paused]);
+  useEffect(() => setPaused(false), [live?.id]);
   // Mod+Z while an undo offer is visible.
   useEffect(() => {
+    const toast = live;
     if (toast?.tone !== "undo" || !toast.action) return;
     const key = (e: KeyboardEvent) => {
       if (e.defaultPrevented || !eventMatches(e, UNDO_COMBO, keyHints.mac)) return;
@@ -104,7 +124,7 @@ export function Toaster() {
     };
     window.addEventListener("keydown", key, true);
     return () => window.removeEventListener("keydown", key, true);
-  }, [toast, keyHints.mac]);
+  }, [live, keyHints.mac]);
   function run(shown: Shown) {
     // The focus was on the toast: it goes back to the page instead of the body.
     const hadFocus = ref.current?.contains(document.activeElement);
@@ -117,7 +137,7 @@ export function Toaster() {
     <div
       ref={ref}
       key={toast.id}
-      className={`toast toast-${toast.tone}${toast.tone === "error" ? " toast-error" : ""}`}
+      className={`toast toast-${toast.tone}${toast.tone === "error" ? " toast-error" : ""}${toast === leaving ? " is-leaving" : ""}`}
       onPointerEnter={() => setPaused(true)}
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -125,12 +145,21 @@ export function Toaster() {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false);
       }}
     >
-      {toast.tone === "error" ? (
-        <WarningCircle size={18} weight="fill" aria-hidden="true" />
-      ) : toast.tone === "undo" ? (
-        <ArrowCounterClockwise size={18} aria-hidden="true" />
-      ) : (
-        <Check size={18} aria-hidden="true" />
+      {/* A confirmation gets a green tile with a tick, an error a red one with
+          a cross; an undo offer none (its button says it). */}
+      {toast.tone !== "undo" && (
+        <span className={`toast-tile ${toast.tone === "error" ? "is-error" : "is-success"}`} aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+            {toast.tone === "error" ? (
+              <>
+                <path d="M7.5 7.5l9 9" pathLength={1} />
+                <path d="M16.5 7.5l-9 9" pathLength={1} />
+              </>
+            ) : (
+              <path d="M6 12.5l4 4 8-9" pathLength={1} />
+            )}
+          </svg>
+        </span>
       )}
       {toast.detail ? (
         <span className="toast-text">
@@ -157,11 +186,13 @@ export function Toaster() {
       )}
       <button
         type="button"
-        className="icon-button"
+        className="toast-close"
         aria-label={t("Meldung schließen", "Close message")}
         onClick={() => dismissToast(toast.id)}
       >
-        <X size={16} />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" aria-hidden="true">
+          <path d="M7 7l10 10M17 7L7 17" />
+        </svg>
       </button>
     </div>
   );
