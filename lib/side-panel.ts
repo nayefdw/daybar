@@ -5,7 +5,8 @@
 // comments also use (lib/side-dock.ts coordinates them). This module is
 // free of React and the DOM: widths, places and the record order.
 
-export type SidePanelKind = "record" | "pdf";
+// "planner": Daybar's right panel (components/daybar/panel.tsx).
+export type SidePanelKind = "record" | "pdf" | "planner";
 
 // Width per kind, dragged at the panel's left edge and kept per device.
 // Never narrower than the minimum, never more than 60 % of the window
@@ -13,6 +14,7 @@ export type SidePanelKind = "record" | "pdf";
 export const SIDE_PANEL_WIDTH: Record<SidePanelKind, { key: string; fallback: number; min: number }> = {
   record: { key: "flowplan-side-panel-record", fallback: 520, min: 360 },
   pdf: { key: "flowplan-side-panel-pdf", fallback: 560, min: 360 },
+  planner: { key: "daybar-side-panel-planner", fallback: 380, min: 320 },
 };
 export const SIDE_PANEL_MAX_SHARE = 0.6;
 export const sidePanelMax = (kind: SidePanelKind, viewport: number) =>
