@@ -2,10 +2,9 @@
 
 ## Install and open
 
-1. Open the repository's **Actions → Windows desktop** page and select a
-   successful build of the version you want.
-2. Download **Daybar-Windows-x64** from Artifacts (GitHub sign-in may be
-   required) and extract the download.
+1. Open the [Windows release](https://github.com/nayefdw/daybar/releases/tag/daybar-windows-v0.12.0).
+2. Download [**Daybar-0.12.0-Setup-x64.exe**](https://github.com/nayefdw/daybar/releases/download/daybar-windows-v0.12.0/Daybar-0.12.0-Setup-x64.exe).
+   This public download does not require a GitHub account or ZIP extraction.
 3. Run **Daybar-0.12.0-Setup-x64.exe** and choose an installation folder.
    This is a per-user installation; administrator rights are not needed.
 4. Open Daybar from Start or the desktop shortcut. On first launch choose
