@@ -22,6 +22,12 @@ async function launch() {
   application = await electron.launch({ executablePath, env, timeout: 180000 });
   page = await application.firstWindow();
   page.setDefaultTimeout(30000);
+  page.on('pageerror', error => console.error('Renderer error:', error.message));
+  page.on('response', async response => {
+    if (new URL(response.url()).pathname === '/api/planner') {
+      console.log('Planner response:', response.status(), await response.text().catch(() => '<unavailable>'));
+    }
+  });
   await page.waitForURL(url => url.protocol === 'http:', { timeout: 180000 });
   serverOrigin = new URL(page.url()).origin;
 }
@@ -53,11 +59,20 @@ try {
   const skip = page.getByRole('button', { name: /^(Skip|Überspringen)$/ });
   await skip.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
   if (await skip.isVisible()) await skip.click();
-  await page.goto(serverOrigin + '/#plan/today');
+  await page.getByRole('navigation', { name: /^(Planner|Planer)$/ }).getByRole('button', { name: /^(Today|Heute)$/ }).click();
+  // The first-visit offline prompt appears after account setup and can
+  // take focus. Dismiss it before exercising the keyboard capture flow.
+  const offlinePrompt = page.getByRole('button', { name: /^(Don't ask again|Nicht mehr fragen)$/ });
+  await offlinePrompt.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+  if (await offlinePrompt.isVisible()) await offlinePrompt.click();
   const capture = page.locator('.db-capture input').first();
   await capture.fill(taskTitle);
+  await expect(capture).toHaveValue(taskTitle);
+  const saved = page.waitForResponse(response => new URL(response.url()).pathname === '/api/planner' && response.request().method() === 'POST', { timeout: 30000 });
   await capture.press('Enter');
-  await expect(page.getByText(taskTitle, { exact: true }).first()).toBeVisible();
+  const response = await saved;
+  assert.ok(response.ok(), `Task creation: ${response.status()} ${await response.text()}`);
+  await expect(page.getByText(taskTitle, { exact: true }).first()).toBeVisible({ timeout: 30000 });
   const boot = await api('/api/bootstrap');
   workspaceId = boot.workspace.id;
   const state = await api(`/api/planner/state?workspace=${workspaceId}&today=${today}`);
@@ -92,6 +107,9 @@ try {
   await quit();
   console.log('PASS: packaged launch, sign-up, task creation, sandbox, tray, clean shutdown, persistent session and task completion across two restarts.');
 } catch (error) {
+  if (page && !page.isClosed()) {
+    console.error('Planner diagnostics:', await api('/api/planner/state').catch(error => error.message));
+  }
   if (page && !page.isClosed()) await page.screenshot({ path: join(results, 'failure.png') }).catch(() => {});
   const log = join(profile, 'desktop.log');
   if (existsSync(log)) console.error(readFileSync(log, 'utf8').slice(-18000));
