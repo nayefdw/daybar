@@ -11,6 +11,7 @@ on:
       - 'locales/**'
       - 'public/**'
       - 'scripts/**'
+      - 'tests/**'
       - 'package*.json'
       - 'next.config.ts'
       - 'instrumentation.ts'
