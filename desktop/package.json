@@ -1,0 +1,46 @@
+{
+  "name": "daybar-desktop",
+  "productName": "Daybar",
+  "version": "0.12.0",
+  "private": true,
+  "description": "Daybar for Windows — your planner, running locally.",
+  "author": "Nayef Dodeen",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/nayefdw/daybar",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs",
+    "build": "node scripts/build.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "devDependencies": {
+    "electron": "45.5.0",
+    "electron-builder": "26.18.1"
+  },
+  "build": {
+    "appId": "com.nayefdw.daybar",
+    "productName": "Daybar",
+    "asar": true,
+    "npmRebuild": false,
+    "directories": { "output": "dist", "buildResources": "assets" },
+    "files": ["main.cjs", "runtime.cjs", "loading.html", "assets/icon.png", "assets/icon.ico", "package.json"],
+    "extraResources": [{ "from": "bundle", "to": "bundle", "filter": ["**/*"] }],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "zip", "arch": ["x64"] }],
+      "artifactName": "Daybar-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Daybar",
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "Daybar-${version}-Setup-${arch}.${ext}"
+    }
+  }
+}

@@ -236,7 +236,10 @@ test("notes are documents in the private space; their title is the page's", asyn
   await assert.rejects(create({ kind: "note", title: "No" }, ben), /Berechtigung/);
 });
 
-test("day notes are the days of a journal in the private space", async () => {
+test("day notes are the days of a journal in the private space", async (t) => {
+  // The journal validates today against server time; keep its fixed fixture
+  // valid regardless of when CI runs. The test context restores Date.
+  t.mock.timers.enable({ apis: ["Date"], now: Date.parse(`${TODAY}T12:00:00Z`) });
   const day = await act({ action: "dayNote.open", day: TODAY });
   assert.ok(day.journalId);
   const journal = (await one<Page>("SELECT * FROM pages WHERE id=?", day.journalId))!;

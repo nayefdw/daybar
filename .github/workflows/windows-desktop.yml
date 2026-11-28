@@ -1,0 +1,93 @@
+name: Windows desktop
+
+on:
+  push:
+    branches: [main, codex/windows-desktop]
+    paths:
+      - 'desktop/**'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'locales/**'
+      - 'public/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package*.json'
+      - 'next.config.ts'
+      - 'instrumentation.ts'
+      - 'proxy.ts'
+      - '.github/workflows/windows-desktop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - name: Enable long Windows paths
+        run: git config --global core.longpaths true
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+      - name: Install web dependencies
+        run: npm ci
+      - name: Install desktop build tools
+        run: npm install --prefix desktop --no-audit --no-fund
+      - name: Desktop lifecycle and security checks
+        run: npm --prefix desktop test
+      - name: Typecheck application
+        run: npm run typecheck
+      - name: Planner regression tests
+        run: node --import tsx --import ./tests/helpers/cleanup.mjs --test tests/daybar-model.test.ts tests/daybar-quick-add.test.ts tests/daybar-repeat.test.ts tests/daybar-planner.test.ts tests/daybar-thisday.test.ts tests/daybar-icons.test.ts
+      - name: Build Windows installer and ZIP
+        run: npm --prefix desktop run build
+      - name: Exercise packaged application
+        run: npm --prefix desktop run smoke
+      - name: Install to a path with spaces and verify the installed application
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem desktop/dist/Daybar-*-Setup-x64.exe | Select-Object -First 1
+          $installDir = Join-Path $env:RUNNER_TEMP 'Daybar Installed Test'
+          $process = Start-Process -FilePath $installer.FullName -ArgumentList @('/S', "/D=$installDir") -WindowStyle Hidden -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "Installer failed: $($process.ExitCode)" }
+          $env:DAYBAR_TEST_EXE = Join-Path $installDir 'Daybar.exe'
+          if (-not (Test-Path -LiteralPath $env:DAYBAR_TEST_EXE)) { throw 'Installed executable missing' }
+          npm --prefix desktop run smoke
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem desktop/dist -File | Where-Object Extension -In '.exe','.zip' | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } | Set-Content desktop/dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Daybar-Windows-x64
+          path: |
+            desktop/dist/*.exe
+            desktop/dist/*.zip
+            desktop/dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Test evidence and dependency lock
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Daybar-Windows-test-evidence
+          path: |
+            desktop/test-results/
+            desktop/package-lock.json
+          retention-days: 30
+          if-no-files-found: warn

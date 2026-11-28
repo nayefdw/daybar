@@ -1,0 +1,71 @@
+name: Publish tested Windows download
+
+on:
+  push:
+    branches: [codex/windows-desktop]
+    paths: ['.github/workflows/windows-download.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daybar-windows-0.12.0-download
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN: '46088695712'
+      BUILD_SHA: '79572b848db8e4a7696dea39c0bcc885ffabb78d'
+      RELEASE_TAG: 'daybar-windows-v0.12.0'
+    steps:
+      - name: Verify the tested build
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN" > build.json
+          jq -e --arg sha "$BUILD_SHA" '.conclusion == "success" and .head_sha == $sha and .head_branch == "codex/windows-desktop"' build.json
+      - name: Download existing binaries and verify checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$BUILD_RUN" --name Daybar-Windows-x64 --dir dist
+          cd dist
+          sed -i 's/\r$//' SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
+          test -s Daybar-0.12.0-Setup-x64.exe
+          test -s Daybar-0.12.0-Windows-x64.zip
+      - name: Publish a public installer download
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<'NOTES'
+          Daybar desktop for Windows 10/11 x64.
+
+          Download **Daybar-0.12.0-Setup-x64.exe**, run the installer, then open Daybar and create a local account. No Docker or separate Node installation is needed. The ZIP is an alternative unpacked distribution.
+
+          This is the exact build that passed packaged-app and installed-app tests, including account/task creation, tray behavior and data persistence across restarts. SHA256SUMS.txt contains file checksums.
+
+          This initial release is unsigned; Windows may show an unknown publisher warning. Data is stored locally under %APPDATA%\Daybar. Automatic hosted-account/iCloud sync and automatic updates are not included.
+
+          Source and licenses are bundled with the app; the release tag identifies the tested source commit.
+          NOTES
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists; refusing to overwrite published binaries."
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" --target "$BUILD_SHA" --title "Daybar 0.12.0 for Windows" --notes-file release-notes.md --prerelease --draft dist/Daybar-0.12.0-Setup-x64.exe dist/Daybar-0.12.0-Windows-x64.zip dist/SHA256SUMS.txt
+          gh release edit "$RELEASE_TAG" --draft=false
+      - name: Verify download without authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --head --location --retry 3 "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/Daybar-0.12.0-Setup-x64.exe"

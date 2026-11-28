@@ -13,3 +13,12 @@ gallery-out/
 test-results-e2ee/
 # The draw.io editor Flowplan ships (scripts/drawio-fetch.mjs, #454)
 vendor/
+
+# Windows desktop build output
+desktop/node_modules/
+desktop/bundle/
+desktop/dist/
+desktop/assets/*.png
+desktop/assets/*.ico
+desktop/test-results/
+
